@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Быстрый старт | Gin Web Framework</title>
+</head>
+<body>
+<h1>Быстрый старт</h1>
+<p>Добро пожаловать в руководство быстрого старта Gin! Это руководство проведёт вас через установку Gin, настройку проекта и запуск вашего первого API, чтобы вы могли уверенно начать создавать веб-сервисы.</p>
+<h2>Предварительные требования</h2>
+<ul>
+<li><strong>Версия Go</strong>: Gin требует <a href="https://go.dev/">Go</a> версии <a href="https://go.dev/doc/devel/release#go1.25">1.25</a> или выше</li>
+<li>Убедитесь, что Go находится в вашем <code>PATH</code> и доступен из терминала. Для помощи по установке Go <a href="https://go.dev/doc/install">смотрите официальную документацию</a>.</li>
+</ul>
+<hr>
+<h2>Шаг 1: Установка Gin и инициализация проекта</h2>
+<p>Начните с создания новой папки проекта и инициализации Go-модуля:</p>
+<pre><code>mkdir gin-quickstart && cd gin-quickstart
+go mod init gin-quickstart</code></pre>
+<p>Добавьте Gin как зависимость:</p>
+<pre><code>go get -u github.com/gin-gonic/gin</code></pre>
+<hr>
+<h2>Шаг 2: Создание первого приложения на Gin</h2>
+<p>Создайте файл с именем <code>main.go</code>:</p>
+<pre><code>touch main.go</code></pre>
+<p>Откройте <code>main.go</code> и добавьте следующий код:</p>
+<pre><code>package main
+
+import "github.com/gin-gonic/gin"
+
+func main() {
+  router := gin.Default()
+  router.GET("/ping", func(c *gin.Context) {
+    c.JSON(200, gin.H{
+      "message": "pong",
+    })
+  })
+  router.Run() // listens on 0.0.0.0:8080 by default
+}</code></pre>
+<hr>
+<h2>Шаг 3: Запуск API-сервера</h2>
+<p>Запустите сервер командой:</p>
+<pre><code>go run main.go</code></pre>
+<p>Перейдите по адресу <a href="http://localhost:8080/ping">http://localhost:8080/ping</a> в браузере, и вы должны увидеть:</p>
+<pre><code>{"message":"pong"}</code></pre>
+<hr>
+<h2>Дополнительный пример: Использование net/http с Gin</h2>
+<p>Если вы хотите использовать константы <code>net/http</code> для кодов ответов, импортируйте его тоже:</p>
+<pre><code>package main
+
+import (
+  "github.com/gin-gonic/gin"
+  "net/http"
+)
+
+func main() {
+  router := gin.Default()
+  router.GET("/ping", func(c *gin.Context) {
+    c.JSON(http.StatusOK, gin.H{
+      "message": "pong",
+    })
+  })
+  router.Run()
+}</code></pre>
+<hr>
+<h2>Советы и ресурсы</h2>
+<ul>
+<li>
+<p>Новичок в Go? Узнайте, как писать и запускать код на Go в <a href="https://go.dev/doc/code">официальной документации Go</a>.</p>
+</li>
+<li>
+<p>Хотите попрактиковаться с концепциями Gin? Ознакомьтесь с нашими <a href="../learning-resources">Учебными ресурсами</a> для интерактивных заданий и руководств.</p>
+</li>
+<li>
+<p>Нужен полнофункциональный пример? Попробуйте создать проект с помощью:</p>
+<pre><code>curl https://raw.githubusercontent.com/gin-gonic/examples/master/basic/main.go > main.go</code></pre>
+</li>
+<li>
+<p>Для более подробной документации посетите <a href="https://github.com/gin-gonic/gin/blob/master/docs/doc.md">документацию исходного кода Gin</a>.</p>
+</li>
+</ul>
+</body>
+</html>
