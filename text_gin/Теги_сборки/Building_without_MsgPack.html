@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Сборка без MsgPack | Gin Web Framework</title>
+</head>
+<body>
+<h1>Сборка без MsgPack</h1>
+<p><a href="https://msgpack.org/">MsgPack</a> (MessagePack) — это компактный формат бинарной сериализации. Его можно представить как более быструю и компактную альтернативу JSON. Gin по умолчанию включает поддержку рендеринга и привязки MsgPack, что означает, что ваше приложение может принимать и возвращать данные в формате MsgPack из коробки, используя <code>c.Bind()</code> и <code>c.Render()</code> с соответствующим типом контента.</p>
+<p>Однако многие приложения используют только JSON и никогда не нуждаются в MsgPack. В этом случае зависимость MsgPack добавляет лишний вес к скомпилированному бинарному файлу. Вы можете исключить её с помощью тега сборки <code>nomsgpack</code>.</p>
+
+<h2>Сборка без MsgPack</h2>
+<p>Передайте тег <code>nomsgpack</code> команде <code>go build</code>:</p>
+<pre><code>go build -tags=nomsgpack .</code></pre>
+<p>Это также работает с другими командами Go:</p>
+<pre><code>go run -tags=nomsgpack .
+go test -tags=nomsgpack ./...</code></pre>
+
+<h2>Что изменяется</h2>
+<p>При сборке с тегом <code>nomsgpack</code> Gin исключает код рендеринга и привязки MsgPack на этапе компиляции. Это имеет несколько практических последствий:</p>
+<ul>
+<li>Скомпилированный бинарный файл становится меньше, так как библиотека сериализации MsgPack не компонуется.</li>
+<li>Любой обработчик, который пытается рендерить или привязывать данные MsgPack, перестанет работать. Если вы используете <code>c.ProtoBuf()</code> или другие рендереры, не связанные с MsgPack, они не затрагиваются.</li>
+<li>Все функции JSON, XML, YAML, TOML и ProtoBuf продолжают работать нормально.</li>
+</ul>
+<p><strong>Заметка:</strong> Если ваш API не отдаёт ответы в формате MsgPack и вы нигде не вызываете <code>c.MsgPack()</code>, использование этого тега безопасно. Ваши существующие обработчики JSON и HTML будут работать идентично.</p>
+
+<h2>Проверка результата</h2>
+<p>Вы можете убедиться в уменьшении размера бинарного файла, сравнив сборки:</p>
+<pre><code># Стандартная сборка
+go build -o gin-app .
+ls -lh gin-app
+
+# Сборка без MsgPack
+go build -tags=nomsgpack -o gin-app-nomsgpack .
+ls -lh gin-app-nomsgpack</code></pre>
+<p>Точная экономия зависит от вашего приложения, но удаление MsgPack обычно немного уменьшает итоговый бинарный файл. Для получения дополнительной информации смотрите <a href="https://github.com/gin-gonic/gin/pull/1852">оригинальный pull request</a>.</p>
+
+<footer>
+<p>Последнее обновление: <time datetime="2026-04-14T11:48:04.000Z">14 апр. 2026 г.</time></p>
+<a href="https://github.com/gin-gonic/website/edit/master/src/content/docs/ru/docs/build-tags/nomsgpack.md">Редактировать страницу</a>
+</footer>
+</body>
+</html>

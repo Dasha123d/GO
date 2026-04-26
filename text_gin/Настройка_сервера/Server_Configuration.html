@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Конфигурация сервера – Gin Web Framework</title>
+</head>
+<body>
+<h1 id="_top">Конфигурация сервера</h1>
+<div class="sl-markdown-content">
+<p>Gin предлагает гибкие возможности конфигурации сервера. Поскольку <code>gin.Engine</code> реализует интерфейс <code>http.Handler</code>, вы можете использовать его со стандартным <code>net/http.Server</code> Go для управления таймаутами, TLS и другими настройками напрямую.</p>
+<h2 id="использование-пользовательского-httpserver">Использование пользовательского http.Server</h2>
+<p>По умолчанию <code>router.Run()</code> запускает базовый HTTP-сервер. Для продакшна создайте свой собственный <code>http.Server</code> для установки таймаутов и других параметров:</p>
+<pre><code>func main() {
+  router := gin.Default()
+  router.GET("/", func(c *gin.Context) {
+    c.String(200, "ok")
+  })
+
+  s := &http.Server{
+    Addr:           ":8080",
+    Handler:        router,
+    ReadTimeout:    10 * time.Second,
+    WriteTimeout:   10 * time.Second,
+    MaxHeaderBytes: 1 << 20,
+  }
+  s.ListenAndServe()
+}
+</code></pre>
+<p>Это даёт вам полный доступ к конфигурации сервера Go, сохраняя при этом все возможности маршрутизации и middleware Gin.</p>
+<h2 id="в-этом-разделе">В этом разделе</h2>
+<ul>
+<li><a href="./custom-http-config/"><strong>Пользовательская конфигурация HTTP</strong></a> — Тонкая настройка базового HTTP-сервера</li>
+<li><a href="./custom-json-codec/"><strong>Пользовательский JSON-кодек</strong></a> — Использование альтернативных библиотек сериализации JSON</li>
+<li><a href="./lets-encrypt/"><strong>Let’s Encrypt</strong></a> — Автоматические TLS-сертификаты с Let’s Encrypt</li>
+<li><a href="./multiple-service/"><strong>Запуск нескольких сервисов</strong></a> — Обслуживание нескольких движков Gin на разных портах</li>
+<li><a href="./graceful-restart-or-stop/"><strong>Плавная перезагрузка или остановка</strong></a> — Завершение работы без разрыва активных соединений</li>
+<li><a href="./http2-server-push/"><strong>HTTP/2 server push</strong></a> — Проактивная отправка ресурсов клиенту</li>
+<li><a href="./cookie/"><strong>Работа с cookies</strong></a> — Чтение и запись HTTP-cookies</li>
+<li><a href="./trusted-proxies/"><strong>Доверенные прокси</strong></a> — Настройка прокси, которым Gin доверяет для определения IP клиента</li>
+</ul>
+</div>
+</body>
+</html>

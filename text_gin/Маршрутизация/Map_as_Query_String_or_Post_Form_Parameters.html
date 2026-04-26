@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Map as Query String or Post Form Parameters – Gin Web Framework</title>
+</head>
+<body>
+<h1 id="_top">Map как параметры строки запроса или POST-формы</h1>
+<div class="sl-markdown-content">
+<p>Иногда вам нужно получить набор пар ключ-значение, где ключи заранее неизвестны — например, динамические фильтры или пользовательские метаданные. Gin предоставляет <code>c.QueryMap</code> и <code>c.PostFormMap</code> для разбора параметров в нотации со скобками (например, <code>ids[a]=1234</code>) в <code>map[string]string</code>.</p>
+<ul>
+<li><code>c.QueryMap("key")</code> — разбирает пары <code>key[subkey]=value</code> из строки запроса URL.</li>
+<li><code>c.PostFormMap("key")</code> — разбирает пары <code>key[subkey]=value</code> из тела запроса.</li>
+</ul>
+<pre><code>package main
+
+import (
+  "fmt"
+  "net/http"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  router := gin.Default()
+
+  router.POST("/post", func(c *gin.Context) {
+    ids := c.QueryMap("ids")
+    names := c.PostFormMap("names")
+
+    fmt.Printf("ids: %v; names: %v\n", ids, names)
+    c.JSON(http.StatusOK, gin.H{
+      "ids":   ids,
+      "names": names,
+    })
+  })
+
+  router.Run(":8080")
+}
+</code></pre>
+<h2>Тестирование</h2>
+<pre><code>curl -X POST "http://localhost:8080/post?ids[a]=1234&#x26;ids[b]=hello" \
+  -d "names[first]=thinkerou&#x26;names[second]=tianou"
+# Output: {"ids":{"a":"1234","b":"hello"},"names":{"first":"thinkerou","second":"tianou"}}
+</code></pre>
+<aside class="starlight-aside starlight-aside--note">
+<p class="starlight-aside__title">Заметка</p>
+<p>Нотация со скобками <code>ids[a]=1234</code> — это распространённое соглашение. Gin разбирает часть внутри скобок как ключ карты. Поддерживаются только одноуровневые скобки — вложенные скобки вроде <code>ids[a][b]=value</code> не разбираются как вложенные карты.</p>
+</aside>
+<h2>Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/routing/querystring-param/">Параметры строки запроса</a></li>
+<li><a href="/ru/docs/routing/query-and-post-form/">Запрос и POST-форма</a></li>
+</ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Рендеринг | Gin Web Framework</title>
+</head>
+<body>
+<h1>Рендеринг</h1>
+<p>Gin поддерживает рендеринг ответов в множестве форматов, включая JSON, XML, YAML, ProtoBuf, HTML и другие. Каждый метод рендеринга следует одному и тому же паттерну: вызов метода на <code>*gin.Context</code> с HTTP-кодом статуса и данными для сериализации. Gin автоматически обрабатывает заголовки content-type, сериализацию и запись ответа.</p>
+<pre><code>// All rendering methods share this pattern:
+c.JSON(http.StatusOK, data)   // application/json
+c.XML(http.StatusOK, data)    // application/xml
+c.YAML(http.StatusOK, data)   // application/x-yaml
+c.TOML(http.StatusOK, data)   // application/toml
+c.ProtoBuf(http.StatusOK, data) // application/x-protobuf</code></pre>
+<p>Вы можете использовать заголовок <code>Accept</code> или параметр запроса для обслуживания одних и тех же данных в нескольких форматах из одного обработчика:</p>
+<pre><code>package main
+
+import (
+  "net/http"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  router := gin.Default()
+
+  router.GET("/user", func(c *gin.Context) {
+    user := gin.H{"name": "Lena", "role": "admin"}
+
+    switch c.Query("format") {
+    case "xml":
+      c.XML(http.StatusOK, user)
+    case "yaml":
+      c.YAML(http.StatusOK, user)
+    default:
+      c.JSON(http.StatusOK, user)
+    }
+  })
+
+  router.Run(":8080")
+}</code></pre>
+<h2>В этом разделе</h2>
+<ul>
+<li><a href="./rendering/"><strong>Рендеринг XML/JSON/YAML/ProtoBuf</strong></a> — Рендеринг ответов в нескольких форматах с автоматической обработкой content-type</li>
+<li><a href="./secure-json/"><strong>SecureJSON</strong></a> — Предотвращение атак перехвата JSON в устаревших браузерах</li>
+<li><a href="./jsonp/"><strong>JSONP</strong></a> — Поддержка кросс-доменных запросов от устаревших клиентов без CORS</li>
+<li><a href="./ascii-json/"><strong>AsciiJSON</strong></a> — Экранирование не-ASCII символов для безопасной передачи</li>
+<li><a href="./pure-json/"><strong>PureJSON</strong></a> — Рендеринг JSON без экранирования HTML-символов</li>
+<li><a href="./serving-static-files/"><strong>Раздача статических файлов</strong></a> — Раздача директорий со статическими ресурсами</li>
+<li><a href="./serving-data-from-file/"><strong>Раздача данных из файла</strong></a> — Раздача отдельных файлов, вложений и загрузок</li>
+<li><a href="./serving-data-from-reader/"><strong>Раздача данных из reader</strong></a> — Потоковая передача данных из любого <code>io.Reader</code> в ответ</li>
+<li><a href="./html-rendering/"><strong>Рендеринг HTML</strong></a> — Рендеринг HTML-шаблонов с динамическими данными</li>
+<li><a href="./multiple-template/"><strong>Множественные шаблоны</strong></a> — Использование нескольких наборов шаблонов в одном приложении</li>
+<li><a href="./bind-single-binary-with-template/"><strong>Встраивание шаблонов в бинарный файл</strong></a> — Встраивание шаблонов в скомпилированный бинарный файл</li>
+</ul>
+</body>
+</html>

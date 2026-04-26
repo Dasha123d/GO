@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Формат лога маршрутов | Gin Web Framework</title>
+</head>
+<body>
+<h1>Формат лога маршрутов</h1>
+
+<p>При запуске Gin в режиме отладки выводит все зарегистрированные маршруты. Формат по умолчанию выглядит так:</p>
+<pre><code>[GIN-debug] POST   /foo                      --> main.main.func1 (3 handlers)
+[GIN-debug] GET    /bar                      --> main.main.func2 (3 handlers)
+[GIN-debug] GET    /status                   --> main.main.func3 (3 handlers)</code></pre>
+<p>Вы можете настроить этот формат, назначив функцию переменной <code>gin.DebugPrintRouteFunc</code>. Это полезно, если вы хотите логировать маршруты в формате JSON, пар ключ-значение или в любом другом формате, ожидаемом вашей системой логирования.</p>
+
+<pre><code>package main
+
+import (
+  &quot;log&quot;
+  &quot;net/http&quot;
+
+  &quot;github.com/gin-gonic/gin&quot;
+)
+
+func main() {
+  router := gin.Default()
+
+  gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
+    log.Printf(&quot;endpoint %v %v %v %v\n&quot;, httpMethod, absolutePath, handlerName, nuHandlers)
+  }
+
+  router.POST(&quot;/foo&quot;, func(c *gin.Context) {
+    c.JSON(http.StatusOK, &quot;foo&quot;)
+  })
+
+  router.GET(&quot;/bar&quot;, func(c *gin.Context) {
+    c.JSON(http.StatusOK, &quot;bar&quot;)
+  })
+
+  router.GET(&quot;/status&quot;, func(c *gin.Context) {
+    c.JSON(http.StatusOK, &quot;ok&quot;)
+  })
+
+  router.Run(&quot;:8080&quot;)
+}</code></pre>
+<p>При запуске сервера вместо стандартных строк <code>[GIN-debug]</code> вы увидите:</p>
+<pre><code>endpoint POST /foo main.main.func2 3
+endpoint GET /bar main.main.func3 3
+endpoint GET /status main.main.func4 3</code></pre>
+
+<h2>Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/logging/custom-log-format/">Пользовательский формат логов</a></li>
+<li><a href="/ru/docs/logging/skip-logging/">Пропуск логирования</a></li>
+</ul>
+</body>
+</html>

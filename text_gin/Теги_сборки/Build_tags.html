@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Теги сборки | Gin Web Framework</title>
+</head>
+<body>
+<h1>Теги сборки</h1>
+<p><a href="https://pkg.go.dev/go/build#hdr-Build_Constraints">Теги сборки</a> Go (также называемые ограничениями сборки) — это директивы, которые указывают компилятору Go включать или исключать файлы при компиляции. Gin использует теги сборки, чтобы вы могли заменять внутренние реализации или отключать необязательные функции на этапе компиляции без изменения кода приложения.</p>
+<p>Это полезно в нескольких сценариях:</p>
+<ul>
+<li><strong>Оптимизация производительности</strong> — Замена стандартного пакета <code>encoding/json</code> на более быстрый сторонний кодировщик для ускорения JSON-сериализации в вашем API.</li>
+<li><strong>Уменьшение размера бинарного файла</strong> — Исключение неиспользуемых функций, таких как рендеринг MsgPack, для получения меньшего скомпилированного бинарного файла.</li>
+<li><strong>Настройка для развёртывания</strong> — Выбор различных кодировщиков для разных окружений (например, высоконагруженная продуктовая сборка vs. стандартная сборка для разработки).</li>
+</ul>
+<p>Теги сборки передаются инструментарию Go с помощью флага <code>-tags</code>:</p>
+<pre><code>go build -tags=&lt;имя_тега&gt; .</code></pre>
+<p>Вы можете комбинировать несколько тегов, разделяя их запятыми:</p>
+<pre><code>go build -tags=nomsgpack,go_json .</code></pre>
+
+<h3>Доступные теги сборки</h3>
+<table>
+<thead><tr><th>Тег</th><th>Эффект</th></tr></thead>
+<tbody>
+<tr><td><code>go_json</code></td><td>Заменяет <code>encoding/json</code> на <a href="https://github.com/goccy/go-json">go-json</a></td></tr>
+<tr><td><code>jsoniter</code></td><td>Заменяет <code>encoding/json</code> на <a href="https://github.com/json-iterator/go">jsoniter</a></td></tr>
+<tr><td><code>sonic avx</code></td><td>Заменяет <code>encoding/json</code> на <a href="https://github.com/bytedance/sonic">sonic</a> (требуются инструкции AVX процессора)</td></tr>
+<tr><td><code>nomsgpack</code></td><td>Отключает поддержку рендеринга MsgPack</td></tr>
+</tbody>
+</table>
+<p><strong>Заметка:</strong> Теги сборки влияют только на то, как компилируется Gin. Код вашего приложения (обработчики маршрутов, middleware и т.д.) не нужно менять при переключении тегов.</p>
+
+<h2>В этом разделе</h2>
+<p>Страницы ниже подробно описывают каждый тег сборки:</p>
+<ul>
+<li><a href="./json-replacement/"><strong>Сборка с заменой JSON</strong></a> — Замена стандартного JSON-кодировщика на go-json, jsoniter или sonic для более быстрой сериализации.</li>
+<li><a href="./nomsgpack/"><strong>Сборка без MsgPack</strong></a> — Отключение рендеринга MsgPack с помощью тега сборки <code>nomsgpack</code> для уменьшения размера бинарного файла.</li>
+</ul>
+
+<footer>
+<p>Последнее обновление: <time datetime="2026-04-14T11:48:04.000Z">14 апр. 2026 г.</time></p>
+<a href="https://github.com/gin-gonic/website/edit/master/src/content/docs/ru/docs/build-tags/index.md">Редактировать страницу</a>
+</footer>
+</body>
+</html>

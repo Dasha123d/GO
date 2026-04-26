@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>AsciiJSON | Gin Web Framework</title>
+</head>
+<body>
+<h1>AsciiJSON</h1>
+<p><code>AsciiJSON</code> сериализует данные в JSON, но экранирует все не-ASCII символы в Unicode escape-последовательности <code>\uXXXX</code>. Специальные HTML-символы, такие как <code>&lt;</code> и <code>&gt;</code>, также экранируются. Результатом является тело ответа, содержащее только 7-битные ASCII-символы.</p>
+<p><strong>Когда использовать AsciiJSON:</strong></p>
+<ul>
+<li>Ваши потребители API требуют строго ASCII-безопасных ответов (например, системы, которые не могут обрабатывать байты в кодировке UTF-8).</li>
+<li>Вам нужно встроить JSON в контексты, поддерживающие только ASCII, такие как определённые системы логирования или устаревшие транспорты.</li>
+<li>Вы хотите убедиться, что символы <code>&lt;</code>, <code>&gt;</code> и <code>&amp;</code> экранированы, чтобы избежать проблем с инъекцией при встраивании JSON в HTML.</li>
+</ul>
+<p>Для большинства современных API достаточно стандартного <code>c.JSON()</code>, поскольку он выводит валидный UTF-8. Используйте <code>AsciiJSON</code> только когда ASCII-безопасность является конкретным требованием.</p>
+<pre><code>package main
+
+import (
+  "net/http"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  router := gin.Default()
+  router.GET("/someJSON", func(c *gin.Context) {
+    data := map[string]interface{}{
+      "lang": "GO语言",
+      "tag":  "<br>",
+    }
+    // will output : {"lang":"GO\u8bed\u8a00","tag":"\u003cbr\u003e"}
+    c.AsciiJSON(http.StatusOK, data)
+  })
+  router.Run(":8080")
+}</code></pre>
+<p>Вы можете проверить этот эндпоинт с помощью curl:</p>
+<pre><code>curl http://localhost:8080/someJSON
+# Output: {"lang":"GO\u8bed\u8a00","tag":"\u003cbr\u003e"}</code></pre>
+<p>Обратите внимание, что китайские символы <code>语言</code> заменены на <code>\u8bed\u8a00</code>, а тег <code>&lt;br&gt;</code> стал <code>\u003cbr\u003e</code>. Тело ответа безопасно для использования в любой среде, работающей только с ASCII.</p>
+</body>
+</html>

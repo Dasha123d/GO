@@ -1,0 +1,68 @@
+<h1 id="_top">Привязка HTML-чекбоксов</h1>
+<p>HTML-чекбоксы с одинаковым атрибутом <code>name</code> отправляют несколько значений при выборе. Gin может привязать эти значения непосредственно к срезу <code>[]string</code> в вашей структуре, используя тег структуры <code>form</code> с суффиксом <code>[]</code>, соответствующим HTML-имени.</p>
+<p>Это полезно для форм, где пользователи выбирают один или несколько вариантов — таких как выбор цветов, настройка разрешений или фильтры с множественным выбором.</p>
+<pre><code>package main
+
+import (
+  "net/http"
+  "github.com/gin-gonic/gin"
+)
+
+type myForm struct {
+  Colors []string `form:"colors[]"`
+}
+
+func main() {
+  router := gin.Default()
+
+  router.LoadHTMLGlob("templates/*")
+
+  router.GET("/", func(c *gin.Context) {
+    c.HTML(http.StatusOK, "form.html", nil)
+  })
+
+  router.POST("/", func(c *gin.Context) {
+    var fakeForm myForm
+    if err := c.ShouldBind(&fakeForm); err != nil {
+      c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+      return
+    }
+    c.JSON(http.StatusOK, gin.H{"color": fakeForm.Colors})
+  })
+
+  router.Run(":8080")
+}
+</code></pre>
+<p>Соответствующая HTML-форма (<code>templates/form.html</code>):</p>
+<pre><code><form action="/" method="POST">
+    <p>Check some colors</p>
+    <label for="red">Red</label>
+    <input type="checkbox" name="colors[]" value="red" id="red">
+    <label for="green">Green</label>
+    <input type="checkbox" name="colors[]" value="green" id="green">
+    <label for="blue">Blue</label>
+    <input type="checkbox" name="colors[]" value="blue" id="blue">
+    <input type="submit">
+</form>
+</code></pre>
+<h2 id="тестирование">Тестирование</h2>
+<pre><code># Select all three colors
+curl -X POST http://localhost:8080/ \
+  -d "colors[]=red&colors[]=green&colors[]=blue"
+# Output: {"color":["red","green","blue"]}
+
+# Select only one color
+curl -X POST http://localhost:8080/ \
+  -d "colors[]=green"
+# Output: {"color":["green"]}
+
+# No checkboxes selected -- slice is empty
+curl -X POST http://localhost:8080/
+# Output: {"color":[]}
+</code></pre>
+<aside aria-label="Совет" class="starlight-aside starlight-aside--tip">...</aside>
+<h2 id="смотрите-также">Смотрите также</h2>
+<ul>
+  <li><a href="/ru/docs/binding/binding-and-validation/">Привязка и валидация</a></li>
+  <li><a href="/ru/docs/binding/multipart-urlencoded-binding/">Привязка Multipart/Urlencoded</a></li>
+</ul>

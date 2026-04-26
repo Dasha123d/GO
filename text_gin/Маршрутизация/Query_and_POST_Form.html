@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Запрос и POST-форма | Gin Web Framework</title>
+</head>
+<body>
+<h1>Запрос и POST-форма</h1>
+
+<p>При обработке <code>POST</code>-запроса часто нужно читать значения как из строки запроса URL, так и из тела запроса. Gin разделяет эти два источника, поэтому вы можете обращаться к каждому из них независимо:</p>
+<ul>
+<li><code>c.Query("key")</code> / <code>c.DefaultQuery("key", "default")</code> — читает из строки запроса URL.</li>
+<li><code>c.PostForm("key")</code> / <code>c.DefaultPostForm("key", "default")</code> — читает из тела запроса <code>application/x-www-form-urlencoded</code> или <code>multipart/form-data</code>.</li>
+</ul>
+<p>Это часто используется в REST API, где маршрут идентифицирует ресурс (через параметры запроса, такие как <code>id</code>), а тело содержит полезную нагрузку (например, <code>name</code> и <code>message</code>).</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;net/http&quot;
+
+  &quot;github.com/gin-gonic/gin&quot;
+)
+
+func main() {
+  router := gin.Default()
+
+  router.POST(&quot;/post&quot;, func(c *gin.Context) {
+    id := c.Query(&quot;id&quot;)
+    page := c.DefaultQuery(&quot;page&quot;, &quot;0&quot;)
+    name := c.PostForm(&quot;name&quot;)
+    message := c.PostForm(&quot;message&quot;)
+
+    fmt.Printf(&quot;id: %s; page: %s; name: %s; message: %s\n&quot;, id, page, name, message)
+    c.String(http.StatusOK, &quot;id: %s; page: %s; name: %s; message: %s&quot;, id, page, name, message)
+  })
+
+  router.Run(&quot;:8080&quot;)
+}</code></pre>
+
+<h2 id="тестирование">Тестирование</h2>
+<pre><code># Query params in URL, form data in body
+curl -X POST &quot;http://localhost:8080/post?id=1234&amp;page=1&quot; \
+  -d &quot;name=manu&amp;message=this_is_great&quot;
+# Output: id: 1234; page: 1; name: manu; message: this_is_great
+
+# Missing page -- falls back to default value &quot;0&quot;
+curl -X POST &quot;http://localhost:8080/post?id=1234&quot; \
+  -d &quot;name=manu&amp;message=hello&quot;
+# Output: id: 1234; page: 0; name: manu; message: hello
+</code></pre>
+
+<aside>
+<p><strong>Заметка:</strong> <code>c.Query</code> читает только из строки запроса URL, а <code>c.PostForm</code> читает только из тела запроса. Они никогда не пересекаются. Если вы хотите, чтобы Gin автоматически проверял оба источника, используйте <code>c.ShouldBind</code> со структурой.</p>
+</aside>
+
+<h2 id="смотрите-также">Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/routing/querystring-param/">Параметры строки запроса</a></li>
+<li><a href="/ru/docs/routing/map-as-querystring-or-postform/">Map как параметры строки запроса или POST-формы</a></li>
+<li><a href="/ru/docs/routing/multipart-urlencoded-form/">Multipart/Urlencoded форма</a></li>
+</ul>
+</body>
+</html>

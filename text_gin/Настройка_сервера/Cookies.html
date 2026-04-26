@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Cookies – Gin Web Framework</title>
+</head>
+<body>
+<h1 id="_top">Cookies</h1>
+<div class="sl-markdown-content">
+<p>Gin предоставляет вспомогательные методы для установки и чтения HTTP-cookies в ответе и запросе.</p>
+<h3 id="параметры-setcookie">Параметры <code dir="auto">SetCookie</code></h3>
+<p>Сигнатура метода <code dir="auto">c.SetCookie()</code>:</p>
+<pre><code>c.SetCookie(name, value string, maxAge int, path, domain string, secure, httpOnly bool)
+</code></pre>
+<table>
+<thead><tr><th>Параметр</th><th>Описание</th></tr></thead>
+<tbody>
+<tr><td><code>name</code></td><td>Имя cookie (ключ).</td></tr>
+<tr><td><code>value</code></td><td>Значение cookie.</td></tr>
+<tr><td><code>maxAge</code></td><td>Время жизни в <strong>секундах</strong>. Установите <code>-1</code> для удаления cookie или <code>0</code> для создания сессионной cookie (удаляется при закрытии браузера).</td></tr>
+<tr><td><code>path</code></td><td>URL-путь, для которого cookie действителен. Используйте <code>"/"</code> для доступа на всём сайте.</td></tr>
+<tr><td><code>domain</code></td><td>Домен, к которому привязан cookie (например, <code>"example.com"</code>). Используйте <code>"localhost"</code> при разработке.</td></tr>
+<tr><td><code>secure</code></td><td>При <code>true</code> cookie отправляется только через <strong>HTTPS</strong> соединения. <strong>Установите <code>true</code> в продакшне.</strong></td></tr>
+<tr><td><code>httpOnly</code></td><td>При <code>true</code> cookie недоступен для клиентского JavaScript (<code>document.cookie</code>), что помогает предотвратить XSS-атаки. <strong>Установите <code>true</code> в продакшне.</strong></td></tr>
+</tbody></table>
+<aside class="starlight-aside starlight-aside--tip"><p class="starlight-aside__title">Рекомендация для продакшна</p><p>Для продакшн-развёртываний установите <code>Secure: true</code>, <code>HttpOnly: true</code> и <code>SameSite: Strict</code> (или <code>Lax</code>) для минимизации уязвимости к атакам CSRF и XSS.</p></aside>
+<h3 id="установка-и-получение-cookie">Установка и получение cookie</h3>
+<pre><code>import (
+  "fmt"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  router := gin.Default()
+  router.GET("/cookie", func(c *gin.Context) {
+    cookie, err := c.Cookie("gin_cookie")
+    if err != nil {
+      cookie = "NotSet"
+      c.SetCookie("gin_cookie", "test", 3600, "/", "localhost", false, true)
+    }
+    fmt.Printf("Cookie value: %s \n", cookie)
+  })
+  router.Run()
+}
+</code></pre>
+<h3 id="попробуйте">Попробуйте</h3>
+<pre><code>curl -v http://localhost:8080/cookie
+curl -v --cookie "gin_cookie=test" http://localhost:8080/cookie
+</code></pre>
+<h3 id="удаление-cookie">Удаление cookie</h3>
+<p>Удалите cookie, установив max age в <code>-1</code>.</p>
+<pre><code>c.SetCookie("gin_cookie", "test", -1, "/", "localhost", false, true)
+</code></pre>
+<h3 id="установка-cookie-через-httpcookie-v111">Установка cookie через http.Cookie (v1.11+)</h3>
+<p>Gin также поддерживает установку cookies с помощью <code>*http.Cookie</code>, предоставляя доступ к полям <code>Expires</code>, <code>MaxAge</code>, <code>SameSite</code> и <code>Partitioned</code>.</p>
+<pre><code>import (
+  "net/http"
+  "time"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  r := gin.Default()
+  r.GET("/set-cookie", func(c *gin.Context) {
+    c.SetCookieData(&http.Cookie{
+      Name:   "session_id",
+      Value:  "abc123",
+      Path:   "/",
+      Domain:   "localhost",
+      Expires:  time.Now().Add(24 * time.Hour),
+      MaxAge:   86400,
+      Secure:   true,
+      HttpOnly: true,
+      SameSite: http.SameSiteLaxMode,
+    })
+    c.String(http.StatusOK, "ok")
+  })
+  r.Run(":8080")
+}
+</code></pre>
+<h2 id="смотрите-также">Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/middleware/security-headers/">Заголовки безопасности</a></li>
+</ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Логирование | Gin Web Framework</title>
+</head>
+<body>
+<h1>Логирование</h1>
+
+<p>Gin включает встроенный middleware логирования, который записывает детали каждого HTTP-запроса, включая код статуса, HTTP-метод, путь и задержку.</p>
+<p>Когда вы создаёте маршрутизатор с помощью <code>gin.Default()</code>, middleware логирования автоматически подключается вместе с middleware восстановления:</p>
+<pre><code>// Logger and Recovery middleware are already attached
+router := gin.Default()</code></pre>
+<p>Если вам нужен полный контроль над тем, какие middleware использовать, создайте маршрутизатор с помощью <code>gin.New()</code> и добавьте логгер вручную:</p>
+<pre><code>// No middleware attached
+router := gin.New()
+
+// Attach the logger middleware
+router.Use(gin.Logger())</code></pre>
+<p>Логгер по умолчанию пишет в <code>os.Stdout</code> и выдаёт такой вывод для каждого запроса:</p>
+<pre><code>[GIN] 2025/06/01 - 15:04:05 | 200 |     512.345µs |       127.0.0.1 | GET      "/ping"</code></pre>
+<p>Каждая запись включает временную метку, HTTP-код статуса, задержку запроса, IP клиента, HTTP-метод и запрошенный путь.</p>
+
+<h2>В этом разделе</h2>
+<ul>
+<li><a href="./write-log/"><strong>Запись логов в файл</strong></a> — Перенаправление вывода логов в файл, в консоль или в оба места одновременно.</li>
+<li><a href="./custom-log-format/"><strong>Пользовательский формат логов</strong></a> — Определение собственного формата логов с помощью <code>LoggerWithFormatter</code>.</li>
+<li><a href="./skip-logging/"><strong>Пропуск логирования</strong></a> — Пропуск логирования для определённых путей или условий.</li>
+<li><a href="./controlling-log-output-coloring/"><strong>Управление цветным выводом логов</strong></a> — Включение или отключение цветного вывода логов.</li>
+<li><a href="./avoid-logging-query-strings/"><strong>Исключение строк запроса из логов</strong></a> — Удаление параметров запроса из вывода логов для безопасности и конфиденциальности.</li>
+<li><a href="./define-format-for-the-log-of-routes/"><strong>Формат лога маршрутов</strong></a> — Настройка формата вывода зарегистрированных маршрутов при запуске.</li>
+</ul>
+</body>
+</html>
