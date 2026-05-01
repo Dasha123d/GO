@@ -1,0 +1,35 @@
+name: tproger_mobile_app_widgetbook
+publish_to: 'none'
+version: 0.0.1
+
+environment:
+  sdk: ">=2.17.6 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  widgetbook: ^2.4.1 
+  flutter_redux: ^0.10.0
+  redux: ^5.0.0
+  tproger_mobile_app:
+    path: ../../tproger_mobile_app
+  tproger_mobile_app_assets:
+    path: ../tproger_mobile_app_assets
+  
+dev_dependencies:
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - packages/tproger_mobile_app_assets/fonts/Inter-Medium.ttf
+    - packages/tproger_mobile_app_assets/fonts/Inter-Regular.ttf
+    - packages/tproger_mobile_app_assets/fonts/Inter-SemiBold.ttf
+    - packages/tproger_mobile_app_assets/images/eye.svg
+    - packages/tproger_mobile_app_assets/images/angry.svg
+    - packages/tproger_mobile_app_assets/images/bookmark.svg
+    - packages/tproger_mobile_app_assets/images/comment.svg
+    - packages/tproger_mobile_app_assets/images/laugh.svg
+    - packages/tproger_mobile_app_assets/images/like.svg
+    - packages/tproger_mobile_app_assets/images/surprise.svg
+    - packages/tproger_mobile_app_assets/images/think.svg
