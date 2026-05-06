@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Интеграция с базой данных – Gin Web Framework</title>
+</head>
+<body>
+<h1 id="_top">Интеграция с базой данных</h1>
+<div class="sl-markdown-content">
+<p>Большинство реальных приложений на Gin нуждаются в базе данных. Это руководство описывает, как правильно организовать доступ к базе данных, настроить пул соединений и применять паттерны, которые делают обработчики тестируемыми, а соединения — здоровыми.</p>
+<h2 id="использование-databasesql-с-gin">Использование database/sql с Gin</h2>
+<p>Стандартный пакет Go <code>database/sql</code> хорошо работает с Gin. Откройте соединение один раз в <code>main</code> и передайте его обработчикам.</p>
+<pre><code>package main
+
+import (
+  "database/sql"
+  "log"
+  "net/http"
+  "github.com/gin-gonic/gin"
+  _ "github.com/lib/pq"
+)
+
+func main() {
+  db, err := sql.Open("postgres", "host=localhost port=5432 user=app dbname=mydb sslmode=disable")
+  if err != nil {
+    log.Fatal(err)
+  }
+  defer db.Close()
+
+  // Verify the connection is alive
+  if err := db.Ping(); err != nil {
+    log.Fatal(err)
+  }
+
+  r := gin.Default()
+
+  r.GET("/users/:id", func(c *gin.Context) {
+    var name string
+    err := db.QueryRowContext(c.Request.Context(), "SELECT name FROM users WHERE id = $1", c.Param("id")).Scan(&name)
+    if err == sql.ErrNoRows {
+      c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+      return
+    }
+    if err != nil {
+      c.JSON(http.StatusInternalServerError, gin.H{"error": "database error"})
+      return
+    }
+    c.JSON(http.StatusOK, gin.H{"name": name})
+  })
+
+  r.Run(":8080")
+}
+</code></pre>
+<p>Всегда передавайте <code>c.Request.Context()</code> в вызовы базы данных, чтобы запросы автоматически отменялись при отключении клиента.</p>
+<h2 id="конфигурация-пула-соединений">Конфигурация пула соединений</h2>
+<p>Пакет <code>database/sql</code> внутренне поддерживает пул соединений. Для продакшн-нагрузок настройте пул в соответствии с профилем вашей базы данных и трафика.</p>
+<pre><code>db, err := sql.Open("postgres", dsn)
+if err != nil {
+  log.Fatal(err)
+}
+
+// Maximum number of open connections to the database.
+db.SetMaxOpenConns(25)
+
+// Maximum number of idle connections retained in the pool.
+db.SetMaxIdleConns(10)
+
+// Maximum amount of time a connection may be reused.
+db.SetConnMaxLifetime(5 * time.Minute)
+
+// Maximum amount of time a connection may sit idle before being closed.
+db.SetConnMaxIdleTime(1 * time.Minute)
+</code></pre>
+<ul>
+<li><code>SetMaxOpenConns</code> prevents your application from overwhelming the database server under high load.</li>
+<li><code>SetMaxIdleConns</code> keeps warm connections ready so new requests avoid the cost of dialling.</li>
+<li><code>SetConnMaxLifetime</code> rotates connections so your app picks up DNS changes and does not hold stale server-side sessions.</li>
+<li><code>SetConnMaxIdleTime</code> closes connections that have been idle too long, freeing resources on both sides.</li>
+</ul>
+<h2 id="паттерны-внедрения-зависимостей">Паттерны внедрения зависимостей</h2>
+<h3 id="замыкание">Замыкание</h3>
+<p>Простейший подход — замкнуть <code>*sql.DB</code> в ваших функциях-обработчиках.</p>
+<pre><code>package main
+
+import (
+  "database/sql"
+  "net/http"
+  "github.com/gin-gonic/gin"
+)
+
+func listUsers(db *sql.DB) gin.HandlerFunc {
+  return func(c *gin.Context) {
+    rows, err := db.QueryContext(c.Request.Context(), "SELECT id, name FROM users")
+    if err != nil {
+      c.JSON(http.StatusInternalServerError, gin.H{"error": "query failed"})
+      return
+    }
+    defer rows.Close()
+
+    type User struct {
+      ID   int    `json:"id"`
+      Name string `json:"name"`
+    }
+    var users []User
+    for rows.Next() {
+      var u User
+      if err := rows.Scan(&u.ID, &u.Name); err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "scan failed"})
+        return
+      }
+      users = append(users, u)
+    }
+    c.JSON(http.StatusOK, users)
+  }
+}
+
+func main() {
+  db, _ := sql.Open("postgres", "your-dsn")
+  defer db.Close()
+
+  r := gin.Default()
+  r.GET("/users", listUsers(db))
+  r.Run(":8080")
+}
+</code></pre>
+<h3 id="middleware">Middleware</h3>
+<p>Сохраните соединение в контексте Gin, чтобы любой обработчик мог его получить.</p>
+<pre><code>func DatabaseMiddleware(db *sql.DB) gin.HandlerFunc {
+  return func(c *gin.Context) {
+    c.Set("db", db)
+    c.Next()
+  }
+}
+
+func main() {
+  db, _ := sql.Open("postgres", "your-dsn")
+  defer db.Close()
+
+  r := gin.Default()
+  r.Use(DatabaseMiddleware(db))
+
+  r.GET("/users/:id", func(c *gin.Context) {
+    db := c.MustGet("db").(*sql.DB)
+    // use db...
+    _ = db
+  })
+
+  r.Run(":8080")
+}
+</code></pre>
+<h3 id="структура-с-методами">Структура с методами</h3>
+<p>Сгруппируйте связанные обработчики в структуру, которая содержит дескриптор базы данных. Этот подход хорошо масштабируется при наличии множества обработчиков с одинаковыми зависимостями.</p>
+<pre><code>type UserHandler struct {
+  DB *sql.DB
+}
+
+func (h *UserHandler) Get(c *gin.Context) {
+  var name string
+  err := h.DB.QueryRowContext(c.Request.Context(), "SELECT name FROM users WHERE id = $1", c.Param("id")).Scan(&name)
+  if err != nil {
+    c.JSON(http.StatusInternalServerError, gin.H{"error": "query failed"})
+    return
+  }
+  c.JSON(http.StatusOK, gin.H{"name": name})
+}
+
+func main() {
+  db, _ := sql.Open("postgres", "your-dsn")
+  defer db.Close()
+
+  uh := &UserHandler{DB: db}
+
+  r := gin.Default()
+  r.GET("/users/:id", uh.Get)
+  r.Run(":8080")
+}
+</code></pre>
+<p>Паттерны замыкания и структуры обычно предпочтительнее middleware, поскольку они обеспечивают типобезопасность на этапе компиляции и избегают приведения типов во время выполнения.</p>
+<h2 id="использование-gorm-с-gin">Использование GORM с Gin</h2>
+<p><a href="https://gorm.io">GORM</a> — популярная ORM для Go. Она оборачивает <code>database/sql</code> и добавляет миграции, ассоциации и конструктор запросов.</p>
+<pre><code>package main
+
+import (
+  "net/http"
+  "github.com/gin-gonic/gin"
+  "gorm.io/driver/postgres"
+  "gorm.io/gorm"
+)
+
+type Product struct {
+  gorm.Model
+  Name  string  `json:"name"`
+  Price float64 `json:"price"`
+}
+
+func main() {
+  dsn := "host=localhost user=app dbname=mydb port=5432 sslmode=disable"
+  db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+  if err != nil {
+    panic("failed to connect to database")
+  }
+
+  // Auto-migrate the schema
+  db.AutoMigrate(&Product{})
+
+  r := gin.Default()
+
+  r.POST("/products", func(c *gin.Context) {
+    var p Product
+    if err := c.ShouldBindJSON(&p); err != nil {
+      c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+      return
+    }
+    if err := db.Create(&p).Error; err != nil {
+      c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create product"})
+      return
+    }
+    c.JSON(http.StatusCreated, p)
+  })
+
+  r.GET("/products/:id", func(c *gin.Context) {
+    var p Product
+    if err := db.First(&p, c.Param("id")).Error; err != nil {
+      c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
+      return
+    }
+    c.JSON(http.StatusOK, p)
+  })
+
+  r.Run(":8080")
+}
+</code></pre>
+<h2 id="обработка-транзакций-в-обработчиках-запросов">Обработка транзакций в обработчиках запросов</h2>
+<p>Когда запрос должен выполнить несколько записей, которые должны быть успешны или неуспешны вместе, используйте транзакцию базы данных.</p>
+<h3 id="с-databasesql">С database/sql</h3>
+<pre><code>r.POST("/transfer", func(c *gin.Context) {
+  tx, err := db.BeginTx(c.Request.Context(), nil)
+  if err != nil {
+    c.JSON(http.StatusInternalServerError, gin.H{"error": "could not begin transaction"})
+    return
+  }
+  // Ensure rollback runs if we return early due to an error.
+  defer tx.Rollback()
+
+  _, err = tx.ExecContext(c.Request.Context(),
+    "UPDATE accounts SET balance = balance - $1 WHERE id = $2", 100, 1)
+  if err != nil {
+    c.JSON(http.StatusInternalServerError, gin.H{"error": "debit failed"})
+    return
+  }
+
+  _, err = tx.ExecContext(c.Request.Context(),
+    "UPDATE accounts SET balance = balance + $1 WHERE id = $2", 100, 2)
+  if err != nil {
+    c.JSON(http.StatusInternalServerError, gin.H{"error": "credit failed"})
+    return
+  }
+
+  if err := tx.Commit(); err != nil {
+    c.JSON(http.StatusInternalServerError, gin.H{"error": "commit failed"})
+    return
+  }
+
+  c.JSON(http.StatusOK, gin.H{"status": "transfer complete"})
+})
+</code></pre>
+<h3 id="с-gorm">С GORM</h3>
+<pre><code>r.POST("/transfer", func(c *gin.Context) {
+  err := db.Transaction(func(tx *gorm.DB) error {
+    if err := tx.Model(&Account{}).Where("id = ?", 1).
+      Update("balance", gorm.Expr("balance - ?", 100)).Error; err != nil {
+      return err
+    }
+    if err := tx.Model(&Account{}).Where("id = ?", 2).
+      Update("balance", gorm.Expr("balance + ?", 100)).Error; err != nil {
+      return err
+    }
+    return nil
+  })
+
+  if err != nil {
+    c.JSON(http.StatusInternalServerError, gin.H{"error": "transfer failed"})
+    return
+  }
+  c.JSON(http.StatusOK, gin.H{"status": "transfer complete"})
+})
+</code></pre>
+<p>Метод <code>Transaction</code> в GORM автоматически обрабатывает <code>Begin</code>, <code>Commit</code> и <code>Rollback</code> на основе возвращённой ошибки.</p>
+<h2 id="лучшие-практики">Лучшие практики</h2>
+<ul>
+<li><strong>Инициализируйте подключение к базе данных в <code>main</code></strong> и делитесь им через замыкания, структуру или middleware. Никогда не открывайте новое подключение для каждого запроса.</li>
+<li><strong>Всегда используйте параметризованные запросы.</strong> Передавайте пользовательский ввод как аргументы (<code>$1</code>, <code>?</code>), а не конкатенируйте строки. Это предотвращает SQL-инъекции.</li>
+<li><strong>Настройте пул соединений для продакшна.</strong> Установите <code>MaxOpenConns</code>, <code>MaxIdleConns</code> и <code>ConnMaxLifetime</code> в значения, соответствующие лимитам вашего сервера баз данных и ожидаемому трафику.</li>
+<li><strong>Обрабатывайте ошибки подключения корректно.</strong> Вызовите <code>db.Ping()</code> при запуске для быстрого обнаружения проблем. В обработчиках возвращайте осмысленные HTTP-коды статуса и избегайте утечки внутренних деталей ошибок клиентам.</li>
+<li><strong>Передавайте контекст запроса в запросы.</strong> Используйте <code>c.Request.Context()</code>, чтобы долгие запросы отменялись при отключении клиента или срабатывании таймаута.</li>
+<li><strong>Закрывайте <code>*sql.Rows</code> с помощью <code>defer</code>.</strong> Незакрытые rows приводят к утечке соединений обратно в пул.</li>
+</ul>
+<h2 id="смотрите-также">Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/server-config/custom-http-config/">Пользовательская конфигурация HTTP</a></li>
+<li><a href="/ru/docs/middleware/custom-middleware/">Пользовательский middleware</a></li>
+<li><a href="/ru/docs/middleware/using-middleware/">Использование middleware</a></li>
+</ul>
+</div>
+</body>
+</html>

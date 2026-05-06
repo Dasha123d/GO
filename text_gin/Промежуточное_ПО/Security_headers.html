@@ -1,0 +1,103 @@
+<h1 id="_top">Заголовки безопасности</h1>
+<p>Важно использовать заголовки безопасности для защиты вашего веб-приложения от распространённых уязвимостей. Этот пример показывает, как добавить заголовки безопасности в ваше приложение Gin, а также как избежать атак, связанных с инъекцией заголовка Host (SSRF, Open Redirection).</p>
+<h3 id="что-защищает-каждый-заголовок">Что защищает каждый заголовок</h3>
+
+<table>
+  <thead><tr><th>Заголовок</th><th>Назначение</th></tr></thead>
+  <tbody>
+    <tr><td><code>X-Content-Type-Options: nosniff</code></td><td>Предотвращает атаки с подменой MIME-типа. Без этого заголовка браузеры могут интерпретировать файлы как тип контента, отличный от объявленного …</td></tr>
+    <tr><td><code>X-Frame-Options: DENY</code></td><td>Предотвращает кликджекинг, запрещая загрузку страницы внутри <code>&lt;iframe></code> …</td></tr>
+    <tr><td><code>Content-Security-Policy</code></td><td>Контролирует, какие ресурсы (скрипты, стили, изображения, шрифты и т.д.) браузер может загружать …</td></tr>
+    <tr><td><code>X-XSS-Protection: 1; mode=block</code></td><td>Активирует встроенный XSS-фильтр браузера …</td></tr>
+    <tr><td><code>Strict-Transport-Security</code></td><td>Заставляет браузер использовать HTTPS для всех будущих запросов к домену …</td></tr>
+    <tr><td><code>Referrer-Policy: strict-origin</code></td><td>Контролирует, сколько информации о реферере отправляется с исходящими запросами …</td></tr>
+    <tr><td><code>Permissions-Policy</code></td><td>Ограничивает, какие функции браузера (геолокация, камера, микрофон и т.д.) могут использоваться страницей …</td></tr>
+  </tbody>
+</table>
+
+<h3 id="пример">Пример</h3>
+<pre><code>package main
+
+import (
+  "net/http"
+
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  r := gin.Default()
+
+  expectedHost := "localhost:8080"
+
+  // Setup Security Headers
+  r.Use(func(c *gin.Context) {
+    if c.Request.Host != expectedHost {
+      c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid host header"})
+      return
+    }
+    c.Header("X-Frame-Options", "DENY")
+    c.Header("Content-Security-Policy", "default-src 'self'; connect-src *; font-src *; script-src-elem * 'unsafe-inline'; img-src * data:; style-src * 'unsafe-inline';")
+    c.Header("X-XSS-Protection", "1; mode=block")
+    c.Header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    c.Header("Referrer-Policy", "strict-origin")
+    c.Header("X-Content-Type-Options", "nosniff")
+    c.Header("Permissions-Policy", "geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()")
+    c.Next()
+  })
+
+  r.GET("/ping", func(c *gin.Context) {
+    c.JSON(200, gin.H{
+      "message": "pong",
+    })
+  })
+
+  r.Run() // listen and serve on 0.0.0.0:8080
+}
+</code></pre>
+<p>Вы можете проверить через <code>curl</code>:</p>
+<pre><code>// Check Headers
+
+curl localhost:8080/ping -I
+
+HTTP/1.1 404 Not Found
+Content-Security-Policy: default-src 'self'; connect-src *; font-src *; script-src-elem * 'unsafe-inline'; img-src * data:; style-src * 'unsafe-inline';
+Content-Type: text/plain
+Permissions-Policy: geolocation=(),midi=(),sync-xhr=(),microphone=(),camera=(),magnetometer=(),gyroscope=(),fullscreen=(self),payment=()
+Referrer-Policy: strict-origin
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-Xss-Protection: 1; mode=block
+Date: Sat, 30 Mar 2024 08:20:44 GMT
+Content-Length: 18
+
+// Check Host Header Injection
+
+curl localhost:8080/ping -I -H "Host:neti.ee"
+
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=utf-8
+Date: Sat, 30 Mar 2024 08:21:09 GMT
+Content-Length: 31
+</code></pre>
+<p>Опционально используйте <a href="https://github.com/danielkov/gin-helmet">gin helmet</a> <code>go get github.com/danielkov/gin-helmet/ginhelmet</code></p>
+<pre><code>package main
+
+import (
+  "github.com/gin-gonic/gin"
+  "github.com/danielkov/gin-helmet/ginhelmet"
+)
+
+func main() {
+  r := gin.Default()
+
+  // Use default security headers
+  r.Use(ginhelmet.Default())
+
+  r.GET("/", func(c *gin.Context) {
+    c.JSON(200, gin.H{"message": "Hello, World!"})
+  })
+
+  r.Run()
+}
+</code></pre>

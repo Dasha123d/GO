@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Структурированное логирование | Gin Web Framework</title>
+</head>
+<body>
+<h1>Структурированное логирование</h1>
+
+<p>Структурированное логирование создаёт машиночитаемый вывод логов (обычно JSON) вместо обычного текста. Это упрощает поиск, фильтрацию и анализ логов в системах агрегации логов, таких как ELK Stack, Datadog или Grafana Loki.</p>
+
+<h2>Зачем структурированное логирование?</h2>
+<p>Стандартный логгер Gin выводит человекочитаемый текст, который отлично подходит для разработки, но сложен для парсинга в масштабе. Структурированное логирование даёт вам:</p>
+<ul>
+<li><strong>Запрашиваемые поля</strong> — фильтрация логов по коду статуса, задержке или ID пользователя</li>
+<li><strong>Согласованный формат</strong> — каждая запись лога имеет одинаковую структуру</li>
+<li><strong>Корреляция</strong> — трассировка запроса между сервисами с помощью ID запроса</li>
+</ul>
+
+<h2>Использование slog (Go 1.21+)</h2>
+<p>Стандартная библиотека Go включает <code>log/slog</code> для структурированного логирования. Вот как использовать его с Gin:</p>
+<pre><code>package main
+
+import (
+  &quot;log/slog&quot;
+  &quot;os&quot;
+  &quot;time&quot;
+
+  &quot;github.com/gin-gonic/gin&quot;
+)
+
+func SlogMiddleware(logger *slog.Logger) gin.HandlerFunc {
+  return func(c *gin.Context) {
+    start := time.Now()
+    path := c.Request.URL.Path
+    query := c.Request.URL.RawQuery
+
+    c.Next()
+
+    logger.Info(&quot;request&quot;,
+      slog.String(&quot;method&quot;, c.Request.Method),
+      slog.String(&quot;path&quot;, path),
+      slog.String(&quot;query&quot;, query),
+      slog.Int(&quot;status&quot;, c.Writer.Status()),
+      slog.Duration(&quot;latency&quot;, time.Since(start)),
+      slog.String(&quot;client_ip&quot;, c.ClientIP()),
+      slog.Int(&quot;body_size&quot;, c.Writer.Size()),
+    )
+
+    if len(c.Errors) &gt; 0 {
+      for _, err := range c.Errors {
+        logger.Error(&quot;request error&quot;, slog.String(&quot;error&quot;, err.Error()))
+      }
+    }
+  }
+}
+
+func main() {
+  logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+  r := gin.New()
+  r.Use(SlogMiddleware(logger))
+  r.Use(gin.Recovery())
+
+  r.GET(&quot;/ping&quot;, func(c *gin.Context) {
+    c.JSON(200, gin.H{&quot;message&quot;: &quot;pong&quot;})
+  })
+
+  r.Run(&quot;:8080&quot;)
+}</code></pre>
+<p>Это создаёт записи логов вида:</p>
+<pre><code>{&quot;time&quot;:&quot;2024-01-15T10:30:00Z&quot;,&quot;level&quot;:&quot;INFO&quot;,&quot;msg&quot;:&quot;request&quot;,&quot;method&quot;:&quot;GET&quot;,&quot;path&quot;:&quot;/ping&quot;,&quot;query&quot;:&quot;&quot;,&quot;status&quot;:200,&quot;latency&quot;:&quot;125µs&quot;,&quot;client_ip&quot;:&quot;127.0.0.1&quot;,&quot;body_size&quot;:18}</code></pre>
+
+<h2>ID запроса / Корреляционный ID</h2>
+<p>Добавление уникального ID запроса к каждой записи лога помогает трассировать запросы между сервисами:</p>
+<pre><code>package main
+
+import (
+  &quot;log/slog&quot;
+  &quot;os&quot;
+  &quot;time&quot;
+
+  &quot;github.com/gin-gonic/gin&quot;
+  &quot;github.com/google/uuid&quot;
+)
+
+func RequestIDMiddleware() gin.HandlerFunc {
+  return func(c *gin.Context) {
+    requestID := c.GetHeader(&quot;X-Request-ID&quot;)
+    if requestID == &quot;&quot; {
+      requestID = uuid.New().String()
+    }
+    c.Set(&quot;request_id&quot;, requestID)
+    c.Header(&quot;X-Request-ID&quot;, requestID)
+    c.Next()
+  }
+}
+
+func SlogMiddleware(logger *slog.Logger) gin.HandlerFunc {
+  return func(c *gin.Context) {
+    start := time.Now()
+
+    c.Next()
+
+    requestID, _ := c.Get(&quot;request_id&quot;)
+    logger.Info(&quot;request&quot;,
+      slog.String(&quot;request_id&quot;, requestID.(string)),
+      slog.String(&quot;method&quot;, c.Request.Method),
+      slog.String(&quot;path&quot;, c.Request.URL.Path),
+      slog.Int(&quot;status&quot;, c.Writer.Status()),
+      slog.Duration(&quot;latency&quot;, time.Since(start)),
+    )
+  }
+}
+
+func main() {
+  logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+  r := gin.New()
+  r.Use(RequestIDMiddleware())
+  r.Use(SlogMiddleware(logger))
+  r.Use(gin.Recovery())
+
+  r.GET(&quot;/ping&quot;, func(c *gin.Context) {
+    c.JSON(200, gin.H{&quot;message&quot;: &quot;pong&quot;})
+  })
+
+  r.Run(&quot;:8080&quot;)
+}</code></pre>
+
+<h2>Использование zerolog</h2>
+<p><a href="https://github.com/rs/zerolog">zerolog</a> — популярный JSON-логгер без аллокаций:</p>
+<pre><code>package main
+
+import (
+  &quot;os&quot;
+  &quot;time&quot;
+
+  &quot;github.com/gin-gonic/gin&quot;
+  &quot;github.com/rs/zerolog&quot;
+  &quot;github.com/rs/zerolog/log&quot;
+)
+
+func ZerologMiddleware() gin.HandlerFunc {
+  return func(c *gin.Context) {
+    start := time.Now()
+
+    c.Next()
+
+    log.Info().
+      Str(&quot;method&quot;, c.Request.Method).
+      Str(&quot;path&quot;, c.Request.URL.Path).
+      Int(&quot;status&quot;, c.Writer.Status()).
+      Dur(&quot;latency&quot;, time.Since(start)).
+      Str(&quot;client_ip&quot;, c.ClientIP()).
+      Msg(&quot;request&quot;)
+  }
+}
+
+func main() {
+  zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+  // Pretty logging for development
+  if gin.Mode() == gin.DebugMode {
+    log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+  }
+
+  r := gin.New()
+  r.Use(ZerologMiddleware())
+  r.Use(gin.Recovery())
+
+  r.GET(&quot;/ping&quot;, func(c *gin.Context) {
+    c.JSON(200, gin.H{&quot;message&quot;: &quot;pong&quot;})
+  })
+
+  r.Run(&quot;:8080&quot;)
+}</code></pre>
+
+<h2>Лучшие практики</h2>
+<ul>
+<li><strong>Используйте JSON-формат в продакшне</strong> — человекочитаемый формат для разработки, JSON для агрегации логов в продакшне</li>
+<li><strong>Включайте ID запросов</strong> — передавайте заголовки <code>X-Request-ID</code> между границами сервисов для распределённой трассировки</li>
+<li><strong>Логируйте на соответствующих уровнях</strong> — используйте <code>Info</code> для обычных запросов, <code>Warn</code> для 4xx, <code>Error</code> для 5xx</li>
+<li><strong>Избегайте логирования конфиденциальных данных</strong> — исключайте пароли, токены и персональные данные из вывода логов</li>
+<li><strong>Установите <code>GIN_MODE=release</code></strong> — это отключает стандартное отладочное логирование Gin в продакшне</li>
+</ul>
+
+<h2>Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/logging/write-log/">Запись логов в файл</a></li>
+<li><a href="/ru/docs/logging/avoid-logging-query-strings/">Исключение строк запроса из логов</a></li>
+<li><a href="/ru/docs/logging/custom-log-format/">Пользовательский формат логов</a></li>
+</ul>
+</body>
+</html>

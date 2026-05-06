@@ -1,0 +1,134 @@
+<h1 id="_top">Управление сессиями</h1>
+<p>Сессии позволяют хранить данные, специфичные для пользователя, между несколькими HTTP-запросами. Поскольку HTTP является протоколом без сохранения состояния, сессии используют cookies или другие механизмы для идентификации возвращающихся пользователей и получения их сохранённых данных.</p>
+<h2 id="использование-gin-contribsessions">Использование gin-contrib/sessions</h2>
+<p>Middleware <a href="https://github.com/gin-contrib/sessions">gin-contrib/sessions</a> предоставляет управление сессиями с несколькими хранилищами:</p>
+<pre><code>go get github.com/gin-contrib/sessions
+</code></pre>
+<h3 id="сессии-на-основе-cookies">Сессии на основе cookies</h3>
+<pre><code>package main
+
+import (
+  "net/http"
+
+  "github.com/gin-contrib/sessions"
+  "github.com/gin-contrib/sessions/cookie"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  r := gin.Default()
+
+  // Create cookie-based session store with a secret key
+  store := cookie.NewStore([]byte("your-secret-key"))
+  r.Use(sessions.Sessions("mysession", store))
+
+  r.GET("/login", func(c *gin.Context) {
+    session := sessions.Default(c)
+    session.Set("user", "john")
+    session.Save()
+    c.JSON(http.StatusOK, gin.H{"message": "logged in"})
+  })
+
+  r.GET("/profile", func(c *gin.Context) {
+    session := sessions.Default(c)
+    user := session.Get("user")
+    if user == nil {
+      c.JSON(http.StatusUnauthorized, gin.H{"error": "not logged in"})
+      return
+    }
+    c.JSON(http.StatusOK, gin.H{"user": user})
+  })
+
+  r.GET("/logout", func(c *gin.Context) {
+    session := sessions.Default(c)
+    session.Clear()
+    session.Save()
+    c.JSON(http.StatusOK, gin.H{"message": "logged out"})
+  })
+
+  r.Run(":8080")
+}
+</code></pre>
+<h3 id="сессии-на-основе-redis">Сессии на основе Redis</h3>
+<pre><code>package main
+
+import (
+  "net/http"
+
+  "github.com/gin-contrib/sessions"
+  "github.com/gin-contrib/sessions/redis"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  r := gin.Default()
+
+  // Connect to Redis for session storage
+  store, err := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("secret"))
+  if err != nil {
+    panic(err)
+  }
+  r.Use(sessions.Sessions("mysession", store))
+
+  r.GET("/set", func(c *gin.Context) {
+    session := sessions.Default(c)
+    session.Set("count", 1)
+    session.Save()
+    c.JSON(http.StatusOK, gin.H{"count": 1})
+  })
+
+  r.GET("/get", func(c *gin.Context) {
+    session := sessions.Default(c)
+    count := session.Get("count")
+    c.JSON(http.StatusOK, gin.H{"count": count})
+  })
+
+  r.Run(":8080")
+}
+</code></pre>
+<h2 id="параметры-сессии">Параметры сессии</h2>
+<p>Настройте поведение сессии с помощью <code>sessions.Options</code>:</p>
+<pre><code>session := sessions.Default(c)
+session.Options(sessions.Options{
+  Path:     "/",
+  MaxAge:   3600,        // Session expires in 1 hour (seconds)
+  HttpOnly: true,        // Prevent JavaScript access
+  Secure:   true,        // Only send over HTTPS
+  SameSite: http.SameSiteLaxMode,
+})
+</code></pre>
+<table><thead><tr><th>Параметр</th><th>Описание</th></tr></thead>
+<tbody>
+<tr><td><code>Path</code></td><td>Область действия пути cookie (по умолчанию: <code>/</code>)</td></tr>
+<tr><td><code>MaxAge</code></td><td>Время жизни в секундах. <code>-1</code> для удаления, <code>0</code> для сессии браузера</td></tr>
+<tr><td><code>HttpOnly</code></td><td>Предотвращает доступ JavaScript к cookie</td></tr>
+<tr><td><code>Secure</code></td><td>Отправлять cookie только через HTTPS</td></tr>
+<tr><td><code>SameSite</code></td><td>Контролирует поведение кросс-сайтовых cookies (<code>Lax</code>, <code>Strict</code>, <code>None</code>)</td></tr>
+</tbody></table>
+<aside aria-label="Заметка" class="starlight-aside starlight-aside--note">...</aside>
+
+<h2 id="доступные-хранилища">Доступные хранилища</h2>
+<table><thead><tr><th>Хранилище</th><th>Пакет</th><th>Сценарий использования</th></tr></thead>
+<tbody>
+<tr><td>Cookie</td><td><code>sessions/cookie</code></td><td>Простые приложения, малый объём данных сессии</td></tr>
+<tr><td>Redis</td><td><code>sessions/redis</code></td><td>Продакшн, многоэкземплярные развёртывания</td></tr>
+<tr><td>Memcached</td><td><code>sessions/memcached</code></td><td>Высокопроизводительный слой кеширования</td></tr>
+<tr><td>MongoDB</td><td><code>sessions/mongo</code></td><td>Когда MongoDB — ваше основное хранилище</td></tr>
+<tr><td>PostgreSQL</td><td><code>sessions/postgres</code></td><td>Когда PostgreSQL — ваше основное хранилище</td></tr>
+</tbody></table>
+
+<h2 id="сессии-vs-jwt">Сессии vs JWT</h2>
+<table><thead><tr><th>Аспект</th><th>Сессии</th><th>JWT</th></tr></thead>
+<tbody>
+<tr><td>Хранение</td><td>На стороне сервера (Redis, БД)</td><td>На стороне клиента (токен)</td></tr>
+<tr><td>Отзыв</td><td>Просто (удалить из хранилища)</td><td>Сложно (требует блокировочного списка)</td></tr>
+<tr><td>Масштабируемость</td><td>Нужно общее хранилище</td><td>Без состояния</td></tr>
+<tr><td>Размер данных</td><td>Неограничен на сервере</td><td>Ограничен размером токена</td></tr>
+</tbody></table>
+<p>Используйте сессии, когда нужен простой отзыв (например, выход, блокировка пользователя). Используйте JWT, когда нужна аутентификация без состояния между микросервисами.</p>
+<h2 id="смотрите-также">Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/server-config/cookie/">Работа с cookies</a></li>
+<li><a href="/ru/docs/middleware/security-guide/">Лучшие практики безопасности</a></li>
+<li><a href="/ru/docs/middleware/using-middleware/">Использование middleware</a></li>
+</ul>

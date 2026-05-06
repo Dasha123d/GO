@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Маршрутизация | Gin Web Framework</title>
+</head>
+<body>
+<h1>Маршрутизация</h1>
+
+<p>Gin предоставляет мощную систему маршрутизации, построенную на <a href="https://github.com/julienschmidt/httprouter">httprouter</a> для высокопроизводительного сопоставления URL. Под капотом httprouter использует <a href="https://en.wikipedia.org/wiki/Radix_tree">radix-дерево</a> (также называемое сжатым префиксным деревом) для хранения и поиска маршрутов, что означает, что сопоставление маршрутов выполняется чрезвычайно быстро и не требует выделения памяти при каждом поиске. Это делает Gin одним из самых быстрых веб-фреймворков для Go.</p>
+
+<p>Маршруты регистрируются путём вызова HTTP-метода на движке (или группе маршрутов) с указанием шаблона URL и одной или нескольких функций-обработчиков:</p>
+
+<pre><code>package main
+
+import (
+  "net/http"
+
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  router := gin.Default()
+
+  router.GET("/hello", func(c *gin.Context) {
+    c.String(http.StatusOK, "Hello, World!")
+  })
+
+  router.POST("/users", func(c *gin.Context) {
+    name := c.PostForm("name")
+    c.JSON(http.StatusCreated, gin.H{"user": name})
+  })
+
+  router.Run(":8080")
+}</code></pre>
+
+<h2>В этом разделе</h2>
+<p>Страницы ниже подробно описывают каждую тему маршрутизации:</p>
+
+<ul>
+  <li><a href="./http-method/"><strong>Использование HTTP-методов</strong></a> — Регистрация маршрутов для GET, POST, PUT, DELETE, PATCH, HEAD и OPTIONS.</li>
+  <li><a href="./param-in-path/"><strong>Параметры в пути</strong></a> — Захват динамических сегментов из URL-путей (например, <code>/user/:name</code>).</li>
+  <li><a href="./querystring-param/"><strong>Параметры строки запроса</strong></a> — Чтение значений строки запроса из URL запроса.</li>
+  <li><a href="./query-and-post-form/"><strong>Запрос и POST-форма</strong></a> — Доступ к данным строки запроса и POST-формы в одном обработчике.</li>
+  <li><a href="./map-as-querystring-or-postform/"><strong>Map как параметры строки запроса или POST-формы</strong></a> — Привязка параметров map из строк запроса или POST-форм.</li>
+  <li><a href="./multipart-urlencoded-form/"><strong>Multipart/urlencoded форма</strong></a> — Разбор тел <code>multipart/form-data</code> и <code>application/x-www-form-urlencoded</code>.</li>
+  <li><a href="./upload-file/"><strong>Загрузка файлов</strong></a> — Обработка загрузки одного и нескольких файлов.</li>
+  <li><a href="./grouping-routes/"><strong>Группировка маршрутов</strong></a> — Организация маршрутов под общими префиксами с общим middleware.</li>
+  <li><a href="./redirects/"><strong>Перенаправления</strong></a> — Выполнение HTTP-перенаправлений и перенаправлений на уровне маршрутизатора.</li>
+</ul>
+</body>
+</html>

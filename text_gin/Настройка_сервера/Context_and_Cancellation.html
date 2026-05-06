@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Контекст и отмена – Gin Web Framework</title>
+</head>
+<body>
+<h1 id="_top">Контекст и отмена</h1>
+<div class="sl-markdown-content">
+<p>Каждый обработчик Gin получает <code>*gin.Context</code>, который оборачивает стандартный <code>context.Context</code> Go вместе с вспомогательными методами запроса и ответа. Понимание правильного использования базового контекста необходимо для создания продакшн-приложений, которые корректно обрабатывают таймауты, отмену и очистку ресурсов.</p>
+<h2 id="доступ-к-контексту-запроса">Доступ к контексту запроса</h2>
+<p>Стандартный <code>context.Context</code> для текущего запроса доступен через <code>c.Request.Context()</code>. Это контекст, который следует передавать любым нижестоящим вызовам — запросам к базе данных, HTTP-запросам или другим операциям ввода-вывода.</p>
+<pre><code>package main
+
+import (
+  "log"
+  "net/http"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  r := gin.Default()
+
+  r.GET("/api/data", func(c *gin.Context) {
+    ctx := c.Request.Context()
+    // Pass ctx to any downstream function that accepts context.Context.
+    log.Println("request context deadline:", ctx.Done())
+    c.JSON(http.StatusOK, gin.H{"status": "ok"})
+  })
+
+  r.Run(":8080")
+}
+</code></pre>
+<h2 id="таймауты-запросов">Таймауты запросов</h2>
+<p>Вы можете применить таймаут к отдельным запросам с помощью middleware. Когда таймаут истекает, контекст отменяется, и любой нижестоящий вызов, который уважает отмену контекста, немедленно возвращается.</p>
+<pre><code>package main
+
+import (
+  "context"
+  "net/http"
+  "time"
+  "github.com/gin-gonic/gin"
+)
+
+// TimeoutMiddleware wraps each request with a context deadline.
+func TimeoutMiddleware(timeout time.Duration) gin.HandlerFunc {
+  return func(c *gin.Context) {
+    ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
+    defer cancel()
+    // Replace the request with one that carries the new context.
+    c.Request = c.Request.WithContext(ctx)
+    c.Next()
+  }
+}
+
+func main() {
+  r := gin.Default()
+  r.Use(TimeoutMiddleware(5 * time.Second))
+
+  r.GET("/api/slow", func(c *gin.Context) {
+    ctx := c.Request.Context()
+    // Simulate work that respects the context deadline.
+    select {
+    case <-time.After(10 * time.Second):
+      c.JSON(http.StatusOK, gin.H{"result": "done"})
+    case <-ctx.Done():
+      c.JSON(http.StatusGatewayTimeout, gin.H{
+        "error": "request timed out",
+      })
+    }
+  })
+
+  r.Run(":8080")
+}
+</code></pre>
+<h2 id="передача-контекста-в-запросы-к-базе-данных">Передача контекста в запросы к базе данных</h2>
+<p>Драйверы баз данных в Go принимают <code>context.Context</code> в качестве первого аргумента. Всегда передавайте контекст запроса, чтобы запросы автоматически отменялись при отключении клиента или истечении таймаута.</p>
+<pre><code>package main
+
+import (
+  "database/sql"
+  "net/http"
+  "github.com/gin-gonic/gin"
+  _ "github.com/lib/pq"
+)
+
+func main() {
+  db, err := sql.Open("postgres", "postgres://localhost/mydb?sslmode=disable")
+  if err != nil {
+    panic(err)
+  }
+
+  r := gin.Default()
+
+  r.GET("/api/users/:id", func(c *gin.Context) {
+    ctx := c.Request.Context()
+    id := c.Param("id")
+
+    var name string
+    err := db.QueryRowContext(ctx, "SELECT name FROM users WHERE id = $1", id).Scan(&name)
+    if err != nil {
+      c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+      return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"id": id, "name": name})
+  })
+
+  r.Run(":8080")
+}
+</code></pre>
+<h2 id="передача-контекста-в-исходящие-http-вызовы">Передача контекста в исходящие HTTP-вызовы</h2>
+<p>Когда ваш обработчик вызывает внешние сервисы, передавайте контекст запроса, чтобы исходящие вызовы отменялись вместе с входящим запросом.</p>
+<pre><code>package main
+
+import (
+  "io"
+  "net/http"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  r := gin.Default()
+
+  r.GET("/api/proxy", func(c *gin.Context) {
+    ctx := c.Request.Context()
+    req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://httpbin.org/delay/3", nil)
+    if err != nil {
+      c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+      return
+    }
+    resp, err := http.DefaultClient.Do(req)
+    if err != nil {
+      c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+      return
+    }
+    defer resp.Body.Close()
+    body, _ := io.ReadAll(resp.Body)
+    c.Data(resp.StatusCode, resp.Header.Get("Content-Type"), body)
+  })
+
+  r.Run(":8080")
+}
+</code></pre>
+<h2 id="обработка-отключения-клиента">Обработка отключения клиента</h2>
+<p>Когда клиент закрывает соединение (например, переходит на другую страницу или отменяет запрос), контекст запроса отменяется. Вы можете обнаружить это в долго выполняющихся обработчиках, чтобы прекратить работу заранее и освободить ресурсы.</p>
+<pre><code>package main
+
+import (
+  "log"
+  "net/http"
+  "time"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  r := gin.Default()
+
+  r.GET("/api/stream", func(c *gin.Context) {
+    ctx := c.Request.Context()
+    for i := 0; ; i++ {
+      select {
+      case <-ctx.Done():
+        log.Println("client disconnected, stopping work")
+        return
+      case <-time.After(1 * time.Second):
+        c.SSEvent("message", gin.H{"count": i})
+        c.Writer.Flush()
+      }
+    }
+  })
+
+  r.Run(":8080")
+}
+</code></pre>
+<h2 id="лучшие-практики">Лучшие практики</h2>
+<ul>
+<li><strong>Всегда передавайте контекст запроса.</strong> Передавайте <code>c.Request.Context()</code> каждой функции, принимающей <code>context.Context</code> — вызовам баз данных, HTTP-клиентам, gRPC-вызовам и любым операциям ввода-вывода. Это гарантирует, что отмена и таймауты распространяются по всей цепочке вызовов.</li>
+<li><strong>Не храните <code>*gin.Context</code> в структурах и не передавайте его через границы горутин.</strong> <code>gin.Context</code> привязан к жизненному циклу HTTP-запроса/ответа и не безопасен для конкурентного использования. Вместо этого извлеките нужные значения (контекст запроса, параметры, заголовки) перед запуском горутин.</li>
+<li><strong>Устанавливайте таймауты на уровне middleware.</strong> Middleware таймаутов даёт вам единое место для установки дедлайнов по всем маршрутам, вместо дублирования логики таймаутов в каждом обработчике.</li>
+<li><strong>Используйте <code>context.WithValue</code> экономно.</strong> Предпочитайте <code>c.Set()</code> и <code>c.Get()</code> внутри обработчиков Gin. Резервируйте <code>context.WithValue</code> для значений, которые должны пересекать границы пакетов через интерфейсы стандартной библиотеки.</li>
+</ul>
+<h2 id="типичные-ошибки">Типичные ошибки</h2>
+<h3 id="использование-gincontext-в-горутинах">Использование <code>gin.Context</code> в горутинах</h3>
+<p><code>gin.Context</code> повторно используется между запросами для производительности. Если вам нужен доступ к нему из горутины, вы <strong>должны</strong> вызвать <code>c.Copy()</code> для создания копии только для чтения. Использование оригинального <code>gin.Context</code> в горутине приводит к гонкам данных и непредсказуемому поведению.</p>
+<pre><code>package main
+
+import (
+  "log"
+  "net/http"
+  "time"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  r := gin.Default()
+
+  r.GET("/api/async", func(c *gin.Context) {
+    // WRONG: using c directly in a goroutine.
+    // go func() {
+    //     log.Println(c.Request.URL.Path) // data race!
+    // }()
+
+    // CORRECT: copy the context first.
+    cCopy := c.Copy()
+    go func() {
+      time.Sleep(2 * time.Second)
+      log.Printf("async work done for %s\n", cCopy.Request.URL.Path)
+    }()
+
+    c.JSON(http.StatusOK, gin.H{"status": "processing"})
+  })
+
+  r.Run(":8080")
+}
+</code></pre>
+<h3 id="игнорирование-отмены-контекста">Игнорирование отмены контекста</h3>
+<p>Если ваш обработчик не проверяет <code>ctx.Done()</code>, он продолжит работать даже после отключения клиента, расходуя CPU и память. Всегда используйте API, поддерживающие контекст (<code>QueryRowContext</code>, <code>NewRequestWithContext</code>, <code>select</code> на <code>ctx.Done()</code>), чтобы работа останавливалась сразу при отмене контекста.</p>
+<h3 id="запись-ответа-после-отмены-контекста">Запись ответа после отмены контекста</h3>
+<p>После отмены контекста избегайте записи в <code>c.Writer</code>. Соединение может быть уже закрыто, и записи завершатся тихой ошибкой или паникой. Проверяйте <code>ctx.Err()</code> перед записью, если ваш обработчик выполняет долгую работу.</p>
+<pre><code>func handler(c *gin.Context) {
+  ctx := c.Request.Context()
+  result, err := doExpensiveWork(ctx)
+  if err != nil {
+    if ctx.Err() != nil {
+      // Client is gone; do not write a response.
+      return
+    }
+    c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+    return
+  }
+  c.JSON(http.StatusOK, gin.H{"result": result})
+}
+</code></pre>
+</div>
+</body>
+</html>

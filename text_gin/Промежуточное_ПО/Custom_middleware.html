@@ -1,0 +1,65 @@
+<h1 id="_top">Пользовательский middleware</h1>
+<p>Middleware в Gin — это функция, которая возвращает <code>gin.HandlerFunc</code>. Middleware выполняется до и/или после основного обработчика, что делает его полезным для логирования, аутентификации, обработки ошибок и других сквозных задач.</p>
+<h3 id="поток-выполнения-middleware">Поток выполнения middleware</h3>
+<p>Функция middleware имеет две фазы, разделённые вызовом <code>c.Next()</code>:</p>
+<ul>
+<li><strong>До <code>c.Next()</code></strong> — Код здесь выполняется до того, как запрос достигнет основного обработчика…</li>
+<li><strong><code>c.Next()</code></strong> — Вызывает следующий обработчик в цепочке…</li>
+<li><strong>После <code>c.Next()</code></strong> — Код здесь выполняется после завершения основного обработчика…</li>
+</ul>
+<p>Если вы хотите полностью остановить цепочку (например, при неудачной аутентификации), вызовите <code>c.Abort()</code> вместо <code>c.Next()</code>…</p>
+
+<pre><code>package main
+
+import (
+  "log"
+  "time"
+
+  "github.com/gin-gonic/gin"
+)
+
+func Logger() gin.HandlerFunc {
+  return func(c *gin.Context) {
+    t := time.Now()
+
+    // Set example variable
+    c.Set("example", "12345")
+
+    // before request
+
+    c.Next()
+
+    // after request
+    latency := time.Since(t)
+    log.Print(latency)
+
+    // access the status we are sending
+    status := c.Writer.Status()
+    log.Println(status)
+  }
+}
+
+func main() {
+  r := gin.New()
+  r.Use(Logger())
+
+  r.GET("/test", func(c *gin.Context) {
+    example := c.MustGet("example").(string)
+
+    // it would print: "12345"
+    log.Println(example)
+  })
+
+  // Listen and serve on 0.0.0.0:8080
+  r.Run(":8080")
+}
+</code></pre>
+<h3 id="попробуйте">Попробуйте</h3>
+<pre><code>curl http://localhost:8080/test
+</code></pre>
+<p>В логах сервера будут показаны задержка запроса и HTTP-код статуса для каждого запроса, проходящего через middleware <code>Logger</code>.</p>
+<h2 id="смотрите-также">Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/middleware/error-handling-middleware/">Middleware обработки ошибок</a></li>
+<li><a href="/ru/docs/middleware/using-middleware/">Использование middleware</a></li>
+</ul>

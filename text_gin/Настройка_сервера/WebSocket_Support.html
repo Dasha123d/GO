@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Поддержка WebSocket – Gin Web Framework</title>
+</head>
+<body>
+<h1 id="_top">Поддержка WebSocket</h1>
+<div class="sl-markdown-content">
+<p>Gin не включает встроенную реализацию WebSocket, но легко интегрируется с пакетом <a href="https://github.com/gorilla/websocket">gorilla/websocket</a>. Поскольку обработчики Gin получают базовые <code>http.ResponseWriter</code> и <code>*http.Request</code>, вы можете обновить любой маршрут Gin до WebSocket-соединения с минимальными усилиями.</p>
+<h2 id="установка">Установка</h2>
+<pre><code>go get github.com/gorilla/websocket
+</code></pre>
+<h2 id="базовый-эхо-сервер">Базовый эхо-сервер</h2>
+<pre><code>package main
+
+import (
+  "log"
+  "net/http"
+  "github.com/gin-gonic/gin"
+  "github.com/gorilla/websocket"
+)
+
+var upgrader = websocket.Upgrader{
+  CheckOrigin: func(r *http.Request) bool {
+    return true
+  },
+}
+
+func handleWebSocket(c *gin.Context) {
+  conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+  if err != nil {
+    log.Printf("WebSocket upgrade error: %v", err)
+    return
+  }
+  defer conn.Close()
+
+  for {
+    messageType, message, err := conn.ReadMessage()
+    if err != nil {
+      log.Printf("Read error: %v", err)
+      break
+    }
+    log.Printf("Received: %s", message)
+
+    if err := conn.WriteMessage(messageType, message); err != nil {
+      log.Printf("Write error: %v", err)
+      break
+    }
+  }
+}
+
+func main() {
+  router := gin.Default()
+  router.GET("/ws", handleWebSocket)
+  router.Run(":8080")
+}
+</code></pre>
+<h2 id="пример-чат-рассылки">Пример чат-рассылки</h2>
+<pre><code>package main
+
+import (
+  "log"
+  "net/http"
+  "sync"
+  "github.com/gin-gonic/gin"
+  "github.com/gorilla/websocket"
+)
+
+var upgrader = websocket.Upgrader{
+  CheckOrigin: func(r *http.Request) bool {
+    return true
+  },
+}
+
+type Hub struct {
+  mu      sync.RWMutex
+  clients map[*websocket.Conn]bool
+}
+
+func newHub() *Hub {
+  return &Hub{
+    clients: make(map[*websocket.Conn]bool),
+  }
+}
+
+func (h *Hub) addClient(conn *websocket.Conn) {
+  h.mu.Lock()
+  defer h.mu.Unlock()
+  h.clients[conn] = true
+}
+
+func (h *Hub) removeClient(conn *websocket.Conn) {
+  h.mu.Lock()
+  defer h.mu.Unlock()
+  delete(h.clients, conn)
+  conn.Close()
+}
+
+func (h *Hub) broadcast(messageType int, message []byte) {
+  h.mu.RLock()
+  defer h.mu.RUnlock()
+  for conn := range h.clients {
+    if err := conn.WriteMessage(messageType, message); err != nil {
+      log.Printf("Broadcast error: %v", err)
+    }
+  }
+}
+
+func main() {
+  hub := newHub()
+  router := gin.Default()
+
+  router.GET("/ws", func(c *gin.Context) {
+    conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+    if err != nil {
+      log.Printf("Upgrade error: %v", err)
+      return
+    }
+    hub.addClient(conn)
+    defer hub.removeClient(conn)
+
+    for {
+      messageType, message, err := conn.ReadMessage()
+      if err != nil {
+        log.Printf("Read error: %v", err)
+        break
+      }
+      hub.broadcast(messageType, message)
+    }
+  })
+
+  router.Run(":8080")
+}
+</code></pre>
+<blockquote>
+<p><strong>Примечание:</strong> В примере рассылки выше запись в несколько соединений происходит при удержании блокировки на чтение. Для продакшена рассмотрите отправку сообщений через канал для каждого клиента, чтобы избежать блокировки цикла рассылки медленным соединением. Смотрите <a href="https://github.com/gorilla/websocket/tree/main/examples/chat">пример чата gorilla/websocket</a> для паттерна, готового к продакшену.</p>
+</blockquote>
+<h2 id="обновление-соединения-и-настройка">Обновление соединения и настройка</h2>
+<pre><code>var upgrader = websocket.Upgrader{
+  // ReadBufferSize and WriteBufferSize specify the I/O buffer sizes in bytes.
+  // The default (4096) works for most use cases. Increase them for large messages.
+  ReadBufferSize:  1024,
+  WriteBufferSize: 1024,
+
+  // CheckOrigin controls whether the request Origin header is acceptable.
+  // By default it rejects cross-origin requests. Override it for CORS support.
+  CheckOrigin: func(r *http.Request) bool {
+    origin := r.Header.Get("Origin")
+    return origin == "https://your-app.example.com"
+  },
+
+  // Subprotocols specifies the server's supported protocols in order of preference.
+  Subprotocols: []string{"graphql-ws", "graphql-transport-ws"},
+}
+</code></pre>
+<p>Вы также можете установить заголовки ответа при обновлении соединения:</p>
+<pre><code>func handleWebSocket(c *gin.Context) {
+  responseHeader := http.Header{}
+  responseHeader.Set("X-Custom-Header", "value")
+
+  conn, err := upgrader.Upgrade(c.Writer, c.Request, responseHeader)
+  if err != nil {
+    log.Printf("Upgrade error: %v", err)
+    return
+  }
+  defer conn.Close()
+  // ...
+}
+</code></pre>
+<h2 id="лучшие-практики">Лучшие практики</h2>
+<h3 id="pingpong-для-проверки-состояния-соединения">Ping/Pong для проверки состояния соединения</h3>
+<pre><code>import "time"
+
+const (
+  pongWait   = 60 * time.Second
+  pingPeriod = (pongWait * 9) / 10 // must be less than pongWait
+)
+
+func handleWebSocket(c *gin.Context) {
+  conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+  if err != nil { return }
+  defer conn.Close()
+
+  conn.SetReadDeadline(time.Now().Add(pongWait))
+  conn.SetPongHandler(func(string) error {
+    conn.SetReadDeadline(time.Now().Add(pongWait))
+    return nil
+  })
+
+  // Start a goroutine to send pings.
+  go func() {
+    ticker := time.NewTicker(pingPeriod)
+    defer ticker.Stop()
+    for range ticker.C {
+      if err := conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+        return
+      }
+    }
+  }()
+
+  // Read loop
+  for {
+    _, message, err := conn.ReadMessage()
+    if err != nil { break }
+    log.Printf("Received: %s", message)
+  }
+}
+</code></pre>
+<h3 id="очистка-соединений">Очистка соединений</h3>
+<ul>
+<li>Используйте <code>defer conn.Close()</code> сразу после успешного обновления.</li>
+<li>Удаляйте соединения из любых общих структур данных (таких как hub в примере чата), когда цикл чтения завершается.</li>
+<li>Устанавливайте дедлайны чтения и записи, чтобы предотвратить утечки горутин от неактивных соединений.</li>
+</ul>
+<h3 id="конкурентная-запись">Конкурентная запись</h3>
+<p>Пакет <code>gorilla/websocket</code> <strong>не</strong> поддерживает конкурентную запись в одно соединение. Если нескольким горутинам нужно писать, сериализуйте доступ одним из следующих способов:</p>
+<ul>
+<li><strong>Мьютекс:</strong> Защитите запись с помощью <code>sync.Mutex</code>.</li>
+<li><strong>Канал:</strong> Направьте все исходящие сообщения через один канал, обслуживаемый одной горутиной-писателем.</li>
+</ul>
+<p>Подход с каналом обычно предпочтительнее, так как он естественным образом обрабатывает обратное давление и сохраняет логику записи в одном месте.</p>
+<h2 id="тестирование">Тестирование</h2>
+<h3 id="использование-wscat">Использование wscat</h3>
+<pre><code>npm install -g wscat
+wscat -c ws://localhost:8080/ws
+</code></pre>
+<h3 id="использование-curl">Использование curl</h3>
+<pre><code>curl --include \
+  --no-buffer \
+  --header "Connection: Upgrade" \
+  --header "Upgrade: websocket" \
+  --header "Sec-WebSocket-Version: 13" \
+  --header "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==" \
+  http://localhost:8080/ws
+</code></pre>
+<h2 id="смотрите-также">Смотрите также</h2>
+<ul>
+<li><a href="https://pkg.go.dev/github.com/gorilla/websocket">Документация gorilla/websocket</a></li>
+<li><a href="https://github.com/gorilla/websocket/tree/main/examples/chat">Пример чата gorilla/websocket</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc6455">RFC 6455 — Протокол WebSocket</a></li>
+<li><a href="/ru/docs/server-config/custom-http-config/">Пользовательская конфигурация HTTP</a></li>
+</ul>
+</div>
+</body>
+</html>

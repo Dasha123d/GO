@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Поддержка Let's Encrypt – Gin Web Framework</title>
+</head>
+<body>
+<h1 id="_top">Поддержка Let's Encrypt</h1>
+<div class="sl-markdown-content">
+<p>Пакет <a href="https://github.com/gin-gonic/autotls">gin-gonic/autotls</a> обеспечивает автоматический HTTPS через Let’s Encrypt. Он автоматически обрабатывает выпуск и обновление сертификатов, позволяя обслуживать HTTPS с минимальной конфигурацией.</p>
+<h2 id="быстрый-старт">Быстрый старт</h2>
+<p>Самый простой способ — вызвать <code>autotls.Run</code> с вашим маршрутизатором и одним или несколькими доменными именами:</p>
+<pre><code>package main
+
+import (
+  "log"
+
+  "github.com/gin-gonic/autotls"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  router := gin.Default()
+
+  router.GET("/ping", func(c *gin.Context) {
+    c.String(200, "pong")
+  })
+
+  log.Fatal(autotls.Run(router, "example1.com", "example2.com"))
+}
+</code></pre>
+<h2 id="пользовательский-менеджер-автосертификатов">Пользовательский менеджер автосертификатов</h2>
+<p>Для большего контроля — например, указания каталога кэша сертификатов или ограничения разрешённых имён хостов — используйте <code>autotls.RunWithManager</code> с пользовательским <code>autocert.Manager</code>:</p>
+<pre><code>package main
+
+import (
+  "log"
+
+  "github.com/gin-gonic/autotls"
+  "github.com/gin-gonic/gin"
+  "golang.org/x/crypto/acme/autocert"
+)
+
+func main() {
+  router := gin.Default()
+
+  router.GET("/ping", func(c *gin.Context) {
+    c.String(200, "pong")
+  })
+
+  m := autocert.Manager{
+    Prompt:     autocert.AcceptTOS,
+    HostPolicy: autocert.HostWhitelist("example1.com", "example2.com"),
+    Cache:      autocert.DirCache("/var/www/.cache"),
+  }
+
+  log.Fatal(autotls.RunWithManager(router, &m))
+}
+</code></pre>
+<aside class="starlight-aside starlight-aside--note"><p class="starlight-aside__title">Заметка</p><p>Let’s Encrypt требует, чтобы ваш сервер был доступен на портах 80 и 443 из публичного интернета. Это не будет работать на localhost или за брандмауэром, блокирующим входящие соединения.</p></aside>
+<h2 id="смотрите-также">Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/server-config/custom-http-config/">Пользовательская конфигурация HTTP</a></li>
+</ul>
+</div>
+</body>
+</html>

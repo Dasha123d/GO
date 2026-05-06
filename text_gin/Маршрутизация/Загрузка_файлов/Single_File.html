@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Один файл | Gin Web Framework</title>
+</head>
+<body>
+<h1>Один файл</h1>
+
+<p>Используйте <code>c.FormFile</code> для получения одного загруженного файла из запроса <code>multipart/form-data</code>, затем <code>c.SaveUploadedFile</code> для сохранения его на диск.</p>
+<p>Вы можете контролировать максимальный объём памяти, используемой при разборе multipart-данных, установив <code>router.MaxMultipartMemory</code> (по умолчанию 32 МиБ). Файлы, превышающие этот лимит, сохраняются во временные файлы на диске, а не в память.</p>
+
+<pre><code>package main
+
+import (
+  &quot;fmt&quot;
+  &quot;log&quot;
+  &quot;net/http&quot;
+  &quot;path/filepath&quot;
+
+  &quot;github.com/gin-gonic/gin&quot;
+)
+
+func main() {
+  router := gin.Default()
+  // Set a lower memory limit for multipart forms (default is 32 MiB)
+  router.MaxMultipartMemory = 8 &lt;&lt; 20 // 8 MiB
+
+  router.POST(&quot;/upload&quot;, func(c *gin.Context) {
+    // single file
+    file, err := c.FormFile(&quot;file&quot;)
+    if err != nil {
+      c.JSON(http.StatusBadRequest, gin.H{&quot;error&quot;: err.Error()})
+      return
+    }
+    log.Println(file.Filename)
+
+    // Upload the file to specific dst.
+    dst := filepath.Join(&quot;./files/&quot;, filepath.Base(file.Filename))
+    c.SaveUploadedFile(file, dst)
+
+    c.String(http.StatusOK, fmt.Sprintf(&quot;&#39;%s&#39; uploaded!&quot;, file.Filename))
+  })
+
+  router.Run(&quot;:8080&quot;)
+}</code></pre>
+
+<h2>Тестирование</h2>
+<pre><code>curl -X POST http://localhost:8080/upload \
+  -F &quot;file=@/path/to/your/file.zip&quot; \
+  -H &quot;Content-Type: multipart/form-data&quot;
+# Output: &#39;file.zip&#39; uploaded!</code></pre>
+
+<aside>
+<p><strong>Осторожно</strong></p>
+<p>Никогда не доверяйте <code>file.Filename</code> от клиента. Всегда очищайте имя файла перед использованием в путях файловой системы. Используйте <code>filepath.Base</code> для удаления компонентов директории и предотвращения атак обхода пути.</p>
+</aside>
+
+<h2>Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/routing/upload-file/multiple-file/">Несколько файлов</a></li>
+<li><a href="/ru/docs/routing/upload-file/limit-bytes/">Ограничение размера загрузки</a></li>
+</ul>
+</body>
+</html>
