@@ -1,0 +1,116 @@
+package test_test
+
+import (
+	"io"
+	"math/rand"
+	"sync"
+	"testing"
+	"time"
+
+	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus/hooks/test"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestAllHooks(t *testing.T) {
+	// Test modifies the standard-logger; restore it afterward.
+	stdLogger := logrus.StandardLogger()
+	oldOut := stdLogger.Out
+	oldHooks := stdLogger.ReplaceHooks(make(logrus.LevelHooks))
+	t.Cleanup(func() {
+		stdLogger.SetOutput(oldOut)
+		stdLogger.ReplaceHooks(oldHooks)
+	})
+	assert := assert.New(t)
+
+	logger, hook := test.NewNullLogger()
+	assert.Nil(hook.LastEntry())
+	assert.Empty(hook.Entries)
+
+	logger.Error("Hello error")
+	assert.Equal(logrus.ErrorLevel, hook.LastEntry().Level)
+	assert.Equal("Hello error", hook.LastEntry().Message)
+	assert.Len(hook.Entries, 1)
+
+	logger.Warn("Hello warning")
+	assert.Equal(logrus.WarnLevel, hook.LastEntry().Level)
+	assert.Equal("Hello warning", hook.LastEntry().Message)
+	assert.Len(hook.Entries, 2)
+
+	hook.Reset()
+	assert.Nil(hook.LastEntry())
+	assert.Empty(hook.Entries)
+
+	hook = test.NewGlobal()
+
+	logrus.SetOutput(io.Discard)
+	logrus.Error("Hello error")
+	assert.Equal(logrus.ErrorLevel, hook.LastEntry().Level)
+	assert.Equal("Hello error", hook.LastEntry().Message)
+	assert.Len(hook.Entries, 1)
+}
+
+func TestLoggingWithHooksRace(t *testing.T) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	unlocker := r.Intn(100)
+
+	assert := assert.New(t)
+	logger, hook := test.NewNullLogger()
+
+	var wgOne, wgAll sync.WaitGroup
+	wgOne.Add(1)
+	wgAll.Add(100)
+
+	for i := range 100 {
+		go func(i int) {
+			logger.Info("info")
+			wgAll.Done()
+			if i == unlocker {
+				wgOne.Done()
+			}
+		}(i)
+	}
+
+	wgOne.Wait()
+
+	assert.Equal(logrus.InfoLevel, hook.LastEntry().Level)
+	assert.Equal("info", hook.LastEntry().Message)
+
+	wgAll.Wait()
+
+	entries := hook.AllEntries()
+	assert.Len(entries, 100)
+}
+
+// nolint:staticcheck // linter assumes logger.Fatal exits, resulting in false SA4006 warnings.
+func TestFatalWithAlternateExit(t *testing.T) {
+	assert := assert.New(t)
+
+	logger, hook := test.NewNullLogger()
+	logger.ExitFunc = func(code int) {}
+
+	logger.Fatal("something went very wrong")
+	assert.Equal(logrus.FatalLevel, hook.LastEntry().Level)
+	assert.Equal("something went very wrong", hook.LastEntry().Message)
+	assert.Len(hook.Entries, 1)
+}
+
+func TestNewLocal(t *testing.T) {
+	assert := assert.New(t)
+	logger := logrus.New()
+	logger.SetOutput(io.Discard)
+
+	var wg sync.WaitGroup
+	defer wg.Wait()
+
+	wg.Add(10)
+	for range 10 {
+		go func() {
+			logger.Info("info")
+			wg.Done()
+		}()
+	}
+
+	hook := test.NewLocal(logger)
+	assert.NotNil(hook)
+}
