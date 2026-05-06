@@ -1,0 +1,15 @@
+enum CategoryFilter {
+  all,
+  studyPlan,
+  task,
+  quiz,
+  book,
+  video,
+  shortMain,
+  expertAnswer,
+  article,
+  translation,
+  selection,
+  humor,
+  interview,
+}
