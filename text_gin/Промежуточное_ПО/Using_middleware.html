@@ -1,0 +1,13 @@
+<h1 id="_top">Использование middleware</h1>
+<p>Middleware в Gin — это функции, которые выполняются до (и опционально после) вашего обработчика маршрута. Они используются для сквозных задач, таких как логирование, аутентификация, восстановление после ошибок и модификация запросов.</p>
+<p>Gin поддерживает три уровня подключения middleware:</p>
+<ul>
+<li><strong>Глобальный middleware</strong> — Применяется ко всем маршрутам маршрутизатора. Регистрируется с помощью <code>router.Use()</code>…</li>
+<li><strong>Middleware группы</strong> — Применяется ко всем маршрутам в группе. Регистрируется с помощью <code>group.Use()</code>…</li>
+<li><strong>Middleware маршрута</strong> — Применяется только к одному маршруту. Передаётся как дополнительные аргументы в <code>router.GET()</code>, <code>router.POST()</code> и т.д…</li>
+</ul>
+<p><strong>Порядок выполнения:</strong> Функции middleware выполняются в порядке их регистрации…</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="go"><code><div class="ec-line"><div class="code"><span style="--0:#F97583;--1:#BF3441">package</span><span style="--0:#E1E4E8;--1:#24292E"> </span><span style="--0:#B392F0;--1:#6F42C1">main</span></div></div>
+... (весь код из исходного файла)
+</code></pre></div></figure></div>
+</code></pre></figure></div>

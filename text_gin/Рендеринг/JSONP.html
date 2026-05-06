@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>JSONP | Gin Web Framework</title>
+</head>
+<body>
+<h1>JSONP</h1>
+<p>JSONP (JSON with Padding) — это техника для выполнения кросс-доменных запросов из браузеров, которые не поддерживают CORS. Она работает путём оборачивания JSON-ответа в вызов JavaScript-функции. Браузер загружает ответ через тег <code>&lt;script&gt;</code>, который не подчиняется политике одного источника, и оборачивающая функция выполняется с данными в качестве аргумента.</p>
+<p>Когда вы вызываете <code>c.JSONP()</code>, Gin проверяет наличие параметра запроса <code>callback</code>. Если он присутствует, тело ответа оборачивается как <code>callbackName({"foo":"bar"})</code> с <code>Content-Type</code> равным <code>application/javascript</code>. Если callback не указан, ответ ведёт себя как стандартный вызов <code>c.JSON()</code>.</p>
+<aside>
+<p><strong>Заметка:</strong> JSONP — это устаревшая техника. Для современных приложений используйте <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">CORS</a>. CORS более безопасен, поддерживает все HTTP-методы (не только GET) и не требует оборачивания ответов в callback-функции. Используйте JSONP только когда нужна поддержка очень старых браузеров или интеграция со сторонними системами, которые это требуют.</p>
+</aside>
+<pre><code>package main
+
+import (
+  "net/http"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  router := gin.Default()
+  router.GET("/JSONP", func(c *gin.Context) {
+    data := map[string]interface{}{
+      "foo": "bar",
+    }
+    // The callback name is read from the query string, e.g.:
+    // GET /JSONP?callback=x
+    // Will output  :   x({"foo":"bar"})
+    c.JSONP(http.StatusOK, data)
+  })
+  router.Run(":8080")
+}</code></pre>
+<p>Проверьте с помощью curl, чтобы увидеть разницу между ответами JSONP и обычным JSON:</p>
+<pre><code># With callback -- returns JavaScript
+curl "http://localhost:8080/JSONP?callback=handleData"
+# Output: handleData({"foo":"bar"});
+
+# Without callback -- returns plain JSON
+curl "http://localhost:8080/JSONP"
+# Output: {"foo":"bar"}</code></pre>
+<aside>
+<p><strong>Соображения безопасности:</strong> Эндпоинты JSONP могут быть уязвимы для XSS-атак, если параметр callback не очищен должным образом. Вредоносное значение callback, такое как <code>alert(document.cookie)//</code>, может внедрить произвольный JavaScript. Gin смягчает это, очищая имя callback и удаляя символы, которые могут быть использованы для инъекции. Тем не менее, вы должны ограничивать JSONP-эндпоинты некритичными данными только для чтения, поскольку любая страница в вебе может загрузить ваш JSONP-эндпоинт через тег <code>&lt;script&gt;</code>.</p>
+</aside>
+<h2>Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/rendering/rendering/">Рендеринг XML/JSON/YAML/ProtoBuf</a></li>
+<li><a href="/ru/docs/rendering/secure-json/">SecureJSON</a></li>
+<li><a href="/ru/docs/rendering/ascii-json/">AsciiJSON</a></li>
+<li><a href="/ru/docs/rendering/pure-json/">PureJSON</a></li>
+</ul>
+</body>
+</html>

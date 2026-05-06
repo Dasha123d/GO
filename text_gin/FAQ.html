@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>FAQ | Gin Web Framework</title>
+</head>
+<body>
+<h1>FAQ</h1>
+
+<h2>Общие вопросы</h2>
+<h3>Как включить автоперезагрузку при разработке?</h3>
+<p>Используйте <a href="https://github.com/air-verse/air">Air</a> для автоматической перезагрузки при разработке. Air отслеживает ваши файлы и пересобирает/перезапускает приложение при обнаружении изменений.</p>
+<p><strong>Установка:</strong></p>
+<pre><code>go install github.com/air-verse/air@latest</code></pre>
+<p><strong>Настройка:</strong></p>
+<p>Создайте файл конфигурации <code>.air.toml</code> в корне вашего проекта:</p>
+<pre><code>air init</code></pre>
+<p>Затем запустите <code>air</code> в директории проекта вместо <code>go run</code>:</p>
+<pre><code>air</code></pre>
+<p>Air будет отслеживать ваши файлы <code>.go</code> и автоматически пересобирать/перезапускать ваше приложение Gin при изменениях. Смотрите <a href="https://github.com/air-verse/air">документацию Air</a> для параметров конфигурации.</p>
+
+<h3>Как настроить CORS в Gin?</h3>
+<p>Используйте официальный middleware <a href="https://github.com/gin-contrib/cors">gin-contrib/cors</a>:</p>
+<pre><code>package main
+
+import (
+  "time"
+  "github.com/gin-contrib/cors"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  r := gin.Default()
+
+  // Default CORS configuration
+  r.Use(cors.Default())
+
+  // Or customize CORS settings
+  r.Use(cors.New(cors.Config{
+    AllowOrigins:     []string{"https://example.com"},
+    AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+    AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+    ExposeHeaders:    []string{"Content-Length"},
+    AllowCredentials: true,
+    MaxAge:           12 * time.Hour,
+  }))
+
+  r.GET("/ping", func(c *gin.Context) {
+    c.JSON(200, gin.H{"message": "pong"})
+  })
+
+  r.Run()
+}</code></pre>
+<p>Полный обзор безопасности см. в разделе <a href="/ru/docs/middleware/security-guide/">Лучшие практики безопасности</a>.</p>
+
+<h3>Как раздавать статические файлы?</h3>
+<p>Используйте <code>Static()</code> или <code>StaticFS()</code> для раздачи статических файлов:</p>
+<pre><code>func main() {
+  r := gin.Default()
+
+  // Serve files from ./assets directory at /assets/*
+  r.Static("/assets", "./assets")
+
+  // Serve a single file
+  r.StaticFile("/favicon.ico", "./resources/favicon.ico")
+
+  // Serve from embedded filesystem (Go 1.16+)
+  r.StaticFS("/public", http.FS(embedFS))
+
+  r.Run()
+}</code></pre>
+<p>Подробнее см. <a href="/ru/docs/rendering/serving-data-from-file/">Раздача данных из файла</a>.</p>
+
+<h3>Как обрабатывать загрузку файлов?</h3>
+<p>Используйте <code>FormFile()</code> для одного файла или <code>MultipartForm()</code> для нескольких файлов:</p>
+<pre><code>// Single file upload
+r.POST("/upload", func(c *gin.Context) {
+  file, _ := c.FormFile("file")
+  c.SaveUploadedFile(file, "./uploads/"+file.Filename)
+  c.String(200, "File %s uploaded successfully", file.Filename)
+})
+
+// Multiple files upload
+r.POST("/upload-multiple", func(c *gin.Context) {
+  form, _ := c.MultipartForm()
+  files := form.File["files"]
+
+  for _, file := range files {
+    c.SaveUploadedFile(file, "./uploads/"+file.Filename)
+  }
+  c.String(200, "%d files uploaded", len(files))
+})</code></pre>
+<p>Подробнее см. документацию <a href="/ru/docs/routing/upload-file/">Загрузка файлов</a>.</p>
+
+<h3>Как реализовать аутентификацию с JWT?</h3>
+<p>Используйте <a href="https://github.com/gin-contrib/jwt">gin-contrib/jwt</a> или реализуйте пользовательский middleware. Вот минимальный пример:</p>
+<pre><code>package main
+
+import (
+  "net/http"
+  "time"
+  "github.com/gin-gonic/gin"
+  "github.com/golang-jwt/jwt/v5"
+)
+
+var jwtSecret = []byte("your-secret-key")
+
+type Claims struct {
+  Username string `json:"username"`
+  jwt.RegisteredClaims
+}
+
+func AuthMiddleware() gin.HandlerFunc {
+  return func(c *gin.Context) {
+    tokenString := c.GetHeader("Authorization")
+    if tokenString == "" {
+      c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing authorization token"})
+      c.Abort()
+      return
+    }
+
+    // Remove "Bearer " prefix if present
+    if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
+      tokenString = tokenString[7:]
+    }
+
+    token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+      return jwtSecret, nil
+    })
+
+    if err != nil || !token.Valid {
+      c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+      c.Abort()
+      return
+    }
+
+    if claims, ok := token.Claims.(*Claims); ok {
+      c.Set("username", claims.Username)
+      c.Next()
+    }
+  }
+}</code></pre>
+<p>Для аутентификации на основе сессий см. <a href="/ru/docs/middleware/session-management/">Управление сессиями</a>.</p>
+
+<h3>Как настроить логирование запросов?</h3>
+<p>Gin включает middleware логирования по умолчанию через <code>gin.Default()</code>. Для структурированного JSON-логирования в продакшене см. <a href="/ru/docs/logging/structured-logging/">Структурированное логирование</a>.</p>
+<p>Для базовой настройки логов:</p>
+<pre><code>r := gin.New()
+r.Use(gin.LoggerWithConfig(gin.LoggerConfig{
+  SkipPaths: []string{"/healthz"},
+}))
+r.Use(gin.Recovery())</code></pre>
+<p>Все варианты, включая пользовательские форматы, вывод в файл и исключение строк запроса, см. в разделе <a href="/ru/docs/logging/">Логирование</a>.</p>
+
+<h3>Как реализовать плавную остановку?</h3>
+<p>См. <a href="/ru/docs/server-config/graceful-restart-or-stop/">Плавная перезагрузка или остановка</a> для полного руководства с примерами кода.</p>
+
+<h3>Почему я получаю “404 Not Found” вместо “405 Method Not Allowed”?</h3>
+<p>По умолчанию Gin возвращает 404 для маршрутов, которые не поддерживают запрашиваемый HTTP-метод. Установите <code>HandleMethodNotAllowed = true</code>, чтобы возвращать 405:</p>
+<pre><code>r := gin.Default()
+r.HandleMethodNotAllowed = true
+
+r.GET("/ping", func(c *gin.Context) {
+  c.JSON(200, gin.H{"message": "pong"})
+})
+
+r.Run()</code></pre>
+<pre><code>$ curl -X POST localhost:8080/ping
+
+HTTP/1.1 405 Method Not Allowed
+Allow: GET</code></pre>
+
+<h3>Как привязать параметры запроса и POST-данные одновременно?</h3>
+<p>Используйте <code>ShouldBind()</code>, который автоматически выбирает привязку на основе типа контента:</p>
+<pre><code>type User struct {
+  Name  string `form:"name" json:"name"`
+  Email string `form:"email" json:"email"`
+  Page  int    `form:"page"`
+}
+
+r.POST("/user", func(c *gin.Context) {
+  var user User
+  if err := c.ShouldBind(&user); err != nil {
+    c.JSON(400, gin.H{"error": err.Error()})
+    return
+  }
+  c.JSON(200, user)
+})</code></pre>
+<p>Все варианты привязки см. в разделе <a href="/ru/docs/binding/">Привязка данных</a>.</p>
+
+<h3>Как валидировать данные запроса?</h3>
+<p>Gin использует <a href="https://github.com/go-playground/validator">go-playground/validator</a> для валидации. Добавьте теги валидации к вашим структурам:</p>
+<pre><code>type User struct {
+  Name  string `json:"name" binding:"required,min=3,max=50"`
+  Email string `json:"email" binding:"required,email"`
+  Age   int    `json:"age" binding:"gte=0,lte=130"`
+}
+
+r.POST("/user", func(c *gin.Context) {
+  var user User
+  if err := c.ShouldBindJSON(&user); err != nil {
+    c.JSON(400, gin.H{"error": err.Error()})
+    return
+  }
+  c.JSON(200, gin.H{"message": "User is valid"})
+})</code></pre>
+<p>Пользовательские валидаторы и продвинутое использование см. в разделе <a href="/ru/docs/binding/binding-and-validation/">Привязка модели и валидация</a>.</p>
+
+<h3>Как запустить Gin в продакшен-режиме?</h3>
+<p>Установите переменную окружения <code>GIN_MODE</code> в значение <code>release</code>:</p>
+<pre><code>export GIN_MODE=release
+# или
+GIN_MODE=release ./your-app</code></pre>
+<p>Или установите программно:</p>
+<pre><code>gin.SetMode(gin.ReleaseMode)</code></pre>
+<p>Режим release отключает отладочное логирование и улучшает производительность.</p>
+
+<h3>Как обрабатывать подключения к базе данных с Gin?</h3>
+<p>См. <a href="/ru/docs/server-config/database/">Интеграция с базой данных</a> для полного руководства, охватывающего <code>database/sql</code>, GORM, пул соединений и паттерны внедрения зависимостей.</p>
+
+<h3>Как тестировать обработчики Gin?</h3>
+<p>Используйте <code>net/http/httptest</code> для тестирования маршрутов:</p>
+<pre><code>func TestPingRoute(t *testing.T) {
+  router := gin.Default()
+  router.GET("/ping", func(c *gin.Context) {
+    c.JSON(200, gin.H{"message": "pong"})
+  })
+
+  w := httptest.NewRecorder()
+  req, _ := http.NewRequest("GET", "/ping", nil)
+  router.ServeHTTP(w, req)
+
+  assert.Equal(t, 200, w.Code)
+  assert.Contains(t, w.Body.String(), "pong")
+}</code></pre>
+<p>Больше примеров см. в документации <a href="/ru/docs/testing/">Тестирование</a>.</p>
+
+<h2>Вопросы о производительности</h2>
+<h3>Как оптимизировать Gin для высокой нагрузки?</h3>
+<ol>
+<li><strong>Используйте режим Release</strong>: Установите <code>GIN_MODE=release</code></li>
+<li><strong>Отключите ненужные middleware</strong>: Используйте только то, что вам нужно</li>
+<li><strong>Используйте <code>gin.New()</code> вместо <code>gin.Default()</code></strong> для ручного управления middleware</li>
+<li><strong>Пул соединений</strong>: Настройте пулы соединений к базе данных (см. <a href="/ru/docs/server-config/database/">Интеграция с базой данных</a>)</li>
+<li><strong>Кеширование</strong>: Реализуйте кеширование для часто запрашиваемых данных</li>
+<li><strong>Балансировка нагрузки</strong>: Используйте обратный прокси (nginx, HAProxy)</li>
+<li><strong>Профилирование</strong>: Используйте pprof из Go для выявления узких мест</li>
+<li><strong>Мониторинг</strong>: Настройте <a href="/ru/docs/server-config/metrics/">метрики и мониторинг</a> для отслеживания производительности</li>
+</ol>
+
+<h3>Готов ли Gin к продакшену?</h3>
+<p>Да. Gin используется в продакшене многими компаниями и проверен под высокими нагрузками. Примеры проектов, использующих Gin в продакшене, см. в разделе <a href="/ru/docs/users/">Пользователи</a>.</p>
+
+<h2>Устранение неполадок</h2>
+<h3>Почему мои параметры маршрута не работают?</h3>
+<p>Убедитесь, что параметры маршрута используют синтаксис <code>:</code> и правильно извлекаются:</p>
+<pre><code>// Correct
+r.GET("/user/:id", func(c *gin.Context) {
+  id := c.Param("id")
+  c.String(200, "User ID: %s", id)
+})
+
+// Not: /user/{id} or /user/<id></code></pre>
+<p>Подробнее см. <a href="/ru/docs/routing/param-in-path/">Параметры в пути</a>.</p>
+
+<h3>Почему мой middleware не выполняется?</h3>
+<p>Middleware должен быть зарегистрирован до маршрутов или групп маршрутов:</p>
+<pre><code>// Correct order
+r := gin.New()
+r.Use(MyMiddleware()) // Register middleware first
+r.GET("/ping", handler) // Then routes
+
+// For route groups
+auth := r.Group("/admin")
+auth.Use(AuthMiddleware()) // Middleware for this group
+{
+  auth.GET("/dashboard", handler)
+}</code></pre>
+<p>Подробнее см. <a href="/ru/docs/middleware/using-middleware/">Использование middleware</a>.</p>
+
+<h3>Почему привязка запроса не работает?</h3>
+<p>Частые причины:</p>
+<ol>
+<li><strong>Отсутствуют теги привязки</strong>: Добавьте теги <code>json:"field"</code> или <code>form:"field"</code></li>
+<li><strong>Несоответствие Content-Type</strong>: Убедитесь, что клиент отправляет правильный заголовок Content-Type</li>
+<li><strong>Ошибки валидации</strong>: Проверьте теги и правила валидации</li>
+<li><strong>Неэкспортируемые поля</strong>: Привязываются только экспортируемые (с заглавной буквы) поля структуры</li>
+</ol>
+<pre><code>type User struct {
+  Name  string `json:"name" binding:"required"` // Correct
+  Email string `json:"email"`                    // Correct
+  age   int    `json:"age"`                      // Won't bind (unexported)
+}</code></pre>
+<p>Подробнее см. <a href="/ru/docs/binding/binding-and-validation/">Привязка модели и валидация</a>.</p>
+</body>
+</html>

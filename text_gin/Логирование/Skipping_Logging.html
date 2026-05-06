@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Пропуск логирования | Gin Web Framework</title>
+</head>
+<body>
+<h1>Пропуск логирования</h1>
+
+<p>Вы можете пропустить логирование для определённых путей или на основе пользовательской логики с помощью <code>LoggerConfig</code>.</p>
+<ul>
+<li><code>SkipPaths</code> исключает определённые маршруты из логирования — полезно для проверок состояния или эндпоинтов метрик, которые создают шум.</li>
+<li><code>Skip</code> — это функция, которая получает <code>*gin.Context</code> и возвращает <code>true</code> для пропуска логирования — полезно для условной логики, например пропуска успешных ответов.</li>
+</ul>
+
+<pre><code>package main
+
+import (
+  &quot;net/http&quot;
+
+  &quot;github.com/gin-gonic/gin&quot;
+)
+
+func main() {
+  router := gin.New()
+
+  // skip logging for desired paths by setting SkipPaths in LoggerConfig
+  loggerConfig := gin.LoggerConfig{SkipPaths: []string{&quot;/metrics&quot;}}
+
+  // skip logging based on your logic by setting Skip func in LoggerConfig
+  loggerConfig.Skip = func(c *gin.Context) bool {
+    // as an example skip non server side errors
+    return c.Writer.Status() &lt; http.StatusInternalServerError
+  }
+
+  router.Use(gin.LoggerWithConfig(loggerConfig))
+  router.Use(gin.Recovery())
+
+  // skipped -- path is in SkipPaths
+  router.GET(&quot;/metrics&quot;, func(c *gin.Context) {
+    c.Status(http.StatusNotImplemented)
+  })
+
+  // skipped -- status &lt; 500
+  router.GET(&quot;/ping&quot;, func(c *gin.Context) {
+    c.String(http.StatusOK, &quot;pong&quot;)
+  })
+
+  // not skipped -- status is 501 (&gt;= 500)
+  router.GET(&quot;/data&quot;, func(c *gin.Context) {
+    c.Status(http.StatusNotImplemented)
+  })
+
+  router.Run(&quot;:8080&quot;)
+}</code></pre>
+
+<h2>Тестирование</h2>
+<pre><code># This request is logged (status 501 &gt;= 500)
+curl http://localhost:8080/data
+
+# This request is NOT logged (path in SkipPaths)
+curl http://localhost:8080/metrics
+
+# This request is NOT logged (status 200 &lt; 500)
+curl http://localhost:8080/ping
+# Output: pong</code></pre>
+
+<h2>Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/logging/custom-log-format/">Пользовательский формат логов</a></li>
+<li><a href="/ru/docs/logging/write-log/">Запись логов</a></li>
+</ul>
+</body>
+</html>

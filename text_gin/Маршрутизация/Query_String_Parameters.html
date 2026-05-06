@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Query String Parameters – Gin Web Framework</title>
+</head>
+<body>
+<h1 id="_top">Параметры строки запроса</h1>
+<div class="sl-markdown-content">
+<p>Параметры строки запроса — это пары ключ-значение, которые появляются после <code>?</code> в URL (например, <code>/search?q=gin&#x26;page=2</code>). Gin предоставляет два метода для их чтения:</p>
+<ul>
+<li><code>c.Query("key")</code> возвращает значение параметра запроса или <strong>пустую строку</strong>, если ключ отсутствует.</li>
+<li><code>c.DefaultQuery("key", "default")</code> возвращает значение или указанное <strong>значение по умолчанию</strong>, если ключ отсутствует.</li>
+</ul>
+<p>Оба метода являются сокращениями для доступа к <code>c.Request.URL.Query()</code> с меньшим количеством шаблонного кода.</p>
+<pre><code>package main
+
+import (
+  "net/http"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  router := gin.Default()
+
+  // Query string parameters are parsed using the existing underlying request object.
+  // The request responds to a url matching:  /welcome?firstname=Jane&#x26;lastname=Doe
+  router.GET("/welcome", func(c *gin.Context) {
+    firstname := c.DefaultQuery("firstname", "Guest")
+    lastname := c.Query("lastname") // shortcut for c.Request.URL.Query().Get("lastname")
+
+    c.String(http.StatusOK, "Hello %s %s", firstname, lastname)
+  })
+  router.Run(":8080")
+}
+</code></pre>
+<h2>Тестирование</h2>
+<pre><code># Both parameters provided
+curl "http://localhost:8080/welcome?firstname=Jane&#x26;lastname=Doe"
+# Output: Hello Jane Doe
+
+# Missing firstname -- uses default value "Guest"
+curl "http://localhost:8080/welcome?lastname=Doe"
+# Output: Hello Guest Doe
+
+# No parameters at all
+curl "http://localhost:8080/welcome"
+# Output: Hello Guest
+</code></pre>
+<h2>Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/routing/param-in-path/">Параметры в пути</a></li>
+</ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Сборка бинарного файла с шаблонами | Gin Web Framework</title>
+</head>
+<body>
+<h1>Сборка бинарного файла с шаблонами</h1>
+<h2>Использование <code>//go:embed</code> (рекомендуется)</h2>
+<p>Начиная с Go 1.16, стандартная библиотека поддерживает встраивание файлов непосредственно в бинарный файл с помощью директивы <code>//go:embed</code>. Сторонние зависимости не нужны.</p>
+<pre><code>package main
+
+import (
+  "embed"
+  "html/template"
+  "net/http"
+
+  "github.com/gin-gonic/gin"
+)
+
+//go:embed templates/*
+var templateFS embed.FS
+
+func main() {
+  router := gin.Default()
+
+  t := template.Must(template.ParseFS(templateFS, "templates/*.tmpl"))
+  router.SetHTMLTemplate(t)
+
+  router.GET("/", func(c *gin.Context) {
+    c.HTML(http.StatusOK, "index.tmpl", nil)
+  })
+
+  router.Run(":8080")
+}</code></pre>
+<h2>Использование сторонних пакетов</h2>
+<p>Вы также можете использовать сторонние пакеты, такие как <a href="https://github.com/jessevdk/go-assets">go-assets</a>, для встраивания шаблонов в бинарный файл.</p>
+<pre><code>func main() {
+  router := gin.New()
+
+  t, err := loadTemplate()
+  if err != nil {
+    panic(err)
+  }
+  router.SetHTMLTemplate(t)
+
+  router.GET("/", func(c *gin.Context) {
+    c.HTML(http.StatusOK, "/html/index.tmpl", nil)
+  })
+  router.Run(":8080")
+}
+
+// loadTemplate loads templates embedded by go-assets-builder
+func loadTemplate() (*template.Template, error) {
+  t := template.New("")
+  for name, file := range Assets.Files {
+    if file.IsDir() || !strings.HasSuffix(name, ".tmpl") {
+      continue
+    }
+    h, err := io.ReadAll(file)
+    if err != nil {
+      return nil, err
+    }
+    t, err = t.New(name).Parse(string(h))
+    if err != nil {
+      return nil, err
+    }
+  }
+  return t, nil
+}</code></pre>
+<p>Полный пример можно найти в директории <a href="https://github.com/gin-gonic/examples/tree/master/assets-in-binary/example01">assets-in-binary/example01</a>.</p>
+</body>
+</html>

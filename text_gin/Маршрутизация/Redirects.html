@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Redirects – Gin Web Framework</title>
+</head>
+<body>
+<h1 id="_top">Перенаправления</h1>
+<div class="sl-markdown-content">
+<p>Gin поддерживает как HTTP-перенаправления (отправка клиента на другой URL), так и перенаправления на уровне маршрутизатора (внутренняя переадресация запроса на другой обработчик без обращения клиента к серверу).</p>
+<h2>HTTP-перенаправления</h2>
+<p>Используйте <code>c.Redirect</code> с соответствующим кодом статуса HTTP для перенаправления клиента:</p>
+<ul>
+<li><strong>301 (<code>http.StatusMovedPermanently</code>)</strong> — ресурс перемещён навсегда.</li>
+<li><strong>302 (<code>http.StatusFound</code>)</strong> — временное перенаправление.</li>
+<li><strong>307 (<code>http.StatusTemporaryRedirect</code>)</strong> — как 302, но браузер должен сохранить исходный HTTP-метод.</li>
+<li><strong>308 (<code>http.StatusPermanentRedirect</code>)</strong> — как 301, но браузер должен сохранить исходный HTTP-метод.</li>
+</ul>
+<pre><code>package main
+
+import (
+  "net/http"
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  router := gin.Default()
+
+  // External redirect (GET)
+  router.GET("/old", func(c *gin.Context) {
+    c.Redirect(http.StatusMovedPermanently, "https://www.google.com/")
+  })
+
+  // Redirect from POST -- use 302 or 307 to preserve behavior
+  router.POST("/submit", func(c *gin.Context) {
+    c.Redirect(http.StatusFound, "/result")
+  })
+
+  // Internal router redirect (no HTTP round-trip)
+  router.GET("/test", func(c *gin.Context) {
+    c.Request.URL.Path = "/final"
+    router.HandleContext(c)
+  })
+
+  router.GET("/final", func(c *gin.Context) {
+    c.JSON(http.StatusOK, gin.H{"hello": "world"})
+  })
+
+  router.GET("/result", func(c *gin.Context) {
+    c.String(http.StatusOK, "Redirected here!")
+  })
+
+  router.Run(":8080")
+}
+</code></pre>
+<h2>Тестирование</h2>
+<pre><code># GET redirect -- follows to Google (use -L to follow, -I to see headers only)
+curl -I http://localhost:8080/old
+
+# POST redirect -- returns 302 with new location
+curl -X POST -I http://localhost:8080/submit
+
+# Internal redirect -- handled server-side, client sees final response
+curl http://localhost:8080/test
+# Output: {"hello":"world"}
+</code></pre>
+<aside class="starlight-aside starlight-aside--caution">
+<p class="starlight-aside__title">Осторожно</p>
+<p>При перенаправлении из POST-обработчика используйте <code>302</code> или <code>307</code> вместо <code>301</code>. Перенаправление <code>301</code> может заставить некоторые браузеры изменить метод с POST на GET.</p>
+</aside>
+<aside class="starlight-aside starlight-aside--tip">
+<p class="starlight-aside__title">Совет</p>
+<p>Внутренние перенаправления через <code>router.HandleContext(c)</code> не отправляют ответ перенаправления клиенту. Запрос перенаправляется внутри сервера, что быстрее и невидимо для клиента.</p>
+</aside>
+<h2>Смотрите также</h2>
+<ul>
+<li><a href="/ru/docs/routing/grouping-routes/">Группировка маршрутов</a></li>
+</ul>
+</div>
+</body>
+</html>
