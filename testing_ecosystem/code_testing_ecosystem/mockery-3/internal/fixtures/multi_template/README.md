@@ -1,0 +1,1 @@
+This package tests that mockery can render different templates for the same interface.
