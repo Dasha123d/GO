@@ -1,0 +1,1264 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>net/http</title>
+</head>
+<body>
+
+<article data-package="net/http">
+
+<main class="go-Main" id="main-content">
+ <article>
+  <div>
+   <div>
+    <div>
+     <h2 id="section-documentation">
+      <img alt="" height="24" src="/static/shared/icon/code_gm_grey_24dp.svg" width="24"/>
+      Documentation
+     </h2>
+     <div>
+      <div>
+       <section>
+        <h3 id="pkg-overview" tabindex="-1">
+         Overview
+        </h3>
+        <p>
+         Package context defines the Context type, which carries deadlines,
+cancellation signals, and other request-scoped values across API boundaries
+and between processes.
+        </p>
+        <p>
+         Incoming requests to a server should create a
+         <a href="#Context">
+          Context
+         </a>
+         , and outgoing
+calls to servers should accept a Context. The chain of function
+calls between them must propagate the Context, optionally replacing
+it with a derived Context created using
+         <a href="#WithCancel">
+          WithCancel
+         </a>
+         ,
+         <a href="#WithDeadline">
+          WithDeadline
+         </a>
+         ,
+         <a href="#WithTimeout">
+          WithTimeout
+         </a>
+         , or
+         <a href="#WithValue">
+          WithValue
+         </a>
+         .
+        </p>
+        <p>
+         A Context may be canceled to indicate that work done on its behalf should stop.
+A Context with a deadline is canceled after the deadline passes.
+When a Context is canceled, all Contexts derived from it are also canceled.
+        </p>
+        <p>
+         The
+         <a href="#WithCancel">
+          WithCancel
+         </a>
+         ,
+         <a href="#WithDeadline">
+          WithDeadline
+         </a>
+         , and
+         <a href="#WithTimeout">
+          WithTimeout
+         </a>
+         functions take a
+Context (the parent) and return a derived Context (the child) and a
+         <a href="#CancelFunc">
+          CancelFunc
+         </a>
+         . Calling the CancelFunc directly cancels the child and its
+children, removes the parent's reference to the child, and stops
+any associated timers. Failing to call the CancelFunc leaks the
+child and its children until the parent is canceled. The go vet tool
+checks that CancelFuncs are used on all control-flow paths.
+        </p>
+        <p>
+         The
+         <a href="#WithCancelCause">
+          WithCancelCause
+         </a>
+         ,
+         <a href="#WithDeadlineCause">
+          WithDeadlineCause
+         </a>
+         , and
+         <a href="#WithTimeoutCause">
+          WithTimeoutCause
+         </a>
+         functions
+return a
+         <a href="#CancelCauseFunc">
+          CancelCauseFunc
+         </a>
+         , which takes an error and records it as
+the cancellation cause. Calling
+         <a href="#Cause">
+          Cause
+         </a>
+         on the canceled context
+or any of its children retrieves the cause. If no cause is specified,
+Cause(ctx) returns the same value as ctx.Err().
+        </p>
+        <p>
+         Programs that use Contexts should follow these rules to keep interfaces
+consistent across packages and enable static analysis tools to check context
+propagation:
+        </p>
+        <p>
+         Do not store Contexts inside a struct type; instead, pass a Context
+explicitly to each function that needs it. This is discussed further in
+         <a href="https://go.dev/blog/context-and-structs">
+          https://go.dev/blog/context-and-structs
+         </a>
+         . The Context should be the first
+parameter, typically named ctx:
+        </p>
+        <pre data-code="go">func DoSomething(ctx context.Context, arg Arg) error {
+	// ... use ctx ...
+}
+</pre>
+        <p>
+         Do not pass a nil
+         <a href="#Context">
+          Context
+         </a>
+         , even if a function permits it. Pass
+         <a href="#TODO">
+          context.TODO
+         </a>
+         if you are unsure about which Context to use.
+        </p>
+        <p>
+         Use context Values only for request-scoped data that transits processes and
+APIs, not for passing optional parameters to functions.
+        </p>
+        <p>
+         The same Context may be passed to functions running in different goroutines;
+Contexts are safe for simultaneous use by multiple goroutines.
+        </p>
+        <p>
+         See
+         <a href="https://go.dev/blog/context">
+          https://go.dev/blog/context
+         </a>
+         for example code for a server that uses
+Contexts.
+        </p>
+       </section>
+       <section>
+        <h3 id="pkg-index">
+         Index
+        </h3>
+        <ul>
+         <li>
+          <a href="#pkg-variables">
+           Variables
+          </a>
+         </li>
+         <li>
+          <a href="#AfterFunc">
+           func AfterFunc(ctx Context, f func()) (stop func() bool)
+          </a>
+         </li>
+         <li>
+          <a href="#Cause">
+           func Cause(c Context) error
+          </a>
+         </li>
+         <li>
+          <a href="#WithCancel">
+           func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
+          </a>
+         </li>
+         <li>
+          <a href="#WithCancelCause">
+           func WithCancelCause(parent Context) (ctx Context, cancel CancelCauseFunc)
+          </a>
+         </li>
+         <li>
+          <a href="#WithDeadline">
+           func WithDeadline(parent Context, d time.Time) (Context, CancelFunc)
+          </a>
+         </li>
+         <li>
+          <a href="#WithDeadlineCause">
+           func WithDeadlineCause(parent Context, d time.Time, cause error) (Context, CancelFunc)
+          </a>
+         </li>
+         <li>
+          <a href="#WithTimeout">
+           func WithTimeout(parent Context, timeout time.Duration) (Context, CancelFunc)
+          </a>
+         </li>
+         <li>
+          <a href="#WithTimeoutCause">
+           func WithTimeoutCause(parent Context, timeout time.Duration, cause error) (Context, CancelFunc)
+          </a>
+         </li>
+         <li>
+          <a href="#CancelCauseFunc">
+           type CancelCauseFunc
+          </a>
+         </li>
+         <li>
+          <a href="#CancelFunc">
+           type CancelFunc
+          </a>
+         </li>
+         <li>
+          <a href="#Context">
+           type Context
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#Background">
+             func Background() Context
+            </a>
+           </li>
+           <li>
+            <a href="#TODO">
+             func TODO() Context
+            </a>
+           </li>
+           <li>
+            <a href="#WithValue">
+             func WithValue(parent Context, key, val any) Context
+            </a>
+           </li>
+           <li>
+            <a href="#WithoutCancel">
+             func WithoutCancel(parent Context) Context
+            </a>
+           </li>
+          </ul>
+         </li>
+        </ul>
+       </section>
+       <section>
+        <h3 id="pkg-examples" tabindex="-1">
+         Examples
+        </h3>
+        <ul>
+         <li>
+          <a href="#example-AfterFunc-Cond">
+           AfterFunc (Cond)
+          </a>
+         </li>
+         <li>
+          <a href="#example-AfterFunc-Connection">
+           AfterFunc (Connection)
+          </a>
+         </li>
+         <li>
+          <a href="#example-AfterFunc-Merge">
+           AfterFunc (Merge)
+          </a>
+         </li>
+         <li>
+          <a href="#example-WithCancel">
+           WithCancel
+          </a>
+         </li>
+         <li>
+          <a href="#example-WithDeadline">
+           WithDeadline
+          </a>
+         </li>
+         <li>
+          <a href="#example-WithTimeout">
+           WithTimeout
+          </a>
+         </li>
+         <li>
+          <a href="#example-WithValue">
+           WithValue
+          </a>
+         </li>
+        </ul>
+       </section>
+       <h3 id="pkg-constants" tabindex="-1">
+        Constants
+       </h3>
+       <section>
+        <p>
+         This section is empty.
+        </p>
+       </section>
+       <h3 id="pkg-variables" tabindex="-1">
+        Variables
+       </h3>
+       <section>
+        <div>
+         <pre data-code="go"><span id="Canceled">var Canceled = <a href="/errors">errors</a>.<a href="/errors#New">New</a>("context canceled")</span></pre>
+        </div>
+        <p>
+         Canceled is the error returned by [Context.Err] when the context is canceled
+for some reason other than its deadline passing.
+        </p>
+        <div>
+         <pre data-code="go"><span id="DeadlineExceeded">var DeadlineExceeded <a href="/builtin#error">error</a> = deadlineExceededError{}</span></pre>
+        </div>
+        <p>
+         DeadlineExceeded is the error returned by [Context.Err] when the context is canceled
+due to its deadline passing.
+        </p>
+       </section>
+       <h3 id="pkg-functions" tabindex="-1">
+        Functions
+       </h3>
+       <section>
+        <div>
+         <h4 id="AfterFunc" tabindex="-1">
+          <span>
+           func
+          </span>
+          <span>
+           <span>
+            added in
+           </span>
+           <span>
+            go1.21.0
+           </span>
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func AfterFunc(ctx <a href="#Context">Context</a>, f func()) (stop func() <a href="/builtin#bool">bool</a>)</pre>
+         </div>
+         <p>
+          AfterFunc arranges to call f in its own goroutine after ctx is canceled.
+If ctx is already canceled, AfterFunc calls f immediately in its own goroutine.
+         </p>
+         <p>
+          Multiple calls to AfterFunc on a context operate independently;
+one does not replace another.
+         </p>
+         <p>
+          Calling the returned stop function stops the association of ctx with f.
+It returns true if the call stopped f from being run.
+If stop returns false,
+either the context is canceled and f has been started in its own goroutine;
+or f was already stopped.
+The stop function does not wait for f to complete before returning.
+If the caller needs to know whether f is completed,
+it must coordinate with f explicitly.
+         </p>
+         <p>
+          If ctx has a "AfterFunc(func()) func() bool" method,
+AfterFunc will use it to schedule the call.
+         </p>
+         <details id="example-AfterFunc-Cond" tabindex="-1">
+          <summary>
+           Example (Cond)
+          </summary>
+          <div>
+           <p>
+            This example uses AfterFunc to define a function which waits on a sync.Cond,
+stopping the wait when a context is canceled.
+           </p>
+           <pre data-code="go">
+package main
+
+import (
+	"context"
+	"fmt"
+	"sync"
+	"time"
+)
+
+func main() {
+	waitOnCond := func(ctx context.Context, cond *sync.Cond, conditionMet func() bool) error {
+		stopf := context.AfterFunc(ctx, func() {
+			// We need to acquire cond.L here to be sure that the Broadcast
+			// below won't occur before the call to Wait, which would result
+			// in a missed signal (and deadlock).
+			cond.L.Lock()
+			defer cond.L.Unlock()
+
+			// If multiple goroutines are waiting on cond simultaneously,
+			// we need to make sure we wake up exactly this one.
+			// That means that we need to Broadcast to all of the goroutines,
+			// which will wake them all up.
+			//
+			// If there are N concurrent calls to waitOnCond, each of the goroutines
+			// will spuriously wake up O(N) other goroutines that aren't ready yet,
+			// so this will cause the overall CPU cost to be O(N²).
+			cond.Broadcast()
+		})
+		defer stopf()
+
+		// Since the wakeups are using Broadcast instead of Signal, this call to
+		// Wait may unblock due to some other goroutine's context being canceled,
+		// so to be sure that ctx is actually canceled we need to check it in a loop.
+		for !conditionMet() {
+			cond.Wait()
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+		}
+
+		return nil
+	}
+
+	cond := sync.NewCond(new(sync.Mutex))
+
+	var wg sync.WaitGroup
+	for i := 0; i &lt; 4; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Millisecond)
+			defer cancel()
+
+			cond.L.Lock()
+			defer cond.L.Unlock()
+
+			err := waitOnCond(ctx, cond, func() bool { return false })
+			fmt.Println(err)
+		}()
+	}
+	wg.Wait()
+
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>context deadline exceeded
+context deadline exceeded
+context deadline exceeded
+context deadline exceeded
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+         <details id="example-AfterFunc-Connection" tabindex="-1">
+          <summary>
+           Example (Connection)
+          </summary>
+          <div>
+           <p>
+            This example uses AfterFunc to define a function which reads from a net.Conn,
+stopping the read when a context is canceled.
+           </p>
+           <pre data-code="go">
+package main
+
+import (
+	"context"
+	"fmt"
+	"net"
+	"time"
+)
+
+func main() {
+	readFromConn := func(ctx context.Context, conn net.Conn, b []byte) (n int, err error) {
+		stopc := make(chan struct{})
+		stop := context.AfterFunc(ctx, func() {
+			conn.SetReadDeadline(time.Now())
+			close(stopc)
+		})
+		n, err = conn.Read(b)
+		if !stop() {
+			// The AfterFunc was started.
+			// Wait for it to complete, and reset the Conn's deadline.
+			&lt;-stopc
+			conn.SetReadDeadline(time.Time{})
+			return n, ctx.Err()
+		}
+		return n, err
+	}
+
+	listener, err := net.Listen("tcp", "localhost:0")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer listener.Close()
+
+	conn, err := net.Dial(listener.Addr().Network(), listener.Addr().String())
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer conn.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Millisecond)
+	defer cancel()
+
+	b := make([]byte, 1024)
+	_, err = readFromConn(ctx, conn, b)
+	fmt.Println(err)
+
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>context deadline exceeded
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+         <details id="example-AfterFunc-Merge" tabindex="-1">
+          <summary>
+           Example (Merge)
+          </summary>
+          <div>
+           <p>
+            This example uses AfterFunc to define a function which combines
+the cancellation signals of two Contexts.
+           </p>
+           <pre data-code="go">
+package main
+
+import (
+	"context"
+	"errors"
+	"fmt"
+)
+
+func main() {
+	// mergeCancel returns a context that contains the values of ctx,
+	// and which is canceled when either ctx or cancelCtx is canceled.
+	mergeCancel := func(ctx, cancelCtx context.Context) (context.Context, context.CancelFunc) {
+		ctx, cancel := context.WithCancelCause(ctx)
+		stop := context.AfterFunc(cancelCtx, func() {
+			cancel(context.Cause(cancelCtx))
+		})
+		return ctx, func() {
+			stop()
+			cancel(context.Canceled)
+		}
+	}
+
+	ctx1, cancel1 := context.WithCancelCause(context.Background())
+	defer cancel1(errors.New("ctx1 canceled"))
+
+	ctx2, cancel2 := context.WithCancelCause(context.Background())
+
+	mergedCtx, mergedCancel := mergeCancel(ctx1, ctx2)
+	defer mergedCancel()
+
+	cancel2(errors.New("ctx2 canceled"))
+	&lt;-mergedCtx.Done()
+	fmt.Println(context.Cause(mergedCtx))
+
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>ctx2 canceled
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+        </div>
+        <div>
+         <h4 id="Cause" tabindex="-1">
+          <span>
+           func
+          </span>
+          <span>
+           <span>
+            added in
+           </span>
+           <span>
+            go1.20
+           </span>
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func Cause(c <a href="#Context">Context</a>) <a href="/builtin#error">error</a></pre>
+         </div>
+         <p>
+          Cause returns a non-nil error explaining why c was canceled.
+The first cancellation of c or one of its parents sets the cause.
+If that cancellation happened via a call to CancelCauseFunc(err),
+then
+          <a href="#Cause">
+           Cause
+          </a>
+          returns err.
+Otherwise Cause(c) returns the same value as c.Err().
+Cause returns nil if c has not been canceled yet.
+         </p>
+        </div>
+        <div>
+         <h4 id="WithCancel" tabindex="-1">
+          <span>
+           func
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func WithCancel(parent <a href="#Context">Context</a>) (ctx <a href="#Context">Context</a>, cancel <a href="#CancelFunc">CancelFunc</a>)</pre>
+         </div>
+         <p>
+          WithCancel returns a derived context that points to the parent context
+but has a new Done channel. The returned context's Done channel is closed
+when the returned cancel function is called or when the parent context's
+Done channel is closed, whichever happens first.
+         </p>
+         <p>
+          Canceling this context releases resources associated with it, so code should
+call cancel as soon as the operations running in this
+          <a href="#Context">
+           Context
+          </a>
+          complete.
+         </p>
+         <details id="example-WithCancel" tabindex="-1">
+          <summary>
+           Example
+          </summary>
+          <div>
+           <p>
+            This example demonstrates the use of a cancelable context to prevent a
+goroutine leak. By the end of the example function, the goroutine started
+by gen will return without leaking.
+           </p>
+           <pre data-code="go">
+package main
+
+import (
+	"context"
+	"fmt"
+)
+
+func main() {
+	// gen generates integers in a separate goroutine and
+	// sends them to the returned channel.
+	// The callers of gen need to cancel the context once
+	// they are done consuming generated integers not to leak
+	// the internal goroutine started by gen.
+	gen := func(ctx context.Context) &lt;-chan int {
+		dst := make(chan int)
+		n := 1
+		go func() {
+			for {
+				select {
+				case &lt;-ctx.Done():
+					return // returning not to leak the goroutine
+				case dst &lt;- n:
+					n++
+				}
+			}
+		}()
+		return dst
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel() // cancel when we are finished consuming integers
+
+	for n := range gen(ctx) {
+		fmt.Println(n)
+		if n == 5 {
+			break
+		}
+	}
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>1
+2
+3
+4
+5
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+        </div>
+        <div>
+         <h4 id="WithCancelCause" tabindex="-1">
+          <span>
+           func
+          </span>
+          <span>
+           <span>
+            added in
+           </span>
+           <span>
+            go1.20
+           </span>
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func WithCancelCause(parent <a href="#Context">Context</a>) (ctx <a href="#Context">Context</a>, cancel <a href="#CancelCauseFunc">CancelCauseFunc</a>)</pre>
+         </div>
+         <p>
+          WithCancelCause behaves like
+          <a href="#WithCancel">
+           WithCancel
+          </a>
+          but returns a
+          <a href="#CancelCauseFunc">
+           CancelCauseFunc
+          </a>
+          instead of a
+          <a href="#CancelFunc">
+           CancelFunc
+          </a>
+          .
+Calling cancel with a non-nil error (the "cause") records that error in ctx;
+it can then be retrieved using Cause(ctx).
+Calling cancel with nil sets the cause to Canceled.
+         </p>
+         <p>
+          Example use:
+         </p>
+         <pre data-code="go">ctx, cancel := context.WithCancelCause(parent)
+cancel(myError)
+ctx.Err() // returns context.Canceled
+context.Cause(ctx) // returns myError
+</pre>
+        </div>
+        <div>
+         <h4 id="WithDeadline" tabindex="-1">
+          <span>
+           func
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func WithDeadline(parent <a href="#Context">Context</a>, d <a href="/time">time</a>.<a href="/time#Time">Time</a>) (<a href="#Context">Context</a>, <a href="#CancelFunc">CancelFunc</a>)</pre>
+         </div>
+         <p>
+          WithDeadline returns a derived context that points to the parent context
+but has the deadline adjusted to be no later than d. If the parent's
+deadline is already earlier than d, WithDeadline(parent, d) is semantically
+equivalent to parent. The returned [Context.Done] channel is closed when
+the deadline expires, when the returned cancel function is called,
+or when the parent context's Done channel is closed, whichever happens first.
+         </p>
+         <p>
+          Canceling this context releases resources associated with it, so code should
+call cancel as soon as the operations running in this
+          <a href="#Context">
+           Context
+          </a>
+          complete.
+         </p>
+         <details id="example-WithDeadline" tabindex="-1">
+          <summary>
+           Example
+          </summary>
+          <div>
+           <p>
+            This example passes a context with an arbitrary deadline to tell a blocking
+function that it should abandon its work as soon as it gets to it.
+           </p>
+           <pre data-code="go">
+d := time.Now().Add(shortDuration)
+ctx, cancel := context.WithDeadline(context.Background(), d)
+
+// Even though ctx will be expired, it is good practice to call its
+// cancellation function in any case. Failure to do so may keep the
+// context and its parent alive longer than necessary.
+defer cancel()
+
+select {
+case &lt;-neverReady:
+	fmt.Println("ready")
+case &lt;-ctx.Done():
+	fmt.Println(ctx.Err())
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>context deadline exceeded
+</span></pre>
+          </div>
+         </details>
+        </div>
+        <div>
+         <h4 id="WithDeadlineCause" tabindex="-1">
+          <span>
+           func
+          </span>
+          <span>
+           <span>
+            added in
+           </span>
+           <span>
+            go1.21.0
+           </span>
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func WithDeadlineCause(parent <a href="#Context">Context</a>, d <a href="/time">time</a>.<a href="/time#Time">Time</a>, cause <a href="/builtin#error">error</a>) (<a href="#Context">Context</a>, <a href="#CancelFunc">CancelFunc</a>)</pre>
+         </div>
+         <p>
+          WithDeadlineCause behaves like
+          <a href="#WithDeadline">
+           WithDeadline
+          </a>
+          but also sets the cause of the
+returned Context when the deadline is exceeded. The returned
+          <a href="#CancelFunc">
+           CancelFunc
+          </a>
+          does
+not set the cause.
+         </p>
+        </div>
+        <div>
+         <h4 id="WithTimeout" tabindex="-1">
+          <span>
+           func
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func WithTimeout(parent <a href="#Context">Context</a>, timeout <a href="/time">time</a>.<a href="/time#Duration">Duration</a>) (<a href="#Context">Context</a>, <a href="#CancelFunc">CancelFunc</a>)</pre>
+         </div>
+         <p>
+          WithTimeout returns WithDeadline(parent, time.Now().Add(timeout)).
+         </p>
+         <p>
+          Canceling this context releases resources associated with it, so code should
+call cancel as soon as the operations running in this
+          <a href="#Context">
+           Context
+          </a>
+          complete:
+         </p>
+         <pre data-code="go">func slowOperationWithTimeout(ctx context.Context) (Result, error) {
+	ctx, cancel := context.WithTimeout(ctx, 100*time.Millisecond)
+	defer cancel()  // releases resources if slowOperation completes before timeout elapses
+	return slowOperation(ctx)
+}
+</pre>
+         <details id="example-WithTimeout" tabindex="-1">
+          <summary>
+           Example
+          </summary>
+          <div>
+           <p>
+            This example passes a context with a timeout to tell a blocking function that
+it should abandon its work after the timeout elapses.
+           </p>
+           <pre data-code="go">
+// Pass a context with a timeout to tell a blocking function that it
+// should abandon its work after the timeout elapses.
+ctx, cancel := context.WithTimeout(context.Background(), shortDuration)
+defer cancel()
+
+select {
+case &lt;-neverReady:
+	fmt.Println("ready")
+case &lt;-ctx.Done():
+	fmt.Println(ctx.Err()) // prints "context deadline exceeded"
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>context deadline exceeded
+</span></pre>
+          </div>
+         </details>
+        </div>
+        <div>
+         <h4 id="WithTimeoutCause" tabindex="-1">
+          <span>
+           func
+          </span>
+          <span>
+           <span>
+            added in
+           </span>
+           <span>
+            go1.21.0
+           </span>
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func WithTimeoutCause(parent <a href="#Context">Context</a>, timeout <a href="/time">time</a>.<a href="/time#Duration">Duration</a>, cause <a href="/builtin#error">error</a>) (<a href="#Context">Context</a>, <a href="#CancelFunc">CancelFunc</a>)</pre>
+         </div>
+         <p>
+          WithTimeoutCause behaves like
+          <a href="#WithTimeout">
+           WithTimeout
+          </a>
+          but also sets the cause of the
+returned Context when the timeout expires. The returned
+          <a href="#CancelFunc">
+           CancelFunc
+          </a>
+          does
+not set the cause.
+         </p>
+        </div>
+       </section>
+       <h3 id="pkg-types" tabindex="-1">
+        Types
+       </h3>
+       <section>
+        <div>
+         <h4 id="CancelCauseFunc" tabindex="-1">
+          <span>
+           type
+          </span>
+          <span>
+           <span>
+            added in
+           </span>
+           <span>
+            go1.20
+           </span>
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type CancelCauseFunc func(cause <a href="/builtin#error">error</a>)</pre>
+         </div>
+         <p>
+          A CancelCauseFunc behaves like a
+          <a href="#CancelFunc">
+           CancelFunc
+          </a>
+          but additionally sets the cancellation cause.
+This cause can be retrieved by calling
+          <a href="#Cause">
+           Cause
+          </a>
+          on the canceled Context or on
+any of its derived Contexts.
+         </p>
+         <p>
+          If the context has already been canceled, CancelCauseFunc does not set the cause.
+For example, if childContext is derived from parentContext:
+         </p>
+         <ul>
+          <li>
+           if parentContext is canceled with cause1 before childContext is canceled with cause2,
+then Cause(parentContext) == Cause(childContext) == cause1
+          </li>
+          <li>
+           if childContext is canceled with cause2 before parentContext is canceled with cause1,
+then Cause(parentContext) == cause1 and Cause(childContext) == cause2
+          </li>
+         </ul>
+        </div>
+        <div>
+         <h4 id="CancelFunc" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type CancelFunc func()</pre>
+         </div>
+         <p>
+          A CancelFunc tells an operation to abandon its work.
+A CancelFunc does not wait for the work to stop.
+A CancelFunc may be called by multiple goroutines simultaneously.
+After the first call, subsequent calls to a CancelFunc do nothing.
+         </p>
+        </div>
+        <div>
+         <h4 id="Context" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type Context interface {
+<span id="Context.Deadline">	<span>// Deadline returns the time when work done on behalf of this context</span>
+</span>	<span>// should be canceled. Deadline returns ok==false when no deadline is</span>
+	<span>// set. Successive calls to Deadline return the same results.</span>
+	Deadline() (deadline <a href="/time">time</a>.<a href="/time#Time">Time</a>, ok <a href="/builtin#bool">bool</a>)
+
+<span id="Context.Done">	<span>// Done returns a channel that's closed when work done on behalf of this</span>
+</span>	<span>// context should be canceled. Done may return nil if this context can</span>
+	<span>// never be canceled. Successive calls to Done return the same value.</span>
+	<span>// The close of the Done channel may happen asynchronously,</span>
+	<span>// after the cancel function returns.</span>
+	<span>//</span>
+	<span>// WithCancel arranges for Done to be closed when cancel is called;</span>
+	<span>// WithDeadline arranges for Done to be closed when the deadline</span>
+	<span>// expires; WithTimeout arranges for Done to be closed when the timeout</span>
+	<span>// elapses.</span>
+	<span>//</span>
+	<span>// Done is provided for use in select statements:</span>
+	<span>//</span>
+	<span>//  // Stream generates values with DoSomething and sends them to out</span>
+	<span>//  // until DoSomething returns an error or ctx.Done is closed.</span>
+	<span>//  func Stream(ctx context.Context, out chan&lt;- Value) error {</span>
+	<span>//  	for {</span>
+	<span>//  		v, err := DoSomething(ctx)</span>
+	<span>//  		if err != nil {</span>
+	<span>//  			return err</span>
+	<span>//  		}</span>
+	<span>//  		select {</span>
+	<span>//  		case &lt;-ctx.Done():</span>
+	<span>//  			return ctx.Err()</span>
+	<span>//  		case out &lt;- v:</span>
+	<span>//  		}</span>
+	<span>//  	}</span>
+	<span>//  }</span>
+	<span>//</span>
+	<span>// See <a href="https://go.dev/blog/pipelines">https://go.dev/blog/pipelines</a> for more examples of how to use</span>
+	<span>// a Done channel for cancellation.</span>
+	Done() &lt;-chan struct{}
+
+<span id="Context.Err">	<span>// If Done is not yet closed, Err returns nil.</span>
+</span>	<span>// If Done is closed, Err returns a non-nil error explaining why:</span>
+	<span>// DeadlineExceeded if the context's deadline passed,</span>
+	<span>// or Canceled if the context was canceled for some other reason.</span>
+	<span>// After Err returns a non-nil error, successive calls to Err return the same error.</span>
+	Err() <a href="/builtin#error">error</a>
+
+<span id="Context.Value">	<span>// Value returns the value associated with this context for key, or nil</span>
+</span>	<span>// if no value is associated with key. Successive calls to Value with</span>
+	<span>// the same key returns the same result.</span>
+	<span>//</span>
+	<span>// Use context values only for request-scoped data that transits</span>
+	<span>// processes and API boundaries, not for passing optional parameters to</span>
+	<span>// functions.</span>
+	<span>//</span>
+	<span>// A key identifies a specific value in a Context. Functions that wish</span>
+	<span>// to store values in Context typically allocate a key in a global</span>
+	<span>// variable then use that key as the argument to context.WithValue and</span>
+	<span>// Context.Value. A key can be any type that supports equality;</span>
+	<span>// packages should define keys as an unexported type to avoid</span>
+	<span>// collisions.</span>
+	<span>//</span>
+	<span>// Packages that define a Context key should provide type-safe accessors</span>
+	<span>// for the values stored using that key:</span>
+	<span>//</span>
+	<span>// 	// Package user defines a User type that's stored in Contexts.</span>
+	<span>// 	package user</span>
+	<span>//</span>
+	<span>// 	import "context"</span>
+	<span>//</span>
+	<span>// 	// User is the type of value stored in the Contexts.</span>
+	<span>// 	type User struct {...}</span>
+	<span>//</span>
+	<span>// 	// key is an unexported type for keys defined in this package.</span>
+	<span>// 	// This prevents collisions with keys defined in other packages.</span>
+	<span>// 	type key int</span>
+	<span>//</span>
+	<span>// 	// userKey is the key for user.User values in Contexts. It is</span>
+	<span>// 	// unexported; clients use user.NewContext and user.FromContext</span>
+	<span>// 	// instead of using this key directly.</span>
+	<span>// 	var userKey key</span>
+	<span>//</span>
+	<span>// 	// NewContext returns a new Context that carries value u.</span>
+	<span>// 	func NewContext(ctx context.Context, u *User) context.Context {</span>
+	<span>// 		return context.WithValue(ctx, userKey, u)</span>
+	<span>// 	}</span>
+	<span>//</span>
+	<span>// 	// FromContext returns the User value stored in ctx, if any.</span>
+	<span>// 	func FromContext(ctx context.Context) (*User, bool) {</span>
+	<span>// 		u, ok := ctx.Value(userKey).(*User)</span>
+	<span>// 		return u, ok</span>
+	<span>// 	}</span>
+	Value(key <a href="/builtin#any">any</a>) <a href="/builtin#any">any</a>
+}</pre>
+         </div>
+         <p>
+          A Context carries a deadline, a cancellation signal, and other values across
+API boundaries.
+         </p>
+         <p>
+          Context's methods may be called by multiple goroutines simultaneously.
+         </p>
+         <div>
+          <h4 id="Background" tabindex="-1">
+           <span>
+            func
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func Background() <a href="#Context">Context</a></pre>
+          </div>
+          <p>
+           Background returns a non-nil, empty
+           <a href="#Context">
+            Context
+           </a>
+           . It is never canceled, has no
+values, and has no deadline. It is typically used by the main function,
+initialization, and tests, and as the top-level Context for incoming
+requests.
+          </p>
+         </div>
+         <div>
+          <h4 id="TODO" tabindex="-1">
+           <span>
+            func
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func TODO() <a href="#Context">Context</a></pre>
+          </div>
+          <p>
+           TODO returns a non-nil, empty
+           <a href="#Context">
+            Context
+           </a>
+           . Code should use context.TODO when
+it's unclear which Context to use or it is not yet available (because the
+surrounding function has not yet been extended to accept a Context
+parameter).
+          </p>
+         </div>
+         <div>
+          <h4 id="WithValue" tabindex="-1">
+           <span>
+            func
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func WithValue(parent <a href="#Context">Context</a>, key, val <a href="/builtin#any">any</a>) <a href="#Context">Context</a></pre>
+          </div>
+          <p>
+           WithValue returns a derived context that points to the parent Context.
+In the derived context, the value associated with key is val.
+          </p>
+          <p>
+           Use context Values only for request-scoped data that transits processes and
+APIs, not for passing optional parameters to functions.
+          </p>
+          <p>
+           The provided key must be comparable and should not be of type
+string or any other built-in type to avoid collisions between
+packages using context. Users of WithValue should define their own
+types for keys. To avoid allocating when assigning to an
+interface{}, context keys often have concrete type
+struct{}. Alternatively, exported context key variables' static
+type should be a pointer or interface.
+          </p>
+          <details id="example-WithValue" tabindex="-1">
+           <summary>
+            Example
+           </summary>
+           <div>
+            <p>
+             This example demonstrates how a value can be passed to the context
+and also how to retrieve it if it exists.
+            </p>
+            <pre data-code="go">
+package main
+
+import (
+	"context"
+	"fmt"
+)
+
+func main() {
+	type favContextKey string
+
+	f := func(ctx context.Context, k favContextKey) {
+		if v := ctx.Value(k); v != nil {
+			fmt.Println("found value:", v)
+			return
+		}
+		fmt.Println("key not found:", k)
+	}
+
+	k := favContextKey("language")
+	ctx := context.WithValue(context.Background(), k, "Go")
+
+	f(ctx, k)
+	f(ctx, favContextKey("color"))
+
+}
+</pre>
+            <pre data-code="go"><span>Output:</span>
+<span>found value: Go
+key not found: color
+</span></pre>
+           </div>
+           <div>
+            <p role="alert">
+            </p>
+           </div>
+          </details>
+         </div>
+         <div>
+          <h4 id="WithoutCancel" tabindex="-1">
+           <span>
+            func
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.21.0
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func WithoutCancel(parent <a href="#Context">Context</a>) <a href="#Context">Context</a></pre>
+          </div>
+          <p>
+           WithoutCancel returns a derived context that points to the parent context
+and is not canceled when parent is canceled.
+The returned context returns no Deadline or Err, and its Done channel is nil.
+Calling
+           <a href="#Cause">
+            Cause
+           </a>
+           on the returned context returns nil.
+          </p>
+         </div>
+        </div>
+       </section>
+      </div>
+     </div>
+    </div>
+    <div>
+     <h2 id="section-sourcefiles">
+      <img alt="" height="24" src="/static/shared/icon/insert_drive_file_gm_grey_24dp.svg" width="24"/>
+      Source Files
+     </h2>
+     <div>
+      <a href="https://cs.opensource.google/go/go/+/go1.26.2:src/context" rel="noopener" target="_blank">
+       View all Source files
+      </a>
+     </div>
+     <div>
+      <ul>
+       <li>
+        <a href="https://cs.opensource.google/go/go/+/go1.26.2:src/context/context.go" rel="noopener" target="_blank" title="context.go">
+         context.go
+        </a>
+       </li>
+      </ul>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div hidden="" id="showInternal-description">
+   Click to show internal directories.
+  </div>
+  <div hidden="" id="hideInternal-description">
+   Click to hide internal directories.
+  </div>
+ </article>
+</main>
+
+
+</article>
+
+</body>
+</html>

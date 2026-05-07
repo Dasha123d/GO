@@ -1,0 +1,2698 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>net/http</title>
+</head>
+<body>
+
+<article data-package="net/http">
+
+<main class="go-Main" id="main-content">
+ <article>
+  <div>
+   <div>
+    <div>
+     <h2 id="section-documentation">
+      <img alt="" height="24" src="/static/shared/icon/code_gm_grey_24dp.svg" width="24"/>
+      Documentation
+     </h2>
+     <div>
+      <div>
+       <section>
+        <h3 id="pkg-overview" tabindex="-1">
+         Overview
+        </h3>
+        <p>
+         Package json implements encoding and decoding of JSON as defined in
+         <a href="https://rfc-editor.org/rfc/rfc7159.html">
+          RFC 7159
+         </a>
+         .
+The mapping between JSON and Go values is described in the documentation for
+the Marshal and Unmarshal functions.
+        </p>
+        <p>
+         See "JSON and Go" for an introduction to this package:
+         <a href="https://golang.org/doc/articles/json_and_go.html">
+          https://golang.org/doc/articles/json_and_go.html
+         </a>
+        </p>
+        <h4 id="hdr-Security_Considerations">
+         Security Considerations
+        </h4>
+        <p>
+         The JSON standard (
+         <a href="https://rfc-editor.org/rfc/rfc7159.html">
+          RFC 7159
+         </a>
+         ) is lax in its definition of a number of parser
+behaviors. As such, many JSON parsers behave differently in various
+scenarios. These differences in parsers mean that systems that use multiple
+independent JSON parser implementations may parse the same JSON object in
+differing ways.
+        </p>
+        <p>
+         Systems that rely on a JSON object being parsed consistently for security
+purposes should be careful to understand the behaviors of this parser, as
+well as how these behaviors may cause interoperability issues with other
+parser implementations.
+        </p>
+        <p>
+         Due to the Go Backwards Compatibility promise (
+         <a href="https://go.dev/doc/go1compat">
+          https://go.dev/doc/go1compat
+         </a>
+         )
+there are a number of behaviors this package exhibits that may cause
+interopability issues, but cannot be changed. In particular the following
+parsing behaviors may cause issues:
+        </p>
+        <ul>
+         <li>
+          If a JSON object contains duplicate keys, keys are processed in the order
+they are observed, meaning later values will replace or be merged into
+prior values, depending on the field type (in particular maps and structs
+will have values merged, while other types have values replaced).
+         </li>
+         <li>
+          When parsing a JSON object into a Go struct, keys are considered in a
+case-insensitive fashion.
+         </li>
+         <li>
+          When parsing a JSON object into a Go struct, unknown keys in the JSON
+object are ignored (unless a
+          <a href="#Decoder">
+           Decoder
+          </a>
+          is used and
+          <a href="#Decoder.DisallowUnknownFields">
+           Decoder.DisallowUnknownFields
+          </a>
+          has been called).
+         </li>
+         <li>
+          Invalid UTF-8 bytes in JSON strings are replaced by the Unicode
+replacement character.
+         </li>
+         <li>
+          Large JSON number integers will lose precision when unmarshaled into
+floating-point types.
+         </li>
+        </ul>
+        <details id="example-package-CustomMarshalJSON" tabindex="-1">
+         <summary>
+          Example (CustomMarshalJSON)
+         </summary>
+         <div>
+          <pre data-code="go">
+//go:build !goexperiment.jsonv2
+
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"strings"
+)
+
+type Animal int
+
+const (
+	Unknown Animal = iota
+	Gopher
+	Zebra
+)
+
+func (a *Animal) UnmarshalJSON(b []byte) error {
+	var s string
+	if err := json.Unmarshal(b, &amp;s); err != nil {
+		return err
+	}
+	switch strings.ToLower(s) {
+	default:
+		*a = Unknown
+	case "gopher":
+		*a = Gopher
+	case "zebra":
+		*a = Zebra
+	}
+
+	return nil
+}
+
+func (a Animal) MarshalJSON() ([]byte, error) {
+	var s string
+	switch a {
+	default:
+		s = "unknown"
+	case Gopher:
+		s = "gopher"
+	case Zebra:
+		s = "zebra"
+	}
+
+	return json.Marshal(s)
+}
+
+func main() {
+	blob := `["gopher","armadillo","zebra","unknown","gopher","bee","gopher","zebra"]`
+	var zoo []Animal
+	if err := json.Unmarshal([]byte(blob), &amp;zoo); err != nil {
+		log.Fatal(err)
+	}
+
+	census := make(map[Animal]int)
+	for _, animal := range zoo {
+		census[animal] += 1
+	}
+
+	fmt.Printf("Zoo Census:\n* Gophers: %d\n* Zebras:  %d\n* Unknown: %d\n",
+		census[Gopher], census[Zebra], census[Unknown])
+
+}
+</pre>
+          <pre data-code="go"><span>Output:</span>
+<span>Zoo Census:
+* Gophers: 3
+* Zebras:  2
+* Unknown: 3
+</span></pre>
+         </div>
+         <div>
+          <p role="alert">
+          </p>
+         </div>
+        </details>
+        <details id="example-package-TextMarshalJSON" tabindex="-1">
+         <summary>
+          Example (TextMarshalJSON)
+         </summary>
+         <div>
+          <pre data-code="go">
+//go:build !goexperiment.jsonv2
+
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"strings"
+)
+
+type Size int
+
+const (
+	Unrecognized Size = iota
+	Small
+	Large
+)
+
+func (s *Size) UnmarshalText(text []byte) error {
+	switch strings.ToLower(string(text)) {
+	default:
+		*s = Unrecognized
+	case "small":
+		*s = Small
+	case "large":
+		*s = Large
+	}
+	return nil
+}
+
+func (s Size) MarshalText() ([]byte, error) {
+	var name string
+	switch s {
+	default:
+		name = "unrecognized"
+	case Small:
+		name = "small"
+	case Large:
+		name = "large"
+	}
+	return []byte(name), nil
+}
+
+func main() {
+	blob := `["small","regular","large","unrecognized","small","normal","small","large"]`
+	var inventory []Size
+	if err := json.Unmarshal([]byte(blob), &amp;inventory); err != nil {
+		log.Fatal(err)
+	}
+
+	counts := make(map[Size]int)
+	for _, size := range inventory {
+		counts[size] += 1
+	}
+
+	fmt.Printf("Inventory Counts:\n* Small:        %d\n* Large:        %d\n* Unrecognized: %d\n",
+		counts[Small], counts[Large], counts[Unrecognized])
+
+}
+</pre>
+          <pre data-code="go"><span>Output:</span>
+<span>Inventory Counts:
+* Small:        3
+* Large:        2
+* Unrecognized: 3
+</span></pre>
+         </div>
+         <div>
+          <p role="alert">
+          </p>
+         </div>
+        </details>
+       </section>
+       <section>
+        <h3 id="pkg-index">
+         Index
+        </h3>
+        <ul>
+         <li>
+          <a href="#Compact">
+           func Compact(dst *bytes.Buffer, src []byte) error
+          </a>
+         </li>
+         <li>
+          <a href="#HTMLEscape">
+           func HTMLEscape(dst *bytes.Buffer, src []byte)
+          </a>
+         </li>
+         <li>
+          <a href="#Indent">
+           func Indent(dst *bytes.Buffer, src []byte, prefix, indent string) error
+          </a>
+         </li>
+         <li>
+          <a href="#Marshal">
+           func Marshal(v any) ([]byte, error)
+          </a>
+         </li>
+         <li>
+          <a href="#MarshalIndent">
+           func MarshalIndent(v any, prefix, indent string) ([]byte, error)
+          </a>
+         </li>
+         <li>
+          <a href="#Unmarshal">
+           func Unmarshal(data []byte, v any) error
+          </a>
+         </li>
+         <li>
+          <a href="#Valid">
+           func Valid(data []byte) bool
+          </a>
+         </li>
+         <li>
+          <a href="#Decoder">
+           type Decoder
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#NewDecoder">
+             func NewDecoder(r io.Reader) *Decoder
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#Decoder.Buffered">
+             func (dec *Decoder) Buffered() io.Reader
+            </a>
+           </li>
+           <li>
+            <a href="#Decoder.Decode">
+             func (dec *Decoder) Decode(v any) error
+            </a>
+           </li>
+           <li>
+            <a href="#Decoder.DisallowUnknownFields">
+             func (dec *Decoder) DisallowUnknownFields()
+            </a>
+           </li>
+           <li>
+            <a href="#Decoder.InputOffset">
+             func (dec *Decoder) InputOffset() int64
+            </a>
+           </li>
+           <li>
+            <a href="#Decoder.More">
+             func (dec *Decoder) More() bool
+            </a>
+           </li>
+           <li>
+            <a href="#Decoder.Token">
+             func (dec *Decoder) Token() (Token, error)
+            </a>
+           </li>
+           <li>
+            <a href="#Decoder.UseNumber">
+             func (dec *Decoder) UseNumber()
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#Delim">
+           type Delim
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#Delim.String">
+             func (d Delim) String() string
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#Encoder">
+           type Encoder
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#NewEncoder">
+             func NewEncoder(w io.Writer) *Encoder
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#Encoder.Encode">
+             func (enc *Encoder) Encode(v any) error
+            </a>
+           </li>
+           <li>
+            <a href="#Encoder.SetEscapeHTML">
+             func (enc *Encoder) SetEscapeHTML(on bool)
+            </a>
+           </li>
+           <li>
+            <a href="#Encoder.SetIndent">
+             func (enc *Encoder) SetIndent(prefix, indent string)
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#InvalidUTF8Error">
+           type InvalidUTF8Error
+          </a>
+          <span>
+           deprecated
+          </span>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#InvalidUTF8Error.Error">
+             func (e *InvalidUTF8Error) Error() string
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#InvalidUnmarshalError">
+           type InvalidUnmarshalError
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#InvalidUnmarshalError.Error">
+             func (e *InvalidUnmarshalError) Error() string
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#Marshaler">
+           type Marshaler
+          </a>
+         </li>
+         <li>
+          <a href="#MarshalerError">
+           type MarshalerError
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#MarshalerError.Error">
+             func (e *MarshalerError) Error() string
+            </a>
+           </li>
+           <li>
+            <a href="#MarshalerError.Unwrap">
+             func (e *MarshalerError) Unwrap() error
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#Number">
+           type Number
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#Number.Float64">
+             func (n Number) Float64() (float64, error)
+            </a>
+           </li>
+           <li>
+            <a href="#Number.Int64">
+             func (n Number) Int64() (int64, error)
+            </a>
+           </li>
+           <li>
+            <a href="#Number.String">
+             func (n Number) String() string
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#RawMessage">
+           type RawMessage
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#RawMessage.MarshalJSON">
+             func (m RawMessage) MarshalJSON() ([]byte, error)
+            </a>
+           </li>
+           <li>
+            <a href="#RawMessage.UnmarshalJSON">
+             func (m *RawMessage) UnmarshalJSON(data []byte) error
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#SyntaxError">
+           type SyntaxError
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#SyntaxError.Error">
+             func (e *SyntaxError) Error() string
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#Token">
+           type Token
+          </a>
+         </li>
+         <li>
+          <a href="#UnmarshalFieldError">
+           type UnmarshalFieldError
+          </a>
+          <span>
+           deprecated
+          </span>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#UnmarshalFieldError.Error">
+             func (e *UnmarshalFieldError) Error() string
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#UnmarshalTypeError">
+           type UnmarshalTypeError
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#UnmarshalTypeError.Error">
+             func (e *UnmarshalTypeError) Error() string
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#Unmarshaler">
+           type Unmarshaler
+          </a>
+         </li>
+         <li>
+          <a href="#UnsupportedTypeError">
+           type UnsupportedTypeError
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#UnsupportedTypeError.Error">
+             func (e *UnsupportedTypeError) Error() string
+            </a>
+           </li>
+          </ul>
+         </li>
+         <li>
+          <a href="#UnsupportedValueError">
+           type UnsupportedValueError
+          </a>
+         </li>
+         <li>
+          <ul>
+           <li>
+            <a href="#UnsupportedValueError.Error">
+             func (e *UnsupportedValueError) Error() string
+            </a>
+           </li>
+          </ul>
+         </li>
+        </ul>
+       </section>
+       <section>
+        <h3 id="pkg-examples" tabindex="-1">
+         Examples
+        </h3>
+        <ul>
+         <li>
+          <a href="#example-package-CustomMarshalJSON">
+           Package (CustomMarshalJSON)
+          </a>
+         </li>
+         <li>
+          <a href="#example-package-TextMarshalJSON">
+           Package (TextMarshalJSON)
+          </a>
+         </li>
+         <li>
+          <a href="#example-Decoder">
+           Decoder
+          </a>
+         </li>
+         <li>
+          <a href="#example-Decoder.Decode-Stream">
+           Decoder.Decode (Stream)
+          </a>
+         </li>
+         <li>
+          <a href="#example-Decoder.Token">
+           Decoder.Token
+          </a>
+         </li>
+         <li>
+          <a href="#example-HTMLEscape">
+           HTMLEscape
+          </a>
+         </li>
+         <li>
+          <a href="#example-Indent">
+           Indent
+          </a>
+         </li>
+         <li>
+          <a href="#example-Marshal">
+           Marshal
+          </a>
+         </li>
+         <li>
+          <a href="#example-MarshalIndent">
+           MarshalIndent
+          </a>
+         </li>
+         <li>
+          <a href="#example-RawMessage-Marshal">
+           RawMessage (Marshal)
+          </a>
+         </li>
+         <li>
+          <a href="#example-RawMessage-Unmarshal">
+           RawMessage (Unmarshal)
+          </a>
+         </li>
+         <li>
+          <a href="#example-Unmarshal">
+           Unmarshal
+          </a>
+         </li>
+         <li>
+          <a href="#example-Valid">
+           Valid
+          </a>
+         </li>
+        </ul>
+       </section>
+       <h3 id="pkg-constants" tabindex="-1">
+        Constants
+       </h3>
+       <section>
+        <p>
+         This section is empty.
+        </p>
+       </section>
+       <h3 id="pkg-variables" tabindex="-1">
+        Variables
+       </h3>
+       <section>
+        <p>
+         This section is empty.
+        </p>
+       </section>
+       <h3 id="pkg-functions" tabindex="-1">
+        Functions
+       </h3>
+       <section>
+        <div>
+         <h4 id="Compact" tabindex="-1">
+          <span>
+           func
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func Compact(dst *<a href="/bytes">bytes</a>.<a href="/bytes#Buffer">Buffer</a>, src []<a href="/builtin#byte">byte</a>) <a href="/builtin#error">error</a></pre>
+         </div>
+         <p>
+          Compact appends to dst the JSON-encoded src with
+insignificant space characters elided.
+         </p>
+        </div>
+        <div>
+         <h4 id="HTMLEscape" tabindex="-1">
+          <span>
+           func
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func HTMLEscape(dst *<a href="/bytes">bytes</a>.<a href="/bytes#Buffer">Buffer</a>, src []<a href="/builtin#byte">byte</a>)</pre>
+         </div>
+         <p>
+          HTMLEscape appends to dst the JSON-encoded src with &lt;, &gt;, &amp;, U+2028 and U+2029
+characters inside string literals changed to \u003c, \u003e, \u0026, \u2028, \u2029
+so that the JSON will be safe to embed inside HTML &lt;script&gt; tags.
+For historical reasons, web browsers don't honor standard HTML
+escaping within &lt;script&gt; tags, so an alternative JSON encoding must be used.
+         </p>
+         <details id="example-HTMLEscape" tabindex="-1">
+          <summary>
+           Example
+          </summary>
+          <div>
+           <pre data-code="go">
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"os"
+)
+
+func main() {
+	var out bytes.Buffer
+	json.HTMLEscape(&amp;out, []byte(`{"Name":"&lt;b&gt;HTML content&lt;/b&gt;"}`))
+	out.WriteTo(os.Stdout)
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>{"Name":"\u003cb\u003eHTML content\u003c/b\u003e"}
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+        </div>
+        <div>
+         <h4 id="Indent" tabindex="-1">
+          <span>
+           func
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func Indent(dst *<a href="/bytes">bytes</a>.<a href="/bytes#Buffer">Buffer</a>, src []<a href="/builtin#byte">byte</a>, prefix, indent <a href="/builtin#string">string</a>) <a href="/builtin#error">error</a></pre>
+         </div>
+         <p>
+          Indent appends to dst an indented form of the JSON-encoded src.
+Each element in a JSON object or array begins on a new,
+indented line beginning with prefix followed by one or more
+copies of indent according to the indentation nesting.
+The data appended to dst does not begin with the prefix nor
+any indentation, to make it easier to embed inside other formatted JSON data.
+Although leading space characters (space, tab, carriage return, newline)
+at the beginning of src are dropped, trailing space characters
+at the end of src are preserved and copied to dst.
+For example, if src has no trailing spaces, neither will dst;
+if src ends in a trailing newline, so will dst.
+         </p>
+         <details id="example-Indent" tabindex="-1">
+          <summary>
+           Example
+          </summary>
+          <div>
+           <pre data-code="go">
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"log"
+	"os"
+)
+
+func main() {
+	type Road struct {
+		Name   string
+		Number int
+	}
+	roads := []Road{
+		{"Diamond Fork", 29},
+		{"Sheep Creek", 51},
+	}
+
+	b, err := json.Marshal(roads)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var out bytes.Buffer
+	json.Indent(&amp;out, b, "=", "\t")
+	out.WriteTo(os.Stdout)
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>[
+=	{
+=		"Name": "Diamond Fork",
+=		"Number": 29
+=	},
+=	{
+=		"Name": "Sheep Creek",
+=		"Number": 51
+=	}
+=]
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+        </div>
+        <div>
+         <h4 id="Marshal" tabindex="-1">
+          <span>
+           func
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func Marshal(v <a href="/builtin#any">any</a>) ([]<a href="/builtin#byte">byte</a>, <a href="/builtin#error">error</a>)</pre>
+         </div>
+         <p>
+          Marshal returns the JSON encoding of v.
+         </p>
+         <p>
+          Marshal traverses the value v recursively.
+If an encountered value implements
+          <a href="#Marshaler">
+           Marshaler
+          </a>
+          and is not a nil pointer, Marshal calls [Marshaler.MarshalJSON]
+to produce JSON. If no [Marshaler.MarshalJSON] method is present but the
+value implements
+          <a href="/encoding#TextMarshaler">
+           encoding.TextMarshaler
+          </a>
+          instead, Marshal calls
+          <a href="/encoding#TextMarshaler.MarshalText">
+           encoding.TextMarshaler.MarshalText
+          </a>
+          and encodes the result as a JSON string.
+The nil pointer exception is not strictly necessary
+but mimics a similar, necessary exception in the behavior of
+[Unmarshaler.UnmarshalJSON].
+         </p>
+         <p>
+          Otherwise, Marshal uses the following type-dependent default encodings:
+         </p>
+         <p>
+          Boolean values encode as JSON booleans.
+         </p>
+         <p>
+          Floating point, integer, and
+          <a href="#Number">
+           Number
+          </a>
+          values encode as JSON numbers.
+NaN and +/-Inf values will return an
+          <a href="#UnsupportedValueError">
+           UnsupportedValueError
+          </a>
+          .
+         </p>
+         <p>
+          String values encode as JSON strings coerced to valid UTF-8,
+replacing invalid bytes with the Unicode replacement rune.
+So that the JSON will be safe to embed inside HTML &lt;script&gt; tags,
+the string is encoded using
+          <a href="#HTMLEscape">
+           HTMLEscape
+          </a>
+          ,
+which replaces "&lt;", "&gt;", "&amp;", U+2028, and U+2029 are escaped
+to "\u003c","\u003e", "\u0026", "\u2028", and "\u2029".
+This replacement can be disabled when using an
+          <a href="#Encoder">
+           Encoder
+          </a>
+          ,
+by calling
+          <a href="#Encoder.SetEscapeHTML">
+           Encoder.SetEscapeHTML
+          </a>
+          (false).
+         </p>
+         <p>
+          Array and slice values encode as JSON arrays, except that
+[]byte encodes as a base64-encoded string, and a nil slice
+encodes as the null JSON value.
+         </p>
+         <p>
+          Struct values encode as JSON objects.
+Each exported struct field becomes a member of the object, using the
+field name as the object key, unless the field is omitted for one of the
+reasons given below.
+         </p>
+         <p>
+          The encoding of each struct field can be customized by the format string
+stored under the "json" key in the struct field's tag.
+The format string gives the name of the field, possibly followed by a
+comma-separated list of options. The name may be empty in order to
+specify options without overriding the default field name.
+         </p>
+         <p>
+          The "omitempty" option specifies that the field should be omitted
+from the encoding if the field has an empty value, defined as
+false, 0, a nil pointer, a nil interface value, and any array,
+slice, map, or string of length zero.
+         </p>
+         <p>
+          As a special case, if the field tag is "-", the field is always omitted.
+Note that a field with name "-" can still be generated using the tag "-,".
+         </p>
+         <p>
+          Examples of struct field tags and their meanings:
+         </p>
+         <pre data-code="go">// Field appears in JSON as key "myName".
+Field int `json:"myName"`
+
+// Field appears in JSON as key "myName" and
+// the field is omitted from the object if its value is empty,
+// as defined above.
+Field int `json:"myName,omitempty"`
+
+// Field appears in JSON as key "Field" (the default), but
+// the field is skipped if empty.
+// Note the leading comma.
+Field int `json:",omitempty"`
+
+// Field is ignored by this package.
+Field int `json:"-"`
+
+// Field appears in JSON as key "-".
+Field int `json:"-,"`
+</pre>
+         <p>
+          The "omitzero" option specifies that the field should be omitted
+from the encoding if the field has a zero value, according to rules:
+         </p>
+         <p>
+          1) If the field type has an "IsZero() bool" method, that will be used to
+determine whether the value is zero.
+         </p>
+         <p>
+          2) Otherwise, the value is zero if it is the zero value for its type.
+         </p>
+         <p>
+          If both "omitempty" and "omitzero" are specified, the field will be omitted
+if the value is either empty or zero (or both).
+         </p>
+         <p>
+          The "string" option signals that a field is stored as JSON inside a
+JSON-encoded string. It applies only to fields of string, floating point,
+integer, or boolean types. This extra level of encoding is sometimes used
+when communicating with JavaScript programs:
+         </p>
+         <pre data-code="go">Int64String int64 `json:",string"`
+</pre>
+         <p>
+          The key name will be used if it's a non-empty string consisting of
+only Unicode letters, digits, and ASCII punctuation except quotation
+marks, backslash, and comma.
+         </p>
+         <p>
+          Embedded struct fields are usually marshaled as if their inner exported fields
+were fields in the outer struct, subject to the usual Go visibility rules amended
+as described in the next paragraph.
+An anonymous struct field with a name given in its JSON tag is treated as
+having that name, rather than being anonymous.
+An anonymous struct field of interface type is treated the same as having
+that type as its name, rather than being anonymous.
+         </p>
+         <p>
+          The Go visibility rules for struct fields are amended for JSON when
+deciding which field to marshal or unmarshal. If there are
+multiple fields at the same level, and that level is the least
+nested (and would therefore be the nesting level selected by the
+usual Go rules), the following extra rules apply:
+         </p>
+         <p>
+          1) Of those fields, if any are JSON-tagged, only tagged fields are considered,
+even if there are multiple untagged fields that would otherwise conflict.
+         </p>
+         <p>
+          2) If there is exactly one field (tagged or not according to the first rule), that is selected.
+         </p>
+         <p>
+          3) Otherwise there are multiple fields, and all are ignored; no error occurs.
+         </p>
+         <p>
+          Handling of anonymous struct fields is new in Go 1.1.
+Prior to Go 1.1, anonymous struct fields were ignored. To force ignoring of
+an anonymous struct field in both current and earlier versions, give the field
+a JSON tag of "-".
+         </p>
+         <p>
+          Map values encode as JSON objects. The map's key type must either be a
+string, an integer type, or implement
+          <a href="/encoding#TextMarshaler">
+           encoding.TextMarshaler
+          </a>
+          . The map keys
+are sorted and used as JSON object keys by applying the following rules,
+subject to the UTF-8 coercion described for string values above:
+         </p>
+         <ul>
+          <li>
+           keys of any string type are used directly
+          </li>
+          <li>
+           keys that implement
+           <a href="/encoding#TextMarshaler">
+            encoding.TextMarshaler
+           </a>
+           are marshaled
+          </li>
+          <li>
+           integer keys are converted to strings
+          </li>
+         </ul>
+         <p>
+          Pointer values encode as the value pointed to.
+A nil pointer encodes as the null JSON value.
+         </p>
+         <p>
+          Interface values encode as the value contained in the interface.
+A nil interface value encodes as the null JSON value.
+         </p>
+         <p>
+          Channel, complex, and function values cannot be encoded in JSON.
+Attempting to encode such a value causes Marshal to return
+an
+          <a href="#UnsupportedTypeError">
+           UnsupportedTypeError
+          </a>
+          .
+         </p>
+         <p>
+          JSON cannot represent cyclic data structures and Marshal does not
+handle them. Passing cyclic structures to Marshal will result in
+an error.
+         </p>
+         <details id="example-Marshal" tabindex="-1">
+          <summary>
+           Example
+          </summary>
+          <div>
+           <pre data-code="go">
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
+func main() {
+	type ColorGroup struct {
+		ID     int
+		Name   string
+		Colors []string
+	}
+	group := ColorGroup{
+		ID:     1,
+		Name:   "Reds",
+		Colors: []string{"Crimson", "Red", "Ruby", "Maroon"},
+	}
+	b, err := json.Marshal(group)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	os.Stdout.Write(b)
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>{"ID":1,"Name":"Reds","Colors":["Crimson","Red","Ruby","Maroon"]}
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+        </div>
+        <div>
+         <h4 id="MarshalIndent" tabindex="-1">
+          <span>
+           func
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func MarshalIndent(v <a href="/builtin#any">any</a>, prefix, indent <a href="/builtin#string">string</a>) ([]<a href="/builtin#byte">byte</a>, <a href="/builtin#error">error</a>)</pre>
+         </div>
+         <p>
+          MarshalIndent is like
+          <a href="#Marshal">
+           Marshal
+          </a>
+          but applies
+          <a href="#Indent">
+           Indent
+          </a>
+          to format the output.
+Each JSON element in the output will begin on a new line beginning with prefix
+followed by one or more copies of indent according to the indentation nesting.
+         </p>
+         <details id="example-MarshalIndent" tabindex="-1">
+          <summary>
+           Example
+          </summary>
+          <div>
+           <pre data-code="go">
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+)
+
+func main() {
+	data := map[string]int{
+		"a": 1,
+		"b": 2,
+	}
+
+	b, err := json.MarshalIndent(data, "&lt;prefix&gt;", "&lt;indent&gt;")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(string(b))
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>{
+&lt;prefix&gt;&lt;indent&gt;"a": 1,
+&lt;prefix&gt;&lt;indent&gt;"b": 2
+&lt;prefix&gt;}
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+        </div>
+        <div>
+         <h4 id="Unmarshal" tabindex="-1">
+          <span>
+           func
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func Unmarshal(data []<a href="/builtin#byte">byte</a>, v <a href="/builtin#any">any</a>) <a href="/builtin#error">error</a></pre>
+         </div>
+         <p>
+          Unmarshal parses the JSON-encoded data and stores the result
+in the value pointed to by v. If v is nil or not a pointer,
+Unmarshal returns an
+          <a href="#InvalidUnmarshalError">
+           InvalidUnmarshalError
+          </a>
+          .
+         </p>
+         <p>
+          Unmarshal uses the inverse of the encodings that
+          <a href="#Marshal">
+           Marshal
+          </a>
+          uses, allocating maps, slices, and pointers as necessary,
+with the following additional rules:
+         </p>
+         <p>
+          To unmarshal JSON into a pointer, Unmarshal first handles the case of
+the JSON being the JSON literal null. In that case, Unmarshal sets
+the pointer to nil. Otherwise, Unmarshal unmarshals the JSON into
+the value pointed at by the pointer. If the pointer is nil, Unmarshal
+allocates a new value for it to point to.
+         </p>
+         <p>
+          To unmarshal JSON into a value implementing
+          <a href="#Unmarshaler">
+           Unmarshaler
+          </a>
+          ,
+Unmarshal calls that value's [Unmarshaler.UnmarshalJSON] method, including
+when the input is a JSON null.
+Otherwise, if the value implements
+          <a href="/encoding#TextUnmarshaler">
+           encoding.TextUnmarshaler
+          </a>
+          and the input is a JSON quoted string, Unmarshal calls
+          <a href="/encoding#TextUnmarshaler.UnmarshalText">
+           encoding.TextUnmarshaler.UnmarshalText
+          </a>
+          with the unquoted form of the string.
+         </p>
+         <p>
+          To unmarshal JSON into a struct, Unmarshal matches incoming object keys to
+the keys used by
+          <a href="#Marshal">
+           Marshal
+          </a>
+          (either the struct field name or its tag),
+ignoring case. If multiple struct fields match an object key, an exact case
+match is preferred over a case-insensitive one.
+         </p>
+         <p>
+          Incoming object members are processed in the order observed. If an object
+includes duplicate keys, later duplicates will replace or be merged into
+prior values.
+         </p>
+         <p>
+          To unmarshal JSON into an interface value,
+Unmarshal stores one of these in the interface value:
+         </p>
+         <ul>
+          <li>
+           bool, for JSON booleans
+          </li>
+          <li>
+           float64, for JSON numbers
+          </li>
+          <li>
+           string, for JSON strings
+          </li>
+          <li>
+           []any, for JSON arrays
+          </li>
+          <li>
+           map[string]any, for JSON objects
+          </li>
+          <li>
+           nil for JSON null
+          </li>
+         </ul>
+         <p>
+          To unmarshal a JSON array into a slice, Unmarshal resets the slice length
+to zero and then appends each element to the slice.
+As a special case, to unmarshal an empty JSON array into a slice,
+Unmarshal replaces the slice with a new empty slice.
+         </p>
+         <p>
+          To unmarshal a JSON array into a Go array, Unmarshal decodes
+JSON array elements into corresponding Go array elements.
+If the Go array is smaller than the JSON array,
+the additional JSON array elements are discarded.
+If the JSON array is smaller than the Go array,
+the additional Go array elements are set to zero values.
+         </p>
+         <p>
+          To unmarshal a JSON object into a map, Unmarshal first establishes a map to
+use. If the map is nil, Unmarshal allocates a new map. Otherwise Unmarshal
+reuses the existing map, keeping existing entries. Unmarshal then stores
+key-value pairs from the JSON object into the map. The map's key type must
+either be any string type, an integer, or implement
+          <a href="/encoding#TextUnmarshaler">
+           encoding.TextUnmarshaler
+          </a>
+          .
+         </p>
+         <p>
+          If the JSON-encoded data contain a syntax error, Unmarshal returns a
+          <a href="#SyntaxError">
+           SyntaxError
+          </a>
+          .
+         </p>
+         <p>
+          If a JSON value is not appropriate for a given target type,
+or if a JSON number overflows the target type, Unmarshal
+skips that field and completes the unmarshaling as best it can.
+If no more serious errors are encountered, Unmarshal returns
+an
+          <a href="#UnmarshalTypeError">
+           UnmarshalTypeError
+          </a>
+          describing the earliest such error. In any
+case, it's not guaranteed that all the remaining fields following
+the problematic one will be unmarshaled into the target object.
+         </p>
+         <p>
+          The JSON null value unmarshals into an interface, map, pointer, or slice
+by setting that Go value to nil. Because null is often used in JSON to mean
+“not present,” unmarshaling a JSON null into any other Go type has no effect
+on the value and produces no error.
+         </p>
+         <p>
+          When unmarshaling quoted strings, invalid UTF-8 or
+invalid UTF-16 surrogate pairs are not treated as an error.
+Instead, they are replaced by the Unicode replacement
+character U+FFFD.
+         </p>
+         <details id="example-Unmarshal" tabindex="-1">
+          <summary>
+           Example
+          </summary>
+          <div>
+           <pre data-code="go">
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+func main() {
+	var jsonBlob = []byte(`[
+	{"Name": "Platypus", "Order": "Monotremata"},
+	{"Name": "Quoll",    "Order": "Dasyuromorphia"}
+]`)
+	type Animal struct {
+		Name  string
+		Order string
+	}
+	var animals []Animal
+	err := json.Unmarshal(jsonBlob, &amp;animals)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	fmt.Printf("%+v", animals)
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>[{Name:Platypus Order:Monotremata} {Name:Quoll Order:Dasyuromorphia}]
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+        </div>
+        <div>
+         <h4 id="Valid" tabindex="-1">
+          <span>
+           func
+          </span>
+          <span>
+           <span>
+            added in
+           </span>
+           <span>
+            go1.9
+           </span>
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">func Valid(data []<a href="/builtin#byte">byte</a>) <a href="/builtin#bool">bool</a></pre>
+         </div>
+         <p>
+          Valid reports whether data is a valid JSON encoding.
+         </p>
+         <details id="example-Valid" tabindex="-1">
+          <summary>
+           Example
+          </summary>
+          <div>
+           <pre data-code="go">
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+func main() {
+	goodJSON := `{"example": 1}`
+	badJSON := `{"example":2:]}}`
+
+	fmt.Println(json.Valid([]byte(goodJSON)), json.Valid([]byte(badJSON)))
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>true false
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+        </div>
+       </section>
+       <h3 id="pkg-types" tabindex="-1">
+        Types
+       </h3>
+       <section>
+        <div>
+         <h4 id="Decoder" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type Decoder struct {
+	<span>// contains filtered or unexported fields</span>
+}</pre>
+         </div>
+         <p>
+          A Decoder reads and decodes JSON values from an input stream.
+         </p>
+         <details id="example-Decoder" tabindex="-1">
+          <summary>
+           Example
+          </summary>
+          <div>
+           <p>
+            This example uses a Decoder to decode a stream of distinct JSON values.
+           </p>
+           <pre data-code="go">
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"strings"
+)
+
+func main() {
+	const jsonStream = `
+	{"Name": "Ed", "Text": "Knock knock."}
+	{"Name": "Sam", "Text": "Who's there?"}
+	{"Name": "Ed", "Text": "Go fmt."}
+	{"Name": "Sam", "Text": "Go fmt who?"}
+	{"Name": "Ed", "Text": "Go fmt yourself!"}
+`
+	type Message struct {
+		Name, Text string
+	}
+	dec := json.NewDecoder(strings.NewReader(jsonStream))
+	for {
+		var m Message
+		if err := dec.Decode(&amp;m); err == io.EOF {
+			break
+		} else if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%s: %s\n", m.Name, m.Text)
+	}
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>Ed: Knock knock.
+Sam: Who's there?
+Ed: Go fmt.
+Sam: Go fmt who?
+Ed: Go fmt yourself!
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+         <div>
+          <h4 id="NewDecoder" tabindex="-1">
+           <span>
+            func
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func NewDecoder(r <a href="/io">io</a>.<a href="/io#Reader">Reader</a>) *<a href="#Decoder">Decoder</a></pre>
+          </div>
+          <p>
+           NewDecoder returns a new decoder that reads from r.
+          </p>
+          <p>
+           The decoder introduces its own buffering and may
+read data from r beyond the JSON values requested.
+          </p>
+         </div>
+         <div>
+          <h4 id="Decoder.Buffered" tabindex="-1">
+           <span>
+            func (*Decoder)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.1
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (dec *<a href="#Decoder">Decoder</a>) Buffered() <a href="/io">io</a>.<a href="/io#Reader">Reader</a></pre>
+          </div>
+          <p>
+           Buffered returns a reader of the data remaining in the Decoder's
+buffer. The reader is valid until the next call to
+           <a href="#Decoder.Decode">
+            Decoder.Decode
+           </a>
+           .
+          </p>
+         </div>
+         <div>
+          <h4 id="Decoder.Decode" tabindex="-1">
+           <span>
+            func (*Decoder)
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (dec *<a href="#Decoder">Decoder</a>) Decode(v <a href="/builtin#any">any</a>) <a href="/builtin#error">error</a></pre>
+          </div>
+          <p>
+           Decode reads the next JSON-encoded value from its
+input and stores it in the value pointed to by v.
+          </p>
+          <p>
+           See the documentation for
+           <a href="#Unmarshal">
+            Unmarshal
+           </a>
+           for details about
+the conversion of JSON into a Go value.
+          </p>
+          <details id="example-Decoder.Decode-Stream" tabindex="-1">
+           <summary>
+            Example (Stream)
+           </summary>
+           <div>
+            <p>
+             This example uses a Decoder to decode a streaming array of JSON objects.
+            </p>
+            <pre data-code="go">
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"strings"
+)
+
+func main() {
+	const jsonStream = `
+	[
+		{"Name": "Ed", "Text": "Knock knock."},
+		{"Name": "Sam", "Text": "Who's there?"},
+		{"Name": "Ed", "Text": "Go fmt."},
+		{"Name": "Sam", "Text": "Go fmt who?"},
+		{"Name": "Ed", "Text": "Go fmt yourself!"}
+	]
+`
+	type Message struct {
+		Name, Text string
+	}
+	dec := json.NewDecoder(strings.NewReader(jsonStream))
+
+	// read open bracket
+	t, err := dec.Token()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%T: %v\n", t, t)
+
+	// while the array contains values
+	for dec.More() {
+		var m Message
+		// decode an array value (Message)
+		err := dec.Decode(&amp;m)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("%v: %v\n", m.Name, m.Text)
+	}
+
+	// read closing bracket
+	t, err = dec.Token()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%T: %v\n", t, t)
+
+}
+</pre>
+            <pre data-code="go"><span>Output:</span>
+<span>json.Delim: [
+Ed: Knock knock.
+Sam: Who's there?
+Ed: Go fmt.
+Sam: Go fmt who?
+Ed: Go fmt yourself!
+json.Delim: ]
+</span></pre>
+           </div>
+           <div>
+            <p role="alert">
+            </p>
+           </div>
+          </details>
+         </div>
+         <div>
+          <h4 id="Decoder.DisallowUnknownFields" tabindex="-1">
+           <span>
+            func (*Decoder)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.10
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (dec *<a href="#Decoder">Decoder</a>) DisallowUnknownFields()</pre>
+          </div>
+          <p>
+           DisallowUnknownFields causes the Decoder to return an error when the destination
+is a struct and the input contains object keys which do not match any
+non-ignored, exported fields in the destination.
+          </p>
+         </div>
+         <div>
+          <h4 id="Decoder.InputOffset" tabindex="-1">
+           <span>
+            func (*Decoder)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.14
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (dec *<a href="#Decoder">Decoder</a>) InputOffset() <a href="/builtin#int64">int64</a></pre>
+          </div>
+          <p>
+           InputOffset returns the input stream byte offset of the current decoder position.
+The offset gives the location of the end of the most recently returned token
+and the beginning of the next token.
+          </p>
+         </div>
+         <div>
+          <h4 id="Decoder.More" tabindex="-1">
+           <span>
+            func (*Decoder)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.5
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (dec *<a href="#Decoder">Decoder</a>) More() <a href="/builtin#bool">bool</a></pre>
+          </div>
+          <p>
+           More reports whether there is another element in the
+current array or object being parsed.
+          </p>
+         </div>
+         <div>
+          <h4 id="Decoder.Token" tabindex="-1">
+           <span>
+            func (*Decoder)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.5
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (dec *<a href="#Decoder">Decoder</a>) Token() (<a href="#Token">Token</a>, <a href="/builtin#error">error</a>)</pre>
+          </div>
+          <p>
+           Token returns the next JSON token in the input stream.
+At the end of the input stream, Token returns nil,
+           <a href="/io#EOF">
+            io.EOF
+           </a>
+           .
+          </p>
+          <p>
+           Token guarantees that the delimiters [ ] { } it returns are
+properly nested and matched: if Token encounters an unexpected
+delimiter in the input, it will return an error.
+          </p>
+          <p>
+           The input stream consists of basic JSON values—bool, string,
+number, and null—along with delimiters [ ] { } of type
+           <a href="#Delim">
+            Delim
+           </a>
+           to mark the start and end of arrays and objects.
+Commas and colons are elided.
+          </p>
+          <details id="example-Decoder.Token" tabindex="-1">
+           <summary>
+            Example
+           </summary>
+           <div>
+            <p>
+             This example uses a Decoder to decode a stream of distinct JSON values.
+            </p>
+            <pre data-code="go">
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"strings"
+)
+
+func main() {
+	const jsonStream = `
+	{"Message": "Hello", "Array": [1, 2, 3], "Null": null, "Number": 1.234}
+`
+	dec := json.NewDecoder(strings.NewReader(jsonStream))
+	for {
+		t, err := dec.Token()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%T: %v", t, t)
+		if dec.More() {
+			fmt.Printf(" (more)")
+		}
+		fmt.Printf("\n")
+	}
+}
+</pre>
+            <pre data-code="go"><span>Output:</span>
+<span>json.Delim: { (more)
+string: Message (more)
+string: Hello (more)
+string: Array (more)
+json.Delim: [ (more)
+float64: 1 (more)
+float64: 2 (more)
+float64: 3
+json.Delim: ] (more)
+string: Null (more)
+&lt;nil&gt;: &lt;nil&gt; (more)
+string: Number (more)
+float64: 1.234
+json.Delim: }
+</span></pre>
+           </div>
+           <div>
+            <p role="alert">
+            </p>
+           </div>
+          </details>
+         </div>
+         <div>
+          <h4 id="Decoder.UseNumber" tabindex="-1">
+           <span>
+            func (*Decoder)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.1
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (dec *<a href="#Decoder">Decoder</a>) UseNumber()</pre>
+          </div>
+          <p>
+           UseNumber causes the Decoder to unmarshal a number into an
+interface value as a
+           <a href="#Number">
+            Number
+           </a>
+           instead of as a float64.
+          </p>
+         </div>
+        </div>
+        <div>
+         <h4 id="Delim" tabindex="-1">
+          <span>
+           type
+          </span>
+          <span>
+           <span>
+            added in
+           </span>
+           <span>
+            go1.5
+           </span>
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type Delim <a href="/builtin#rune">rune</a></pre>
+         </div>
+         <p>
+          A Delim is a JSON array or object delimiter, one of [ ] { or }.
+         </p>
+         <div>
+          <h4 id="Delim.String" tabindex="-1">
+           <span>
+            func (Delim)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.5
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (d <a href="#Delim">Delim</a>) String() <a href="/builtin#string">string</a></pre>
+          </div>
+         </div>
+        </div>
+        <div>
+         <h4 id="Encoder" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type Encoder struct {
+	<span>// contains filtered or unexported fields</span>
+}</pre>
+         </div>
+         <p>
+          An Encoder writes JSON values to an output stream.
+         </p>
+         <div>
+          <h4 id="NewEncoder" tabindex="-1">
+           <span>
+            func
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func NewEncoder(w <a href="/io">io</a>.<a href="/io#Writer">Writer</a>) *<a href="#Encoder">Encoder</a></pre>
+          </div>
+          <p>
+           NewEncoder returns a new encoder that writes to w.
+          </p>
+         </div>
+         <div>
+          <h4 id="Encoder.Encode" tabindex="-1">
+           <span>
+            func (*Encoder)
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (enc *<a href="#Encoder">Encoder</a>) Encode(v <a href="/builtin#any">any</a>) <a href="/builtin#error">error</a></pre>
+          </div>
+          <p>
+           Encode writes the JSON encoding of v to the stream,
+with insignificant space characters elided,
+followed by a newline character.
+          </p>
+          <p>
+           See the documentation for
+           <a href="#Marshal">
+            Marshal
+           </a>
+           for details about the
+conversion of Go values to JSON.
+          </p>
+         </div>
+         <div>
+          <h4 id="Encoder.SetEscapeHTML" tabindex="-1">
+           <span>
+            func (*Encoder)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.7
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (enc *<a href="#Encoder">Encoder</a>) SetEscapeHTML(on <a href="/builtin#bool">bool</a>)</pre>
+          </div>
+          <p>
+           SetEscapeHTML specifies whether problematic HTML characters
+should be escaped inside JSON quoted strings.
+The default behavior is to escape &amp;, &lt;, and &gt; to \u0026, \u003c, and \u003e
+to avoid certain safety problems that can arise when embedding JSON in HTML.
+          </p>
+          <p>
+           In non-HTML settings where the escaping interferes with the readability
+of the output, SetEscapeHTML(false) disables this behavior.
+          </p>
+         </div>
+         <div>
+          <h4 id="Encoder.SetIndent" tabindex="-1">
+           <span>
+            func (*Encoder)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.7
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (enc *<a href="#Encoder">Encoder</a>) SetIndent(prefix, indent <a href="/builtin#string">string</a>)</pre>
+          </div>
+          <p>
+           SetIndent instructs the encoder to format each subsequent encoded
+value as if indented by the package-level function Indent(dst, src, prefix, indent).
+Calling SetIndent("", "") disables indentation.
+          </p>
+         </div>
+        </div>
+        <div>
+         <details>
+          <summary>
+           <h4 id="InvalidUTF8Error" tabindex="-1">
+            <span>
+             type
+             <span>
+              deprecated
+             </span>
+            </span>
+           </h4>
+          </summary>
+          <div>
+           <div>
+            <pre data-code="go">type InvalidUTF8Error struct {
+<span id="InvalidUTF8Error.S">	S <a href="/builtin#string">string</a> <span>// the whole string value that caused the error</span>
+</span>}</pre>
+           </div>
+           <p>
+            Before Go 1.2, an InvalidUTF8Error was returned by
+            <a href="#Marshal">
+             Marshal
+            </a>
+            when
+attempting to encode a string value with invalid UTF-8 sequences.
+As of Go 1.2,
+            <a href="#Marshal">
+             Marshal
+            </a>
+            instead coerces the string to valid UTF-8 by
+replacing invalid bytes with the Unicode replacement rune U+FFFD.
+           </p>
+           <p>
+            Deprecated: No longer used; kept for compatibility.
+           </p>
+           <div>
+            <h4 id="InvalidUTF8Error.Error" tabindex="-1">
+             <span>
+              func (*InvalidUTF8Error)
+             </span>
+            </h4>
+            <div>
+             <pre data-code="go">func (e *<a href="#InvalidUTF8Error">InvalidUTF8Error</a>) Error() <a href="/builtin#string">string</a></pre>
+            </div>
+           </div>
+          </div>
+         </details>
+        </div>
+        <div>
+         <h4 id="InvalidUnmarshalError" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type InvalidUnmarshalError struct {
+<span id="InvalidUnmarshalError.Type">	Type <a href="/reflect">reflect</a>.<a href="/reflect#Type">Type</a>
+</span>}</pre>
+         </div>
+         <p>
+          An InvalidUnmarshalError describes an invalid argument passed to
+          <a href="#Unmarshal">
+           Unmarshal
+          </a>
+          .
+(The argument to
+          <a href="#Unmarshal">
+           Unmarshal
+          </a>
+          must be a non-nil pointer.)
+         </p>
+         <div>
+          <h4 id="InvalidUnmarshalError.Error" tabindex="-1">
+           <span>
+            func (*InvalidUnmarshalError)
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (e *<a href="#InvalidUnmarshalError">InvalidUnmarshalError</a>) Error() <a href="/builtin#string">string</a></pre>
+          </div>
+         </div>
+        </div>
+        <div>
+         <h4 id="Marshaler" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type Marshaler interface {
+<span id="Marshaler.MarshalJSON">	MarshalJSON() ([]<a href="/builtin#byte">byte</a>, <a href="/builtin#error">error</a>)
+</span>}</pre>
+         </div>
+         <p>
+          Marshaler is the interface implemented by types that
+can marshal themselves into valid JSON.
+         </p>
+        </div>
+        <div>
+         <h4 id="MarshalerError" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type MarshalerError struct {
+<span id="MarshalerError.Type">	Type <a href="/reflect">reflect</a>.<a href="/reflect#Type">Type</a>
+</span><span id="MarshalerError.Err">	Err  <a href="/builtin#error">error</a>
+</span>	<span>// contains filtered or unexported fields</span>
+}</pre>
+         </div>
+         <p>
+          A MarshalerError represents an error from calling a
+[Marshaler.MarshalJSON] or
+          <a href="/encoding#TextMarshaler.MarshalText">
+           encoding.TextMarshaler.MarshalText
+          </a>
+          method.
+         </p>
+         <div>
+          <h4 id="MarshalerError.Error" tabindex="-1">
+           <span>
+            func (*MarshalerError)
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (e *<a href="#MarshalerError">MarshalerError</a>) Error() <a href="/builtin#string">string</a></pre>
+          </div>
+         </div>
+         <div>
+          <h4 id="MarshalerError.Unwrap" tabindex="-1">
+           <span>
+            func (*MarshalerError)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.13
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (e *<a href="#MarshalerError">MarshalerError</a>) Unwrap() <a href="/builtin#error">error</a></pre>
+          </div>
+          <p>
+           Unwrap returns the underlying error.
+          </p>
+         </div>
+        </div>
+        <div>
+         <h4 id="Number" tabindex="-1">
+          <span>
+           type
+          </span>
+          <span>
+           <span>
+            added in
+           </span>
+           <span>
+            go1.1
+           </span>
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type Number <a href="/builtin#string">string</a></pre>
+         </div>
+         <p>
+          A Number represents a JSON number literal.
+         </p>
+         <div>
+          <h4 id="Number.Float64" tabindex="-1">
+           <span>
+            func (Number)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.1
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (n <a href="#Number">Number</a>) Float64() (<a href="/builtin#float64">float64</a>, <a href="/builtin#error">error</a>)</pre>
+          </div>
+          <p>
+           Float64 returns the number as a float64.
+          </p>
+         </div>
+         <div>
+          <h4 id="Number.Int64" tabindex="-1">
+           <span>
+            func (Number)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.1
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (n <a href="#Number">Number</a>) Int64() (<a href="/builtin#int64">int64</a>, <a href="/builtin#error">error</a>)</pre>
+          </div>
+          <p>
+           Int64 returns the number as an int64.
+          </p>
+         </div>
+         <div>
+          <h4 id="Number.String" tabindex="-1">
+           <span>
+            func (Number)
+           </span>
+           <span>
+            <span>
+             added in
+            </span>
+            <span>
+             go1.1
+            </span>
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (n <a href="#Number">Number</a>) String() <a href="/builtin#string">string</a></pre>
+          </div>
+          <p>
+           String returns the literal text of the number.
+          </p>
+         </div>
+        </div>
+        <div>
+         <h4 id="RawMessage" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type RawMessage []<a href="/builtin#byte">byte</a></pre>
+         </div>
+         <p>
+          RawMessage is a raw encoded JSON value.
+It implements
+          <a href="#Marshaler">
+           Marshaler
+          </a>
+          and
+          <a href="#Unmarshaler">
+           Unmarshaler
+          </a>
+          and can
+be used to delay JSON decoding or precompute a JSON encoding.
+         </p>
+         <details id="example-RawMessage-Marshal" tabindex="-1">
+          <summary>
+           Example (Marshal)
+          </summary>
+          <div>
+           <p>
+            This example uses RawMessage to use a precomputed JSON during marshal.
+           </p>
+           <pre data-code="go">
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
+func main() {
+	h := json.RawMessage(`{"precomputed": true}`)
+
+	c := struct {
+		Header *json.RawMessage `json:"header"`
+		Body   string           `json:"body"`
+	}{Header: &amp;h, Body: "Hello Gophers!"}
+
+	b, err := json.MarshalIndent(&amp;c, "", "\t")
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	os.Stdout.Write(b)
+
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>{
+	"header": {
+		"precomputed": true
+	},
+	"body": "Hello Gophers!"
+}
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+         <details id="example-RawMessage-Unmarshal" tabindex="-1">
+          <summary>
+           Example (Unmarshal)
+          </summary>
+          <div>
+           <p>
+            This example uses RawMessage to delay parsing part of a JSON message.
+           </p>
+           <pre data-code="go">
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+)
+
+func main() {
+	type Color struct {
+		Space string
+		Point json.RawMessage // delay parsing until we know the color space
+	}
+	type RGB struct {
+		R uint8
+		G uint8
+		B uint8
+	}
+	type YCbCr struct {
+		Y  uint8
+		Cb int8
+		Cr int8
+	}
+
+	var j = []byte(`[
+	{"Space": "YCbCr", "Point": {"Y": 255, "Cb": 0, "Cr": -10}},
+	{"Space": "RGB",   "Point": {"R": 98, "G": 218, "B": 255}}
+]`)
+	var colors []Color
+	err := json.Unmarshal(j, &amp;colors)
+	if err != nil {
+		log.Fatalln("error:", err)
+	}
+
+	for _, c := range colors {
+		var dst any
+		switch c.Space {
+		case "RGB":
+			dst = new(RGB)
+		case "YCbCr":
+			dst = new(YCbCr)
+		}
+		err := json.Unmarshal(c.Point, dst)
+		if err != nil {
+			log.Fatalln("error:", err)
+		}
+		fmt.Println(c.Space, dst)
+	}
+}
+</pre>
+           <pre data-code="go"><span>Output:</span>
+<span>YCbCr &amp;{255 0 -10}
+RGB &amp;{98 218 255}
+</span></pre>
+          </div>
+          <div>
+           <p role="alert">
+           </p>
+          </div>
+         </details>
+         <div>
+          <h4 id="RawMessage.MarshalJSON" tabindex="-1">
+           <span>
+            func (RawMessage)
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (m <a href="#RawMessage">RawMessage</a>) MarshalJSON() ([]<a href="/builtin#byte">byte</a>, <a href="/builtin#error">error</a>)</pre>
+          </div>
+          <p>
+           MarshalJSON returns m as the JSON encoding of m.
+          </p>
+         </div>
+         <div>
+          <h4 id="RawMessage.UnmarshalJSON" tabindex="-1">
+           <span>
+            func (*RawMessage)
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (m *<a href="#RawMessage">RawMessage</a>) UnmarshalJSON(data []<a href="/builtin#byte">byte</a>) <a href="/builtin#error">error</a></pre>
+          </div>
+          <p>
+           UnmarshalJSON sets *m to a copy of data.
+          </p>
+         </div>
+        </div>
+        <div>
+         <h4 id="SyntaxError" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type SyntaxError struct {
+<span id="SyntaxError.Offset">	Offset <a href="/builtin#int64">int64</a> <span>// error occurred after reading Offset bytes</span>
+</span>	<span>// contains filtered or unexported fields</span>
+}</pre>
+         </div>
+         <p>
+          A SyntaxError is a description of a JSON syntax error.
+          <a href="#Unmarshal">
+           Unmarshal
+          </a>
+          will return a SyntaxError if the JSON can't be parsed.
+         </p>
+         <div>
+          <h4 id="SyntaxError.Error" tabindex="-1">
+           <span>
+            func (*SyntaxError)
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (e *<a href="#SyntaxError">SyntaxError</a>) Error() <a href="/builtin#string">string</a></pre>
+          </div>
+         </div>
+        </div>
+        <div>
+         <h4 id="Token" tabindex="-1">
+          <span>
+           type
+          </span>
+          <span>
+           <span>
+            added in
+           </span>
+           <span>
+            go1.5
+           </span>
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type Token <a href="/builtin#any">any</a></pre>
+         </div>
+         <p>
+          A Token holds a value of one of these types:
+         </p>
+         <ul>
+          <li>
+           <a href="#Delim">
+            Delim
+           </a>
+           , for the four JSON delimiters [ ] { }
+          </li>
+          <li>
+           bool, for JSON booleans
+          </li>
+          <li>
+           float64, for JSON numbers
+          </li>
+          <li>
+           <a href="#Number">
+            Number
+           </a>
+           , for JSON numbers
+          </li>
+          <li>
+           string, for JSON string literals
+          </li>
+          <li>
+           nil, for JSON null
+          </li>
+         </ul>
+        </div>
+        <div>
+         <details>
+          <summary>
+           <h4 id="UnmarshalFieldError" tabindex="-1">
+            <span>
+             type
+             <span>
+              deprecated
+             </span>
+            </span>
+           </h4>
+          </summary>
+          <div>
+           <div>
+            <pre data-code="go">type UnmarshalFieldError struct {
+<span id="UnmarshalFieldError.Key">	Key   <a href="/builtin#string">string</a>
+</span><span id="UnmarshalFieldError.Type">	Type  <a href="/reflect">reflect</a>.<a href="/reflect#Type">Type</a>
+</span><span id="UnmarshalFieldError.Field">	Field <a href="/reflect">reflect</a>.<a href="/reflect#StructField">StructField</a>
+</span>}</pre>
+           </div>
+           <p>
+            An UnmarshalFieldError describes a JSON object key that
+led to an unexported (and therefore unwritable) struct field.
+           </p>
+           <p>
+            Deprecated: No longer used; kept for compatibility.
+           </p>
+           <div>
+            <h4 id="UnmarshalFieldError.Error" tabindex="-1">
+             <span>
+              func (*UnmarshalFieldError)
+             </span>
+            </h4>
+            <div>
+             <pre data-code="go">func (e *<a href="#UnmarshalFieldError">UnmarshalFieldError</a>) Error() <a href="/builtin#string">string</a></pre>
+            </div>
+           </div>
+          </div>
+         </details>
+        </div>
+        <div>
+         <h4 id="UnmarshalTypeError" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type UnmarshalTypeError struct {
+<span id="UnmarshalTypeError.Value">	Value  <a href="/builtin#string">string</a>       <span>// description of JSON value - "bool", "array", "number -5"</span>
+</span><span id="UnmarshalTypeError.Type">	Type   <a href="/reflect">reflect</a>.<a href="/reflect#Type">Type</a> <span>// type of Go value it could not be assigned to</span>
+</span><span id="UnmarshalTypeError.Offset">	Offset <a href="/builtin#int64">int64</a>        <span>// error occurred after reading Offset bytes</span>
+</span><span id="UnmarshalTypeError.Struct">	Struct <a href="/builtin#string">string</a>       <span>// name of the struct type containing the field</span>
+</span><span id="UnmarshalTypeError.Field">	Field  <a href="/builtin#string">string</a>       <span>// the full path from root node to the field, include embedded struct</span>
+</span>}</pre>
+         </div>
+         <p>
+          An UnmarshalTypeError describes a JSON value that was
+not appropriate for a value of a specific Go type.
+         </p>
+         <div>
+          <h4 id="UnmarshalTypeError.Error" tabindex="-1">
+           <span>
+            func (*UnmarshalTypeError)
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (e *<a href="#UnmarshalTypeError">UnmarshalTypeError</a>) Error() <a href="/builtin#string">string</a></pre>
+          </div>
+         </div>
+        </div>
+        <div>
+         <h4 id="Unmarshaler" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type Unmarshaler interface {
+<span id="Unmarshaler.UnmarshalJSON">	UnmarshalJSON([]<a href="/builtin#byte">byte</a>) <a href="/builtin#error">error</a>
+</span>}</pre>
+         </div>
+         <p>
+          Unmarshaler is the interface implemented by types
+that can unmarshal a JSON description of themselves.
+The input can be assumed to be a valid encoding of
+a JSON value. UnmarshalJSON must copy the JSON data
+if it wishes to retain the data after returning.
+         </p>
+        </div>
+        <div>
+         <h4 id="UnsupportedTypeError" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type UnsupportedTypeError struct {
+<span id="UnsupportedTypeError.Type">	Type <a href="/reflect">reflect</a>.<a href="/reflect#Type">Type</a>
+</span>}</pre>
+         </div>
+         <p>
+          An UnsupportedTypeError is returned by
+          <a href="#Marshal">
+           Marshal
+          </a>
+          when attempting
+to encode an unsupported value type.
+         </p>
+         <div>
+          <h4 id="UnsupportedTypeError.Error" tabindex="-1">
+           <span>
+            func (*UnsupportedTypeError)
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (e *<a href="#UnsupportedTypeError">UnsupportedTypeError</a>) Error() <a href="/builtin#string">string</a></pre>
+          </div>
+         </div>
+        </div>
+        <div>
+         <h4 id="UnsupportedValueError" tabindex="-1">
+          <span>
+           type
+          </span>
+         </h4>
+         <div>
+          <pre data-code="go">type UnsupportedValueError struct {
+<span id="UnsupportedValueError.Value">	Value <a href="/reflect">reflect</a>.<a href="/reflect#Value">Value</a>
+</span><span id="UnsupportedValueError.Str">	Str   <a href="/builtin#string">string</a>
+</span>}</pre>
+         </div>
+         <p>
+          An UnsupportedValueError is returned by
+          <a href="#Marshal">
+           Marshal
+          </a>
+          when attempting
+to encode an unsupported value.
+         </p>
+         <div>
+          <h4 id="UnsupportedValueError.Error" tabindex="-1">
+           <span>
+            func (*UnsupportedValueError)
+           </span>
+          </h4>
+          <div>
+           <pre data-code="go">func (e *<a href="#UnsupportedValueError">UnsupportedValueError</a>) Error() <a href="/builtin#string">string</a></pre>
+          </div>
+         </div>
+        </div>
+       </section>
+      </div>
+     </div>
+    </div>
+    <div>
+     <h2 id="section-sourcefiles">
+      <img alt="" height="24" src="/static/shared/icon/insert_drive_file_gm_grey_24dp.svg" width="24"/>
+      Source Files
+     </h2>
+     <div>
+      <a href="https://cs.opensource.google/go/go/+/go1.26.2:src/encoding/json" rel="noopener" target="_blank">
+       View all Source files
+      </a>
+     </div>
+     <div>
+      <ul>
+       <li>
+        <a href="https://cs.opensource.google/go/go/+/go1.26.2:src/encoding/json/decode.go" rel="noopener" target="_blank" title="decode.go">
+         decode.go
+        </a>
+       </li>
+       <li>
+        <a href="https://cs.opensource.google/go/go/+/go1.26.2:src/encoding/json/encode.go" rel="noopener" target="_blank" title="encode.go">
+         encode.go
+        </a>
+       </li>
+       <li>
+        <a href="https://cs.opensource.google/go/go/+/go1.26.2:src/encoding/json/fold.go" rel="noopener" target="_blank" title="fold.go">
+         fold.go
+        </a>
+       </li>
+       <li>
+        <a href="https://cs.opensource.google/go/go/+/go1.26.2:src/encoding/json/indent.go" rel="noopener" target="_blank" title="indent.go">
+         indent.go
+        </a>
+       </li>
+       <li>
+        <a href="https://cs.opensource.google/go/go/+/go1.26.2:src/encoding/json/scanner.go" rel="noopener" target="_blank" title="scanner.go">
+         scanner.go
+        </a>
+       </li>
+       <li>
+        <a href="https://cs.opensource.google/go/go/+/go1.26.2:src/encoding/json/stream.go" rel="noopener" target="_blank" title="stream.go">
+         stream.go
+        </a>
+       </li>
+       <li>
+        <a href="https://cs.opensource.google/go/go/+/go1.26.2:src/encoding/json/tables.go" rel="noopener" target="_blank" title="tables.go">
+         tables.go
+        </a>
+       </li>
+       <li>
+        <a href="https://cs.opensource.google/go/go/+/go1.26.2:src/encoding/json/tags.go" rel="noopener" target="_blank" title="tags.go">
+         tags.go
+        </a>
+       </li>
+      </ul>
+     </div>
+    </div>
+    <div>
+     <h2 id="section-directories">
+      <img alt="" height="24" src="/static/shared/icon/folder_gm_grey_24dp.svg" width="24"/>
+      Directories
+     </h2>
+     <div>
+     </div>
+     <table>
+      <tr>
+       <th>
+        Path
+       </th>
+       <th>
+        Synopsis
+       </th>
+      </tr>
+      <tr>
+       <td>
+        <div>
+         <div>
+          <a href="/encoding/json/jsontext@go1.26.2">
+           jsontext
+          </a>
+         </div>
+         <div>
+          Package jsontext implements syntactic processing of JSON as specified in RFC 4627, RFC 7159, RFC 7493, RFC 8259, and RFC 8785.
+         </div>
+        </div>
+       </td>
+       <td>
+        Package jsontext implements syntactic processing of JSON as specified in RFC 4627, RFC 7159, RFC 7493, RFC 8259, and RFC 8785.
+       </td>
+      </tr>
+      <tr>
+       <td>
+        <div>
+         <div>
+          <a href="/encoding/json/v2@go1.26.2">
+           v2
+          </a>
+         </div>
+         <div>
+          Package json implements semantic processing of JSON as specified in RFC 8259.
+         </div>
+        </div>
+       </td>
+       <td>
+        Package json implements semantic processing of JSON as specified in RFC 8259.
+       </td>
+      </tr>
+     </table>
+    </div>
+   </div>
+  </div>
+  <div hidden="" id="showInternal-description">
+   Click to show internal directories.
+  </div>
+  <div hidden="" id="hideInternal-description">
+   Click to hide internal directories.
+  </div>
+ </article>
+</main>
+
+
+</article>
+
+</body>
+</html>
