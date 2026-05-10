@@ -1,0 +1,91 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'><title>gin-docs</title></head><body><main class="astro-bguv2lll" data-pagefind-body="" dir="ltr" lang="en"> <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <h1 class="astro-j6tvhyss" id="_top">Documentation</h1> </div> </div> <div class="content-panel astro-7nkwcw3z"> <div class="sl-container astro-7nkwcw3z"> <div class="sl-markdown-content"> <p>Gin is a high-performance HTTP web framework written in <a href="https://go.dev/">Go</a>. It provides a Martini-like API but with significantly better performance—up to 40 times faster—thanks to <a href="https://github.com/julienschmidt/httprouter">httprouter</a>. Gin is designed for building REST APIs, web applications, and microservices where speed and developer productivity are essential.</p>
+<p><strong>Why choose Gin?</strong></p>
+<p>Gin combines the simplicity of Express.js-style routing with Go’s performance characteristics, making it ideal for:</p>
+<ul>
+<li>Building high-throughput REST APIs</li>
+<li>Developing microservices that need to handle many concurrent requests</li>
+<li>Creating web applications that require fast response times</li>
+<li>Prototyping web services quickly with minimal boilerplate</li>
+</ul>
+<p><strong>Gin’s key features:</strong></p>
+<ul>
+<li><strong>Zero allocation router</strong> - Extremely memory-efficient routing with no heap allocations</li>
+<li><strong>High performance</strong> - Benchmarks show superior speed compared to other Go web frameworks</li>
+<li><strong>Middleware support</strong> - Extensible middleware system for authentication, logging, CORS, etc.</li>
+<li><strong>Crash-free</strong> - Built-in recovery middleware prevents panics from crashing your server</li>
+<li><strong>JSON validation</strong> - Automatic request/response JSON binding and validation</li>
+<li><strong>Route grouping</strong> - Organize related routes and apply common middleware</li>
+<li><strong>Error management</strong> - Centralized error handling and logging</li>
+<li><strong>Built-in rendering</strong> - Support for JSON, XML, HTML templates, and more</li>
+<li><strong>Extensible</strong> - Large ecosystem of community middleware and plugins</li>
+</ul>
+<h2 id="getting-started">Getting Started</h2>
+<h3 id="prerequisites">Prerequisites</h3>
+<ul>
+<li><strong>Go version</strong>: Gin requires <a href="https://go.dev/">Go</a> version <a href="https://go.dev/doc/devel/release#go1.25">1.25</a> or above</li>
+<li><strong>Basic Go knowledge</strong>: Familiarity with Go syntax and package management is helpful</li>
+</ul>
+<h3 id="installation">Installation</h3>
+<p>With <a href="https://go.dev/wiki/Modules#how-to-use-modules">Go’s module support</a>, simply import Gin in your code and Go will automatically fetch it during build:</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="go"><code><div class="ec-line"><div class="code"><span style="--0:#F97583;--1:#BF3441">import</span><span style="--0:#9ECBFF;--1:#032F62">"</span><span style="--0:#B392F0;--1:#6F42C1">github.com/gin-gonic/gin</span><span style="--0:#9ECBFF;--1:#032F62">"</span></div></div></code></pre><div class="copy"><button data-code='import "github.com/gin-gonic/gin"' data-copied="Copied!" title="Copy to clipboard"></button></div></figure></div>
+<h3 id="your-first-gin-application">Your First Gin Application</h3>
+<p>Here’s a complete example that demonstrates Gin’s simplicity:</p>
+<div class="expressive-code"><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="go"><code><div class="ec-line"><div class="code"><span style="--0:#F97583;--1:#BF3441">package</span><span style="--0:#B392F0;--1:#6F42C1">main</span></div></div><div class="ec-line"></div><div class="ec-line"><div class="code"><span style="--0:#F97583;--1:#BF3441">import</span><span style="--0:#E1E4E8;--1:#24292E"> (</span></div></div><div class="ec-line"><div class="code"><span style="--0:#9ECBFF;--1:#032F62">"</span><span style="--0:#B392F0;--1:#6F42C1">net/http</span><span style="--0:#9ECBFF;--1:#032F62">"</span></div></div><div class="ec-line"></div><div class="ec-line"><div class="code"><span style="--0:#9ECBFF;--1:#032F62">"</span><span style="--0:#B392F0;--1:#6F42C1">github.com/gin-gonic/gin</span><span style="--0:#9ECBFF;--1:#032F62">"</span></div></div><div class="ec-line"><div class="code"><span style="--0:#E1E4E8;--1:#24292E">)</span></div></div><div class="ec-line"></div><div class="ec-line"><div class="code"><span style="--0:#F97583;--1:#BF3441">func</span><span style="--0:#B392F0;--1:#6F42C1">main</span><span style="--0:#E1E4E8;--1:#24292E">() {</span></div></div><div class="ec-line"><div class="code"><span style="--0:#99A0A6;--1:#616972">// Create a Gin router with default middleware (logger and recovery)</span></div></div><div class="ec-line"><div class="code"><span class="indent"></span><span style="--0:#E1E4E8;--1:#24292E">r </span><span style="--0:#F97583;--1:#BF3441">:=</span><span style="--0:#E1E4E8;--1:#24292E"> gin.</span><span style="--0:#B392F0;--1:#6F42C1">Default</span><span style="--0:#E1E4E8;--1:#24292E">()</span></div></div><div class="ec-line"></div><div class="ec-line"><div class="code"><span style="--0:#99A0A6;--1:#616972">// Define a simple GET endpoint</span></div></div><div class="ec-line"><div class="code"><span class="indent"></span><span style="--0:#E1E4E8;--1:#24292E">r.</span><span style="--0:#B392F0;--1:#6F42C1">GET</span><span style="--0:#E1E4E8;--1:#24292E">(</span><span style="--0:#9ECBFF;--1:#032F62">"/ping"</span><span style="--0:#E1E4E8;--1:#24292E">, </span><span style="--0:#F97583;--1:#BF3441">func</span><span style="--0:#E1E4E8;--1:#24292E">(</span><span style="--0:#FFAB70;--1:#AE4B07">c</span><span style="--0:#F97583;--1:#BF3441">*</span><span style="--0:#B392F0;--1:#6F42C1">gin</span><span style="--0:#E1E4E8;--1:#24292E">.</span><span style="--0:#B392F0;--1:#6F42C1">Context</span><span style="--0:#E1E4E8;--1:#24292E">) {</span></div></div><div class="ec-line"><div class="code"><span style="--0:#99A0A6;--1:#616972">// Return JSON response</span></div></div><div class="ec-line"><div class="code"><span class="indent"></span><span style="--0:#E1E4E8;--1:#24292E">c.</span><span style="--0:#B392F0;--1:#6F42C1">JSON</span><span style="--0:#E1E4E8;--1:#24292E">(http.StatusOK, </span><span style="--0:#B392F0;--1:#6F42C1">gin</span><span style="--0:#E1E4E8;--1:#24292E">.</span><span style="--0:#B392F0;--1:#6F42C1">H</span><span style="--0:#E1E4E8;--1:#24292E">{</span></div></div><div class="ec-line"><div class="code"><span style="--0:#9ECBFF;--1:#032F62">"message"</span><span style="--0:#E1E4E8;--1:#24292E">: </span><span style="--0:#9ECBFF;--1:#032F62">"pong"</span><span style="--0:#E1E4E8;--1:#24292E">,</span></div></div><div class="ec-line"><div class="code"><span class="indent"></span><span style="--0:#E1E4E8;--1:#24292E">})</span></div></div><div class="ec-line"><div class="code"><span class="indent"></span><span style="--0:#E1E4E8;--1:#24292E">})</span></div></div><div class="ec-line"></div><div class="ec-line"><div class="code"><span style="--0:#99A0A6;--1:#616972">// Start server on port 8080 (default)</span></div></div><div class="ec-line"><div class="code"><span style="--0:#99A0A6;--1:#616972">// Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)</span></div></div><div class="ec-line"><div class="code"><span class="indent"></span><span style="--0:#E1E4E8;--1:#24292E">r.</span><span style="--0:#B392F0;--1:#6F42C1">Run</span><span style="--0:#E1E4E8;--1:#24292E">()</span></div></div><div class="ec-line"><div class="code"><span style="--0:#E1E4E8;--1:#24292E">}</span></div></div></code></pre><div class="copy"><button data-code='package mainimport (  "net/http"  "github.com/gin-gonic/gin")func main() {  // Create a Gin router with default middleware (logger and recovery)  r := gin.Default()  // Define a simple GET endpoint  r.GET("/ping", func(c *gin.Context) {    // Return JSON response    c.JSON(http.StatusOK, gin.H{      "message": "pong",    })  })  // Start server on port 8080 (default)  // Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)  r.Run()}' data-copied="Copied!" title="Copy to clipboard"></button></div></figure></div>
+<p><strong>Running the application:</strong></p>
+<ol>
+<li>
+<p>Save the code above as <code dir="auto">main.go</code></p>
+</li>
+<li>
+<p>Run the application:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#B392F0;--1:#6F42C1">go</span><span style="--0:#9ECBFF;--1:#032F62">run</span><span style="--0:#9ECBFF;--1:#032F62">main.go</span></div></div></code></pre><div class="copy"><button data-code="go run main.go" data-copied="Copied!" title="Copy to clipboard"></button></div></figure></div>
+</li>
+<li>
+<p>Open your browser and visit <a href="http://localhost:8080/ping"><code dir="auto">http://localhost:8080/ping</code></a></p>
+</li>
+<li>
+<p>You should see: <code dir="auto">{"message":"pong"}</code></p>
+</li>
+</ol>
+<p><strong>What this example demonstrates:</strong></p>
+<ul>
+<li>Creating a Gin router with default middleware</li>
+<li>Defining HTTP endpoints with simple handler functions</li>
+<li>Returning JSON responses</li>
+<li>Starting an HTTP server</li>
+</ul>
+<h3 id="next-steps">Next Steps</h3>
+<p>After running your first Gin application, explore these resources to learn more:</p>
+<h4 id="-learning-resources">📚 Learning Resources</h4>
+<ul>
+<li><strong><a href="./quickstart/">Gin Quick Start Guide</a></strong> - Comprehensive tutorial with API examples and build configurations</li>
+<li><strong><a href="https://github.com/gin-gonic/examples">Example Repository</a></strong> - Ready-to-run examples demonstrating various Gin use cases:
+<ul>
+<li>REST API development</li>
+<li>Authentication &amp; middleware</li>
+<li>File uploads and downloads</li>
+<li>WebSocket connections</li>
+<li>Template rendering</li>
+</ul>
+</li>
+</ul>
+<h3 id="official-tutorials">Official Tutorials</h3>
+<ul>
+<li><a href="https://go.dev/doc/tutorial/web-service-gin">Go.dev Tutorial: Developing a RESTful API with Go and Gin</a></li>
+</ul>
+<h2 id="-middleware-ecosystem">🔌 Middleware Ecosystem</h2>
+<p>Gin has a rich ecosystem of middleware for common web development needs. Explore community-contributed middleware:</p>
+<ul>
+<li>
+<p><strong><a href="https://github.com/gin-contrib">gin-contrib</a></strong> - Official middleware collection including:</p>
+<ul>
+<li>Authentication (JWT, Basic Auth, Sessions)</li>
+<li>CORS, Rate limiting, Compression</li>
+<li>Logging, Metrics, Tracing</li>
+<li>Static file serving, Template engines</li>
+</ul>
+</li>
+<li>
+<p><strong><a href="https://github.com/gin-gonic/contrib">gin-gonic/contrib</a></strong> - Additional community middleware</p>
+</li>
+</ul> </div>  </div> </div> </main></body></html>
