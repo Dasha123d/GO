@@ -1,0 +1,12 @@
+{
+  "title": "net/http стандартная библиотека",
+  "source_url": "https://go.dev/",
+  "format": "markdown",
+  "topics": ["stdlib","http","server","middleware"],
+  "level": "beginner",
+  "has_code_examples": true,
+  "extractable": true,
+  "text_layer_verified": true,
+  "last_updated": "2026-05-09",
+  "chunk_strategy": {"method": "section-based", "max_size": 1024, "overlap": 50}
+}

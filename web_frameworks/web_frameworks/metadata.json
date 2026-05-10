@@ -1,0 +1,12 @@
+{
+  "collection": "web_frameworks",
+  "description": "Материалы по веб-фреймворкам Go: stdlib, Gin, Echo, Chi, Fiber, паттерны",
+  "format": "markdown",
+  "language": "ru/en",
+  "vector_db_ready": true,
+  "chunk_strategy": "section-based",
+  "max_chunk_tokens": 512,
+  "overlap_tokens": 50,
+  "last_updated": "2026-05-09",
+  "license": "MIT / Apache-2.0 / Go License"
+}
