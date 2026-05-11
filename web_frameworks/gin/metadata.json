@@ -1,0 +1,64 @@
+{
+  "library": "gin",
+  "import_path": "github.com/gin-gonic/gin",
+  "version": "v1.9.1",
+  "license": "MIT",
+  "format": "cleaned_html+raw_go",
+  
+  "topics": ["web", "http", "framework", "router", "middleware", "rest-api", "backend"],
+  "difficulty": "beginner",
+  "content_languages": ["en"],
+  "interface_language": "ru",
+  
+  "examples_count": 5,
+  "guides_count": 4,
+  "last_updated": "2026-01-15",
+  "checksum": "sha256:PLACEHOLDER_UPDATE_AFTER_DOWNLOAD",
+  
+  "source": {
+    "docs": "https://gin-gonic.com/en/docs/",
+    "examples": "https://github.com/gin-gonic/examples",
+    "api_ref": "https://pkg.go.dev/github.com/gin-gonic/gin"
+  },
+  
+  "files_manifest": {
+    "guides_html": [
+      "gin-quick-start.html",
+      "gin-routing-guide.html",
+      "gin-middleware-patterns.html",
+      "gin-testing-best-practices.html"
+    ],
+    "examples_code": [
+      "examples/hello-world.go",
+      "examples/cors-middleware.go",
+      "examples/form-binding.go",
+      "examples/request-data.go",
+      "examples/custom-validator.go"
+    ],
+    "examples_docs": [
+      "examples/hello-world.md",
+      "examples/cors-middleware.md",
+      "examples/form-binding.md",
+      "examples/request-data.md",
+      "examples/custom-validator.md"
+    ]
+  },
+  
+  "go_requirements": {
+    "min_version": "1.18",
+    "dependencies": [
+      "github.com/gin-gonic/gin@v1.9.1",
+      "github.com/gin-contrib/cors@v1.4.0",
+      "github.com/go-playground/validator/v10@v10.15.0"
+    ]
+  },
+  
+  "vector_db": {
+    "collection_name": "go_frameworks",
+    "chunk_strategy": "by-section",
+    "include_code_blocks": true,
+    "code_language": "go",
+    "metadata_fields": ["library", "topics", "format", "difficulty"],
+    "exclude_patterns": ["//go:build ignore", "package main"]
+  }
+}
