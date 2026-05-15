@@ -1,0 +1,95 @@
+{
+  "directory": "database_drivers",
+  "description": "Руководства и примеры по работе с базами данных и драйверами в Go: database/sql, PostgreSQL, MySQL, SQLite, MongoDB, Redis, тестирование.",
+  "tags": ["go", "database", "sql", "postgres", "mysql", "sqlite", "mongodb", "redis", "testing"],
+  "files": {
+    "intro-database-sql.md": {
+      "title": "Введение в database/sql",
+      "summary": "Основы работы с пакетом database/sql, подключение драйверов, выполнение запросов, обработка ошибок.",
+      "order": 1
+    },
+    "connection-pooling.md": {
+      "title": "Пул соединений и управление временем жизни",
+      "summary": "Настройка пула соединений в sql.DB, параметры SetMaxOpenConns, SetConnMaxLifetime, мониторинг.",
+      "order": 2
+    },
+    "postgres-drivers.md": {
+      "title": "Драйверы PostgreSQL: pq и pgx",
+      "summary": "Сравнение lib/pq и jackc/pgx, подключение, особенности типов, COPY, listen/notify.",
+      "order": 3
+    },
+    "mysql-driver.md": {
+      "title": "Драйвер MySQL",
+      "summary": "Драйвер go-sql-driver/mysql, DSN, работа с часовыми поясами, NULL, prepared statements.",
+      "order": 4
+    },
+    "sqlite-driver.md": {
+      "title": "Драйвер SQLite3",
+      "summary": "Использование mattn/go-sqlite3, CGO, in-memory базы, особенности транзакций.",
+      "order": 5
+    },
+    "mongodb-driver.md": {
+      "title": "Драйвер MongoDB",
+      "summary": "Официальный mongo-go-driver, BSON, CRUD, агрегации, индексы.",
+      "order": 6
+    },
+    "redis-client.md": {
+      "title": "Клиент Redis",
+      "summary": "Клиент go-redis, основные команды, пайплайны, Pub/Sub, кластер.",
+      "order": 7
+    },
+    "testing-database-code.md": {
+      "title": "Тестирование кода баз данных",
+      "summary": "Стратегии тестирования: in-memory SQLite, Docker, sqlmock, test helpers.",
+      "order": 8
+    },
+    "examples/postgres-connect.go": {
+      "title": "Пример: Подключение к PostgreSQL",
+      "summary": "Демонстрация подключения через pgx и выполнения простого запроса."
+    },
+    "examples/postgres-connect.md": {
+      "title": "Документация к примеру postgres-connect",
+      "summary": "Описание зависимостей, запуск, ожидаемый результат."
+    },
+    "examples/mysql-connect.go": {
+      "title": "Пример: Подключение к MySQL",
+      "summary": "Создание таблицы, вставка и чтение данных с go-sql-driver/mysql."
+    },
+    "examples/mysql-connect.md": {
+      "title": "Документация к примеру mysql-connect",
+      "summary": "Настройка MySQL, DSN, запуск."
+    },
+    "examples/sqlite-basic.go": {
+      "title": "Пример: Базовые операции SQLite",
+      "summary": "In-memory SQLite, транзакция, запрос."
+    },
+    "examples/sqlite-basic.md": {
+      "title": "Документация к примеру sqlite-basic",
+      "summary": "Запуск без внешней БД, вывод."
+    },
+    "examples/mongo-crud.go": {
+      "title": "Пример: CRUD с MongoDB",
+      "summary": "Вставка, поиск, обновление и удаление документа."
+    },
+    "examples/mongo-crud.md": {
+      "title": "Документация к примеру mongo-crud",
+      "summary": "Требования, как поднять MongoDB локально."
+    },
+    "examples/redis-cache.go": {
+      "title": "Пример: Кэширование с Redis",
+      "summary": "Сохранение и чтение JSON-объекта из Redis с TTL."
+    },
+    "examples/redis-cache.md": {
+      "title": "Документация к примеру redis-cache",
+      "summary": "Запуск Redis, ожидаемый вывод."
+    },
+    "examples/transactions.go": {
+      "title": "Пример: SQL-транзакции",
+      "summary": "Транзакция с откатом при ошибке."
+    },
+    "examples/transactions.md": {
+      "title": "Документация к примеру transactions",
+      "summary": "Объяснение сценария, запуск."
+    }
+  }
+}
