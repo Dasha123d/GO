@@ -1,5 +1,3 @@
-### Файл: mysql-driver.md
-```markdown
 # Драйвер MySQL
 
 Основной драйвер MySQL для Go: `github.com/go-sql-driver/mysql`.

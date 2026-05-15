@@ -1,8 +1,3 @@
-
----
-
-### Файл: postgres-drivers.md
-```markdown
 # Драйверы PostgreSQL: pq и pgx
 
 В экосистеме Go два основных драйвера для PostgreSQL: `lib/pq` и `jackc/pgx`.
