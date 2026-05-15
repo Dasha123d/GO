@@ -1,0 +1,85 @@
+{
+  "directory": "websocket_realtime",
+  "description": "Руководства и примеры по WebSocket и real-time коммуникациям в Go: gorilla/websocket, nhooyr.io/websocket, чат, pub/sub, тестирование.",
+  "tags": ["go", "websocket", "realtime", "gorilla", "nhooyr", "chat", "pubsub", "testing"],
+  "files": {
+    "intro-websockets-go.md": {
+      "title": "Введение в WebSocket в Go",
+      "summary": "Протокол WebSocket, стандартная библиотека net/http и апгрейд соединений, обзор популярных библиотек.",
+      "order": 1
+    },
+    "gorilla-websocket.md": {
+      "title": "Библиотека gorilla/websocket",
+      "summary": "Установка, апгрейд HTTP-соединения, чтение/запись сообщений, обработка ошибок, контрольный пример.",
+      "order": 2
+    },
+    "nhooyr-websocket.md": {
+      "title": "Библиотека nhooyr.io/websocket",
+      "summary": "Современная легковесная библиотека, контексты, таймауты, работа с net/http.",
+      "order": 3
+    },
+    "realtime-patterns.md": {
+      "title": "Шаблоны real-time взаимодействия",
+      "summary": "Паттерны: чат-комнаты, широковещательная рассылка, pub/sub, комнаты и клиенты.",
+      "order": 4
+    },
+    "connection-management.md": {
+      "title": "Управление соединениями и переподключение",
+      "summary": "Обработка обрывов, переподключение с экспоненциальной задержкой, gracefully shutdown.",
+      "order": 5
+    },
+    "testing-websockets.md": {
+      "title": "Тестирование WebSocket-серверов",
+      "summary": "Подходы: net/http/httptest, запуск настоящего сервера, использование gorilla/websocket клиента в тестах.",
+      "order": 6
+    },
+    "examples/echo-server.go": {
+      "title": "Пример: эхо-сервер",
+      "summary": "Простейший WebSocket-сервер на gorilla/websocket, возвращающий полученные сообщения."
+    },
+    "examples/echo-server.md": {
+      "title": "Документация к echo-server",
+      "summary": "Описание, зависимости, запуск и проверка с помощью wscat."
+    },
+    "examples/chat-server.go": {
+      "title": "Пример: чат-сервер",
+      "summary": "Многопользовательский чат с комнатами, регистрацией клиентов и широковещанием."
+    },
+    "examples/chat-server.md": {
+      "title": "Документация к chat-server",
+      "summary": "Как запустить, подключиться несколькими клиентами."
+    },
+    "examples/pubsub-client.go": {
+      "title": "Пример: pub/sub клиент",
+      "summary": "Клиент на nhooyr.io/websocket, подписывающийся на канал и получающий сообщения."
+    },
+    "examples/pubsub-client.md": {
+      "title": "Документация к pubsub-client",
+      "summary": "Требуется запущенный WebSocket-сервер с поддержкой pub/sub."
+    },
+    "examples/graceful-shutdown.go": {
+      "title": "Пример: graceful shutdown",
+      "summary": "Сервер, корректно завершающий соединения при получении сигнала ОС."
+    },
+    "examples/graceful-shutdown.md": {
+      "title": "Документация к graceful-shutdown",
+      "summary": "Демонстрация плавного отключения."
+    },
+    "examples/heartbeat.go": {
+      "title": "Пример: heartbeat (ping/pong)",
+      "summary": "Настройка пингов и обработка разрывов по таймауту."
+    },
+    "examples/heartbeat.md": {
+      "title": "Документация к heartbeat",
+      "summary": "Значение ping/pong для обнаружения мёртвых соединений."
+    },
+    "examples/reconnection.go": {
+      "title": "Пример: клиент с переподключением",
+      "summary": "Клиент, автоматически восстанавливающий соединение при обрыве."
+    },
+    "examples/reconnection.md": {
+      "title": "Документация к reconnection",
+      "summary": "Логика экспоненциальной задержки."
+    }
+  }
+}
