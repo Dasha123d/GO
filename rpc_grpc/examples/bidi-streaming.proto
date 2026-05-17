@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package bidistream;
+
+option go_package = "rpc_grpc/examples/bidistream";
+
+service Chat {
+  rpc Chat(stream ChatMessage) returns (stream ChatMessage);
+}
+
+message ChatMessage {
+  string user = 1;
+  string text = 2;
+}

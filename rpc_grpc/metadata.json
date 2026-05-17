@@ -1,0 +1,47 @@
+{
+  "directory": "rpc_grpc",
+  "description": "Руководства и примеры по RPC и gRPC в Go: Protocol Buffers, сервер, клиент, стриминг, тестирование.",
+  "tags": ["go", "rpc", "grpc", "protobuf", "streaming", "testing"],
+  "files": {
+    "intro-rpc-go.md": {
+      "title": "Введение в RPC в Go",
+      "summary": "Обзор RPC, сравнение REST и gRPC, общая архитектура.",
+      "order": 1
+    },
+    "grpc-basics.md": {
+      "title": "Основы gRPC",
+      "summary": "Концепции gRPC, жизненный цикл запроса, HTTP/2, Protobuf.",
+      "order": 2
+    },
+    "protocol-buffers.md": {
+      "title": "Protocol Buffers и генерация кода",
+      "summary": "Синтаксис proto3, компиляция с protoc, плагины для Go.",
+      "order": 3
+    },
+    "grpc-server.md": {
+      "title": "Реализация gRPC-сервера",
+      "summary": "Создание сервера, регистрация сервисов, запуск, рефлексия.",
+      "order": 4
+    },
+    "grpc-client.md": {
+      "title": "Реализация gRPC-клиента",
+      "summary": "Подключение к серверу, вызовы, перехватчики, балансировка.",
+      "order": 5
+    },
+    "grpc-streaming.md": {
+      "title": "Потоковая передача (streaming)",
+      "summary": "Server streaming, client streaming, bidirectional streaming, управление потоками.",
+      "order": 6
+    },
+    "error-handling-metadata.md": {
+      "title": "Обработка ошибок и метаданные",
+      "summary": "Статус-коды gRPC, rich errors, метаданные (headers/trailers).",
+      "order": 7
+    },
+    "testing-grpc.md": {
+      "title": "Тестирование gRPC-сервисов",
+      "summary": "Использование bufconn, тестовых серверов, моков.",
+      "order": 8
+    }
+  }
+}

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package serverstream;
+
+option go_package = "rpc_grpc/examples/serverstream";
+
+service DataStream {
+  rpc StreamData (DataRequest) returns (stream DataResponse);
+}
+
+message DataRequest {
+  int32 count = 1;
+}
+
+message DataResponse {
+  int32 index = 1;
+  string message = 2;
+}

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package clientstream;
+
+option go_package = "rpc_grpc/examples/clientstream";
+
+service Accumulator {
+  rpc Accumulate (stream Value) returns (Sum);
+}
+
+message Value {
+  int32 number = 1;
+}
+
+message Sum {
+  int32 total = 1;
+}
