@@ -1,0 +1,89 @@
+{
+  "directory": "http_middleware_helpers",
+  "description": "Руководства и примеры по созданию HTTP middleware в Go: стандартный паттерн, chi, gorilla/mux, логирование, аутентификация, восстановление, CORS, rate limiting.",
+  "tags": ["go", "http", "middleware", "security", "logging", "cors", "rate-limiting"],
+  "files": {
+    "intro-http-middleware.md": {
+      "title": "Введение в HTTP middleware",
+      "summary": "Роль middleware в Go, обёртка http.Handler, цепочки.",
+      "order": 1
+    },
+    "standard-middleware.md": {
+      "title": "Стандартный паттерн middleware",
+      "summary": "Создание middleware с использованием только net/http, пример цепочки.",
+      "order": 2
+    },
+    "chi-gorilla-middleware.md": {
+      "title": "Middleware с chi и gorilla/mux",
+      "summary": "Использование middleware в популярных роутерах, встроенные middleware.",
+      "order": 3
+    },
+    "logging-middleware.md": {
+      "title": "Логирование запросов",
+      "summary": "Запись метода, URL, статуса, времени выполнения.",
+      "order": 4
+    },
+    "auth-middleware.md": {
+      "title": "Аутентификация (Basic, JWT)",
+      "summary": "Обработка Basic Auth, JWT-токенов, извлечение пользователя.",
+      "order": 5
+    },
+    "recovery-middleware.md": {
+      "title": "Восстановление после паники",
+      "summary": "Перехват паник в обработчиках, логирование стека.",
+      "order": 6
+    },
+    "cors-security.md": {
+      "title": "CORS и безопасность",
+      "summary": "Настройка Cross-Origin Resource Sharing, заголовки безопасности.",
+      "order": 7
+    },
+    "rate-limiting-timeout.md": {
+      "title": "Rate limiting и таймауты",
+      "summary": "Ограничение частоты запросов, установка таймаутов на обработку.",
+      "order": 8
+    },
+    "examples/basic-logger.go": {
+      "title": "Логирующий middleware",
+      "summary": "Middleware, выводящий метод, путь, статус и длительность."
+    },
+    "examples/basic-logger.md": {
+      "title": "Документация к basic-logger"
+    },
+    "examples/auth-basic.go": {
+      "title": "Basic Auth middleware",
+      "summary": "Проверка Basic-авторизации из заголовка Authorization."
+    },
+    "examples/auth-basic.md": {
+      "title": "Документация к auth-basic"
+    },
+    "examples/auth-jwt.go": {
+      "title": "JWT middleware",
+      "summary": "Валидация JWT токена и добавление claims в контекст."
+    },
+    "examples/auth-jwt.md": {
+      "title": "Документация к auth-jwt"
+    },
+    "examples/panic-recovery.go": {
+      "title": "Recovery middleware",
+      "summary": "Перехват паник и возврат 500 ошибки."
+    },
+    "examples/panic-recovery.md": {
+      "title": "Документация к panic-recovery"
+    },
+    "examples/cors-handler.go": {
+      "title": "CORS middleware",
+      "summary": "Установка заголовков Access-Control-Allow-*."
+    },
+    "examples/cors-handler.md": {
+      "title": "Документация к cors-handler"
+    },
+    "examples/rate-limiter.go": {
+      "title": "Rate limiter middleware",
+      "summary": "Простой ограничитель на основе token bucket."
+    },
+    "examples/rate-limiter.md": {
+      "title": "Документация к rate-limiter"
+    }
+  }
+}
