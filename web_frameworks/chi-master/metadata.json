@@ -1,0 +1,75 @@
+{
+    "library": "chi",
+    "import_path": "github.com/go-chi/chi/v5",
+    "version": "v5.0.12",
+    "license": "MIT",
+    "format": "cleaned_html+raw_go",
+    "topics": [
+      "web",
+      "http",
+      "router",
+      "middleware",
+      "rest-api",
+      "idiomatic",
+      "composable",
+      "net-http"
+    ],
+    "difficulty": "intermediate",
+    "content_languages": ["en"],
+    "interface_language": "ru",
+    "examples_count": 8,
+    "guides_count": 7,
+    "last_updated": "2026-05-19",
+    "checksum": "sha256:PLACEHOLDER_CHI",
+    "source": {
+      "docs": "https://go-chi.io/",
+      "examples": "https://github.com/go-chi/chi/tree/master/_examples",
+      "api_ref": "https://pkg.go.dev/github.com/go-chi/chi/v5"
+    },
+    "files_manifest": {
+      "examples_code": [
+        "examples/hello-world.go",
+        "examples/routing-example.go",
+        "examples/middleware-basic.go",
+        "examples/middleware-cors.go",
+        "examples/context-values.go",
+        "examples/route-groups.go",
+        "examples/error-handling.go",
+        "examples/graceful-shutdown.go"
+      ],
+      "examples_docs": [
+        "examples/hello-world.md",
+        "examples/routing-example.md",
+        "examples/middleware-basic.md",
+        "examples/middleware-cors.md",
+        "examples/context-values.md",
+        "examples/route-groups.md",
+        "examples/error-handling.md",
+        "examples/graceful-shutdown.md"
+      ],
+      "guides_html": [
+        "text_chi/01-introduction.html",
+        "text_chi/02-installation.html",
+        "text_chi/03-routing.html",
+        "text_chi/04-middleware.html",
+        "text_chi/05-context.html",
+        "text_chi/06-testing.html",
+        "text_chi/07-faq.html"
+      ]
+    },
+    "go_requirements": {
+      "min_version": "1.16",
+      "dependencies": [
+        "github.com/go-chi/chi/v5@v5.0.12",
+        "github.com/go-chi/chi/v5/middleware@v5.0.12"
+      ]
+    },
+    "vector_db": {
+      "collection_name": "go_frameworks",
+      "chunk_strategy": "by-section",
+      "include_code_blocks": true,
+      "code_language": "go",
+      "metadata_fields": ["library", "topics", "format", "difficulty"],
+      "exclude_patterns": ["//go:build ignore", "package main"]
+    }
+  }
