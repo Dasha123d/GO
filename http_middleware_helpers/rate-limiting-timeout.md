@@ -36,3 +36,9 @@ func Timeout(timeout time.Duration) func(http.Handler) http.Handler {
     }
 }
 ```
+Если обработчик не уложится в таймаут, контекст отменится, и можно вернуть `503 Service Unavailable`.
+
+Комбинирование
+Rate limiter и таймаут часто идут вместе с логированием и восстановлением.
+
+Пример rate limiter'а: `examples/rate-limiter.go`.
