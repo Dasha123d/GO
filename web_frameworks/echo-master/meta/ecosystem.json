@@ -1,0 +1,24 @@
+{
+    "official_extensions": [
+      {
+        "name": "echo-contrib",
+        "repo": "https://github.com/labstack/echo-contrib",
+        "description": "Collection of additional middleware for Echo"
+      },
+      {
+        "name": "echo-swagger",
+        "repo": "https://github.com/labstack/echo-swagger",
+        "description": "Swagger middleware for Echo"
+      }
+    ],
+    "template_engines": [
+      "html/template (Standard)",
+      "github.com/flosch/pongo2",
+      "github.com/valyala/quicktemplate"
+    ],
+    "database_drivers": [
+      "database/sql (Standard)",
+      "gorm.io/gorm",
+      "github.com/jmoiron/sqlx"
+    ]
+  }

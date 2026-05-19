@@ -1,0 +1,15 @@
+{
+    "go_versions": {
+      "minimum_supported": "1.19",
+      "tested_versions": [
+        "1.19",
+        "1.20",
+        "1.21",
+        "1.22",
+        "1.23"
+      ],
+      "recommended": "1.22"
+    },
+    "os_support": ["Linux", "macOS", "Windows", "FreeBSD"],
+    "architecture": ["amd64", "arm64", "386"]
+  }

@@ -1,0 +1,21 @@
+{
+    "core_dependencies": [
+      {
+        "name": "github.com/labstack/gommon",
+        "version": "v0.4.0",
+        "purpose": "Internal utilities (log, color, bytes)"
+      }
+    ],
+    "middleware_dependencies": [
+      {
+        "name": "github.com/golang-jwt/jwt",
+        "version": "v3.2.2",
+        "purpose": "JWT authentication"
+      },
+      {
+        "name": "github.com/labstack/echo-contrib",
+        "version": "v0.15.0",
+        "purpose": "Extra middleware (prometheus, session, jaeger)"
+      }
+    ]
+  }

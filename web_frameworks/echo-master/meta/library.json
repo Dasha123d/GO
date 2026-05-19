@@ -1,0 +1,14 @@
+{
+    "name": "Echo",
+    "repository": "https://github.com/labstack/echo",
+    "website": "https://echo.labstack.com/",
+    "license": "MIT",
+    "license_url": "https://github.com/labstack/echo/blob/master/LICENSE",
+    "language": "Go",
+    "package_path": "github.com/labstack/echo/v4",
+    "current_version": "v4.12.0",
+    "description": "High performance, extensible, minimalist Go web framework",
+    "tags": ["web", "framework", "http", "rest", "router", "middleware", "minimalist"],
+    "maintainer": "Amit Saha",
+    "contributors": "https://github.com/labstack/echo/graphs/contributors"
+  }
