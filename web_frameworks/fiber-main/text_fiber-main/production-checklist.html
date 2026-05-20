@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Очищенная документация</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 25px; background: #fafafa; color: #333; }
+        article { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 6px; overflow-x: auto; }
+        pre code { background: none; color: inherit; padding: 0; }
+        a { color: #00979d; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        blockquote { border-left: 4px solid #ddd; padding-left: 15px; margin: 15px 0; color: #666; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { padding: 8px 12px; border: 1px solid #ddd; }
+        th { background: #f9f9f9; }
+    </style>
+</head>
+<body>
+<article>
+<main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><span class="theme-doc-version-badge badge badge--secondary">Version: v3.x</span><div class="theme-doc-markdown markdown"><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="custom-json-encoderdecoder">Custom JSON Encoder/Decoder<a aria-label="Direct link to Custom JSON Encoder/Decoder" class="hash-link" href="#custom-json-encoderdecoder" rel="noopener" target="_blank" title="Direct link to Custom JSON Encoder/Decoder" translate="no">​</a></h2>
+<p>Fiber defaults to the standard <code>encoding/json</code> for stability and reliability. If you need more speed, consider these libraries:</p>
+<ul>
+<li class=""><a class="" href="https://github.com/goccy/go-json" rel="noopener" target="_blank">goccy/go-json</a></li>
+<li class=""><a class="" href="https://github.com/bytedance/sonic" rel="noopener" target="_blank">bytedance/sonic</a></li>
+<li class=""><a class="" href="https://github.com/segmentio/encoding" rel="noopener" target="_blank">segmentio/encoding</a></li>
+<li class=""><a class="" href="https://github.com/minio/simdjson-go" rel="noopener" target="_blank">minio/simdjson-go</a></li>
+</ul>
+<div class="language-go codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockTitle_OeMC">Example</div><div class="codeBlockContent_QJqH"><pre class="prism-code language-go codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa" tabindex="0"><code class="codeBlockLines_e6Vv"><div class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">package</span><span class="token plain"> main</span><br/></div><div class="token-line" style="color:#393A34"><br/></div><div class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">import</span><span class="token string" style="color:#e3116c">"github.com/gofiber/fiber/v3"</span><br/></div><div class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">import</span><span class="token string" style="color:#e3116c">"github.com/goccy/go-json"</span><br/></div><div class="token-line" style="color:#393A34"><br/></div><div class="token-line" style="color:#393A34"><span class="token keyword" style="color:#00009f">func</span><span class="token function" style="color:#d73a49">main</span><span class="token punctuation" style="color:#393A34">(</span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">{</span><br/></div><div class="token-line" style="color:#393A34"><span class="token plain">    app </span><span class="token operator" style="color:#393A34">:=</span><span class="token plain"> fiber</span><span class="token punctuation" style="color:#393A34">.</span><span class="token function" style="color:#d73a49">New</span><span class="token punctuation" style="color:#393A34">(</span><span class="token plain">fiber</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">Config</span><span class="token punctuation" style="color:#393A34">{</span><br/></div><div class="token-line" style="color:#393A34"><span class="token plain">        JSONEncoder</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> json</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">Marshal</span><span class="token punctuation" style="color:#393A34">,</span><br/></div><div class="token-line" style="color:#393A34"><span class="token plain">        JSONDecoder</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"> json</span><span class="token punctuation" style="color:#393A34">.</span><span class="token plain">Unmarshal</span><span class="token punctuation" style="color:#393A34">,</span><br/></div><div class="token-line" style="color:#393A34"><span class="token punctuation" style="color:#393A34">}</span><span class="token punctuation" style="color:#393A34">)</span><br/></div><div class="token-line" style="color:#393A34"><br/></div><div class="token-line" style="color:#393A34"><span class="token comment" style="color:#999988;font-style:italic">// ...</span><br/></div><div class="token-line" style="color:#393A34"><span class="token punctuation" style="color:#393A34">}</span><br/></div></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="references">References<a aria-label="Direct link to References" class="hash-link" href="#references" rel="noopener" target="_blank" title="Direct link to References" translate="no">​</a></h3>
+<ul>
+<li class=""><a class="" href="https://docs.gofiber.io/client/rest#setjsonmarshal" rel="noopener" target="_blank">Set custom JSON encoder for client</a></li>
+<li class=""><a class="" href="https://docs.gofiber.io/client/rest#setjsonunmarshal" rel="noopener" target="_blank">Set custom JSON decoder for client</a></li>
+<li class=""><a class="" href="https://docs.gofiber.io/api/fiber#jsonencoder" rel="noopener" target="_blank">Set custom JSON encoder for application</a></li>
+<li class=""><a class="" href="https://docs.gofiber.io/api/fiber#jsondecoder" rel="noopener" target="_blank">Set custom JSON decoder for application</a></li>
+</ul></div></article></div></div><div class="col col--3"></div></div></div></main>
+</article>
+</body>
+</html>

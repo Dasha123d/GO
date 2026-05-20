@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Очищенная документация</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 25px; background: #fafafa; color: #333; }
+        article { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 6px; overflow-x: auto; }
+        pre code { background: none; color: inherit; padding: 0; }
+        a { color: #00979d; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        blockquote { border-left: 4px solid #ddd; padding-left: 15px; margin: 15px 0; color: #666; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { padding: 8px 12px; border: 1px solid #ddd; }
+        th { background: #f9f9f9; }
+    </style>
+</head>
+<body>
+<article>
+<main class="go-Main" id="main-content">
+
+
+
+
+<article class="go-Main-article js-mainContent">
+<div class="UnitDetails" data-test-id="UnitDetails" style="display: block;">
+<div class="UnitDetails-content js-unitDetailsContent" data-test-id="UnitDetails-content">
+<div class="UnitReadme UnitReadme--expanded js-readme">
+<h2 class="UnitReadme-title" id="section-readme">
+<img alt="" class="go-Icon" height="24" src="/static/shared/icon/chrome_reader_mode_gm_grey_24dp.svg" width="24"/>
+      README
+      
+</h2>
+<div class="UnitReadme-content" data-test-id="Unit-readmeContent">
+<div class="Overview-readmeContent js-readmeContent"><h3 class="h1" id="readme-heading"><img alt="chi" src="https://cdn.rawgit.com/go-chi/chi/master/_examples/chi.svg" width="220"/></h3>
+
+<p><code>chi</code> is a lightweight, idiomatic and composable router for building Go HTTP services. It's
+especially good at helping you write large REST API services that are kept maintainable as your
+project grows and changes. <code>chi</code> is built on the new <code>context</code> package introduced in Go 1.7 to
+handle signaling, cancelation and request-scoped values across a handler chain.</p>
+<p>The focus of the project has been to seek out an elegant and comfortable design for writing
+REST API servers, written during the development of the Pressly API service that powers our
+public API service, which in turn powers all of our client-side applications.</p>
+<p>The key considerations of chi's design are: project structure, maintainability, standard http
+handlers (stdlib-only), developer productivity, and deconstructing a large system into many small
+parts. The core router <code>github.com/go-chi/chi</code> is quite small (less than 1000 LOC), but we've also
+included some useful/optional subpackages: <a href="https://github.com/go-chi/chi/blob/v5.2.5/middleware" rel="noopener" target="_blank">middleware</a>, <a href="https://github.com/go-chi/render" rel="noopener" target="_blank">render</a>
+and <a href="https://github.com/go-chi/docgen" rel="noopener" target="_blank">docgen</a>. We hope you enjoy it too!</p>
+<h4 class="h2" id="readme-install">Install</h4>
+<pre><code>go get -u github.com/go-chi/chi/v5
+</code></pre>
+<h4 class="h2" id="readme-features">Features</h4>
+<ul>
+<li><strong>Lightweight</strong> - cloc'd in ~1000 LOC for the chi router</li>
+<li><strong>Fast</strong> - yes, see <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#readme-benchmarks" rel="noopener" target="_blank">benchmarks</a></li>
+<li><strong>100% compatible with net/http</strong> - use any http or middleware pkg in the ecosystem that is also compatible with <code>net/http</code></li>
+<li><strong>Designed for modular/composable APIs</strong> - middlewares, inline middlewares, route groups and sub-router mounting</li>
+<li><strong>Context control</strong> - built on new <code>context</code> package, providing value chaining, cancellations and timeouts</li>
+<li><strong>Robust</strong> - in production at Pressly, Cloudflare, Heroku, 99Designs, and many others (see <a href="https://github.com/go-chi/chi/issues/91" rel="noopener" target="_blank">discussion</a>)</li>
+<li><strong>Doc generation</strong> - <code>docgen</code> auto-generates routing documentation from your source to JSON or Markdown</li>
+<li><strong>Go.mod support</strong> - as of v5, go.mod support (see <a href="https://github.com/go-chi/chi/blob/master/CHANGELOG.md" rel="noopener" target="_blank">CHANGELOG</a>)</li>
+<li><strong>No external dependencies</strong> - plain ol' Go stdlib + net/http</li>
+</ul>
+<h4 class="h2" id="readme-examples">Examples</h4>
+<p>See <a href="https://github.com/go-chi/chi/raw/master/_examples/" rel="noopener" target="_blank">_examples/</a> for a variety of examples.</p>
+<p><strong>As easy as:</strong></p>
+<pre><code>package main
+
+import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+)
+
+func main() {
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("welcome"))
+	})
+	http.ListenAndServe(":3000", r)
+}
+</code></pre>
+<p><strong>REST Preview:</strong></p>
+<p>Here is a little preview of what routing looks like with chi. Also take a look at the generated routing docs
+in JSON (<a href="https://github.com/go-chi/chi/raw/master/_examples/rest/routes.json" rel="noopener" target="_blank">routes.json</a>) and in
+Markdown (<a href="https://github.com/go-chi/chi/blob/master/_examples/rest/routes.md" rel="noopener" target="_blank">routes.md</a>).</p>
+<p>I highly recommend reading the source of the <a href="https://github.com/go-chi/chi/raw/master/_examples/" rel="noopener" target="_blank">examples</a> listed
+above, they will show you all the features of chi and serve as a good form of documentation.</p>
+<pre><code>import (
+  //...
+  "context"
+  "github.com/go-chi/chi/v5"
+  "github.com/go-chi/chi/v5/middleware"
+)
+
+func main() {
+  r := chi.NewRouter()
+
+  // A good base middleware stack
+  r.Use(middleware.RequestID)
+  r.Use(middleware.RealIP)
+  r.Use(middleware.Logger)
+  r.Use(middleware.Recoverer)
+
+  // Set a timeout value on the request context (ctx), that will signal
+  // through ctx.Done() that the request has timed out and further
+  // processing should be stopped.
+  r.Use(middleware.Timeout(60 * time.Second))
+
+  r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+    w.Write([]byte("hi"))
+  })
+
+  // RESTy routes for "articles" resource
+  r.Route("/articles", func(r chi.Router) {
+    r.With(paginate).Get("/", listArticles)                           // GET /articles
+    r.With(paginate).Get("/{month}-{day}-{year}", listArticlesByDate) // GET /articles/01-16-2017
+
+    r.Post("/", createArticle)                                        // POST /articles
+    r.Get("/search", searchArticles)                                  // GET /articles/search
+
+    // Regexp url parameters:
+    r.Get("/{articleSlug:[a-z-]+}", getArticleBySlug)                // GET /articles/home-is-toronto
+
+    // Subrouters:
+    r.Route("/{articleID}", func(r chi.Router) {
+      r.Use(ArticleCtx)
+      r.Get("/", getArticle)                                          // GET /articles/123
+      r.Put("/", updateArticle)                                       // PUT /articles/123
+      r.Delete("/", deleteArticle)                                    // DELETE /articles/123
+    })
+  })
+
+  // Mount the admin sub-router
+  r.Mount("/admin", adminRouter())
+
+  http.ListenAndServe(":3333", r)
+}
+
+func ArticleCtx(next http.Handler) http.Handler {
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    articleID := chi.URLParam(r, "articleID")
+    article, err := dbGetArticle(articleID)
+    if err != nil {
+      http.Error(w, http.StatusText(404), 404)
+      return
+    }
+    ctx := context.WithValue(r.Context(), "article", article)
+    next.ServeHTTP(w, r.WithContext(ctx))
+  })
+}
+
+func getArticle(w http.ResponseWriter, r *http.Request) {
+  ctx := r.Context()
+  article, ok := ctx.Value("article").(*Article)
+  if !ok {
+    http.Error(w, http.StatusText(422), 422)
+    return
+  }
+  w.Write([]byte(fmt.Sprintf("title:%s", article.Title)))
+}
+
+// A completely separate router for administrator routes
+func adminRouter() http.Handler {
+  r := chi.NewRouter()
+  r.Use(AdminOnly)
+  r.Get("/", adminIndex)
+  r.Get("/accounts", adminListAccounts)
+  return r
+}
+
+func AdminOnly(next http.Handler) http.Handler {
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
+    perm, ok := ctx.Value("acl.permission").(YourPermissionType)
+    if !ok || !perm.IsAdmin() {
+      http.Error(w, http.StatusText(403), 403)
+      return
+    }
+    next.ServeHTTP(w, r)
+  })
+}
+</code></pre>
+<h4 class="h2" id="readme-router-interface">Router interface</h4>
+<p>chi's router is based on a kind of <a href="https://en.wikipedia.org/wiki/Radix_tree" rel="noopener" target="_blank">Patricia Radix trie</a>.
+The router is fully compatible with <code>net/http</code>.</p>
+<p>Built on top of the tree is the <code>Router</code> interface:</p>
+<pre><code>// Router consisting of the core routing methods used by chi's Mux,
+// using only the standard net/http.
+type Router interface {
+	http.Handler
+	Routes
+
+	// Use appends one or more middlewares onto the Router stack.
+	Use(middlewares ...func(http.Handler) http.Handler)
+
+	// With adds inline middlewares for an endpoint handler.
+	With(middlewares ...func(http.Handler) http.Handler) Router
+
+	// Group adds a new inline-Router along the current routing
+	// path, with a fresh middleware stack for the inline-Router.
+	Group(fn func(r Router)) Router
+
+	// Route mounts a sub-Router along a `pattern` string.
+	Route(pattern string, fn func(r Router)) Router
+
+	// Mount attaches another http.Handler along ./pattern/*
+	Mount(pattern string, h http.Handler)
+
+	// Handle and HandleFunc adds routes for `pattern` that matches
+	// all HTTP methods.
+	Handle(pattern string, h http.Handler)
+	HandleFunc(pattern string, h http.HandlerFunc)
+
+	// Method and MethodFunc adds routes for `pattern` that matches
+	// the `method` HTTP method.
+	Method(method, pattern string, h http.Handler)
+	MethodFunc(method, pattern string, h http.HandlerFunc)
+
+	// HTTP-method routing along `pattern`
+	Connect(pattern string, h http.HandlerFunc)
+	Delete(pattern string, h http.HandlerFunc)
+	Get(pattern string, h http.HandlerFunc)
+	Head(pattern string, h http.HandlerFunc)
+	Options(pattern string, h http.HandlerFunc)
+	Patch(pattern string, h http.HandlerFunc)
+	Post(pattern string, h http.HandlerFunc)
+	Put(pattern string, h http.HandlerFunc)
+	Trace(pattern string, h http.HandlerFunc)
+
+	// NotFound defines a handler to respond whenever a route could
+	// not be found.
+	NotFound(h http.HandlerFunc)
+
+	// MethodNotAllowed defines a handler to respond whenever a method is
+	// not allowed.
+	MethodNotAllowed(h http.HandlerFunc)
+}
+
+// Routes interface adds two methods for router traversal, which is also
+// used by the github.com/go-chi/docgen package to generate documentation for Routers.
+type Routes interface {
+	// Routes returns the routing tree in an easily traversable structure.
+	Routes() []Route
+
+	// Middlewares returns the list of middlewares in use by the router.
+	Middlewares() Middlewares
+
+	// Match searches the routing tree for a handler that matches
+	// the method/path - similar to routing a http request, but without
+	// executing the handler thereafter.
+	Match(rctx *Context, method, path string) bool
+}
+</code></pre>
+<p>Each routing method accepts a URL <code>pattern</code> and chain of <code>handlers</code>. The URL pattern
+supports named params (ie. <code>/users/{userID}</code>) and wildcards (ie. <code>/admin/*</code>). URL parameters
+can be fetched at runtime by calling <code>chi.URLParam(r, "userID")</code> for named parameters
+and <code>chi.URLParam(r, "*")</code> for a wildcard parameter.</p>
+<h5 class="h3" id="readme-middleware-handlers">Middleware handlers</h5>
+<p>chi's middlewares are just stdlib net/http middleware handlers. There is nothing special
+about them, which means the router and all the tooling is designed to be compatible and
+friendly with any middleware in the community. This offers much better extensibility and reuse
+of packages and is at the heart of chi's purpose.</p>
+<p>Here is an example of a standard net/http middleware where we assign a context key <code>"user"</code>
+the value of <code>"123"</code>. This middleware sets a hypothetical user identifier on the request
+context and calls the next handler in the chain.</p>
+<pre><code>// HTTP middleware setting a value on the request context
+func MyMiddleware(next http.Handler) http.Handler {
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    // create new context from `r` request context, and assign key `"user"`
+    // to value of `"123"`
+    ctx := context.WithValue(r.Context(), "user", "123")
+
+    // call the next handler in the chain, passing the response writer and
+    // the updated request object with the new context value.
+    //
+    // note: context.Context values are nested, so any previously set
+    // values will be accessible as well, and the new `"user"` key
+    // will be accessible from this point forward.
+    next.ServeHTTP(w, r.WithContext(ctx))
+  })
+}
+</code></pre>
+<h5 class="h3" id="readme-request-handlers">Request handlers</h5>
+<p>chi uses standard net/http request handlers. This little snippet is an example of a http.Handler
+func that reads a user identifier from the request context - hypothetically, identifying
+the user sending an authenticated request, validated+set by a previous middleware handler.</p>
+<pre><code>// HTTP handler accessing data from the request context.
+func MyRequestHandler(w http.ResponseWriter, r *http.Request) {
+  // here we read from the request context and fetch out `"user"` key set in
+  // the MyMiddleware example above.
+  user := r.Context().Value("user").(string)
+
+  // respond to the client
+  w.Write([]byte(fmt.Sprintf("hi %s", user)))
+}
+</code></pre>
+<h5 class="h3" id="readme-url-parameters">URL parameters</h5>
+<p>chi's router parses and stores URL parameters right onto the request context. Here is
+an example of how to access URL params in your net/http handlers. And of course, middlewares
+are able to access the same information.</p>
+<pre><code>// HTTP handler accessing the url routing parameters.
+func MyRequestHandler(w http.ResponseWriter, r *http.Request) {
+  // fetch the url parameter `"userID"` from the request of a matching
+  // routing pattern. An example routing pattern could be: /users/{userID}
+  userID := chi.URLParam(r, "userID")
+
+  // fetch `"key"` from the request context
+  ctx := r.Context()
+  key := ctx.Value("key").(string)
+
+  // respond to the client
+  w.Write([]byte(fmt.Sprintf("hi %v, %v", userID, key)))
+}
+</code></pre>
+<h4 class="h2" id="readme-middlewares">Middlewares</h4>
+<p>chi comes equipped with an optional <code>middleware</code> package, providing a suite of standard
+<code>net/http</code> middlewares. Please note, any middleware in the ecosystem that is also compatible
+with <code>net/http</code> can be used with chi's mux.</p>
+<h5 class="h3" id="readme-core-middlewares">Core middlewares</h5>
+<hr/>
+<table>
+<thead>
+<tr>
+<th align="left">chi/middleware Handler</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#AllowContentEncoding" rel="noopener" target="_blank">AllowContentEncoding</a></td>
+<td align="left">Enforces a whitelist of request Content-Encoding headers</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#AllowContentType" rel="noopener" target="_blank">AllowContentType</a></td>
+<td align="left">Explicit whitelist of accepted request Content-Types</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#BasicAuth" rel="noopener" target="_blank">BasicAuth</a></td>
+<td align="left">Basic HTTP authentication</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#Compress" rel="noopener" target="_blank">Compress</a></td>
+<td align="left">Gzip compression for clients that accept compressed responses</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#ContentCharset" rel="noopener" target="_blank">ContentCharset</a></td>
+<td align="left">Ensure charset for Content-Type request headers</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#CleanPath" rel="noopener" target="_blank">CleanPath</a></td>
+<td align="left">Clean double slashes from request path</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#GetHead" rel="noopener" target="_blank">GetHead</a></td>
+<td align="left">Automatically route undefined HEAD requests to GET handlers</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#Heartbeat" rel="noopener" target="_blank">Heartbeat</a></td>
+<td align="left">Monitoring endpoint to check the servers pulse</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#Logger" rel="noopener" target="_blank">Logger</a></td>
+<td align="left">Logs the start and end of each request with the elapsed processing time</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#NoCache" rel="noopener" target="_blank">NoCache</a></td>
+<td align="left">Sets response headers to prevent clients from caching</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#Profiler" rel="noopener" target="_blank">Profiler</a></td>
+<td align="left">Easily attach net/http/pprof to your routers</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#RealIP" rel="noopener" target="_blank">RealIP</a></td>
+<td align="left">Sets a http.Request's RemoteAddr to either X-Real-IP or X-Forwarded-For</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#Recoverer" rel="noopener" target="_blank">Recoverer</a></td>
+<td align="left">Gracefully absorb panics and prints the stack trace</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#RequestID" rel="noopener" target="_blank">RequestID</a></td>
+<td align="left">Injects a request ID into the context of each request</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#RedirectSlashes" rel="noopener" target="_blank">RedirectSlashes</a></td>
+<td align="left">Redirect slashes on routing paths</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#RouteHeaders" rel="noopener" target="_blank">RouteHeaders</a></td>
+<td align="left">Route handling for request headers</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#SetHeader" rel="noopener" target="_blank">SetHeader</a></td>
+<td align="left">Short-hand middleware to set a response header key/value</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#StripSlashes" rel="noopener" target="_blank">StripSlashes</a></td>
+<td align="left">Strip slashes on routing paths</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/v5/middleware#Sunset" rel="noopener" target="_blank">Sunset</a></td>
+<td align="left">Sunset set Deprecation/Sunset header to response</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#Throttle" rel="noopener" target="_blank">Throttle</a></td>
+<td align="left">Puts a ceiling on the number of concurrent requests</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#Timeout" rel="noopener" target="_blank">Timeout</a></td>
+<td align="left">Signals to the request context when the timeout deadline is reached</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#URLFormat" rel="noopener" target="_blank">URLFormat</a></td>
+<td align="left">Parse extension from url and put it on request context</td>
+</tr>
+<tr>
+<td align="left"><a href="https://pkg.go.dev/github.com/go-chi/chi/middleware#WithValue" rel="noopener" target="_blank">WithValue</a></td>
+<td align="left">Short-hand middleware to set a key/value on the request context</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h5 class="h3" id="readme-extra-middlewares-amp-packages">Extra middlewares &amp; packages</h5>
+<p>Please see <a href="https://github.com/go-chi" rel="noopener" target="_blank">https://github.com/go-chi</a> for additional packages.</p>
+<hr/>
+<table>
+<thead>
+<tr>
+<th align="left">package</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><a href="https://github.com/go-chi/cors" rel="noopener" target="_blank">cors</a></td>
+<td align="left">Cross-origin resource sharing (CORS)</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/go-chi/docgen" rel="noopener" target="_blank">docgen</a></td>
+<td align="left">Print chi.Router routes at runtime</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/go-chi/jwtauth" rel="noopener" target="_blank">jwtauth</a></td>
+<td align="left">JWT authentication</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/go-chi/hostrouter" rel="noopener" target="_blank">hostrouter</a></td>
+<td align="left">Domain/host based request routing</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/go-chi/httplog" rel="noopener" target="_blank">httplog</a></td>
+<td align="left">Small but powerful structured HTTP request logging</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/go-chi/httprate" rel="noopener" target="_blank">httprate</a></td>
+<td align="left">HTTP request rate limiter</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/go-chi/httptracer" rel="noopener" target="_blank">httptracer</a></td>
+<td align="left">HTTP request performance tracing library</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/go-chi/httpvcr" rel="noopener" target="_blank">httpvcr</a></td>
+<td align="left">Write deterministic tests for external sources</td>
+</tr>
+<tr>
+<td align="left"><a href="https://github.com/go-chi/stampede" rel="noopener" target="_blank">stampede</a></td>
+<td align="left">HTTP request coalescer</td>
+</tr>
+</tbody>
+</table>
+<hr/>
+<h4 class="h2" id="readme-context">context?</h4>
+<p><code>context</code> is a tiny pkg that provides simple interface to signal context across call stacks
+and goroutines. It was originally written by <a href="https://github.com/Sajmani" rel="noopener" target="_blank">Sameer Ajmani</a>
+and is available in stdlib since go1.7.</p>
+<p>Learn more at <a href="https://blog.golang.org/context" rel="noopener" target="_blank">https://blog.golang.org/context</a></p>
+<p>and..</p>
+<ul>
+<li>Docs: <a href="https://golang.org/pkg/context" rel="noopener" target="_blank">https://golang.org/pkg/context</a></li>
+<li>Source: <a href="https://github.com/golang/go/tree/master/src/context" rel="noopener" target="_blank">https://github.com/golang/go/tree/master/src/context</a></li>
+</ul>
+<h4 class="h2" id="readme-benchmarks">Benchmarks</h4>
+<p>The benchmark suite: <a href="https://github.com/pkieltyka/go-http-routing-benchmark" rel="noopener" target="_blank">https://github.com/pkieltyka/go-http-routing-benchmark</a></p>
+<p>Results as of Nov 29, 2020 with Go 1.15.5 on Linux AMD 3950x</p>
+<pre><code>BenchmarkChi_Param          	3075895	        384 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_Param5         	2116603	        566 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_Param20        	 964117	       1227 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_ParamWrite     	2863413	        420 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_GithubStatic   	3045488	        395 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_GithubParam    	2204115	        540 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_GithubAll      	  10000	     113811 ns/op	    81203 B/op    406 allocs/op
+BenchmarkChi_GPlusStatic    	3337485	        359 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_GPlusParam     	2825853	        423 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_GPlus2Params   	2471697	        483 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_GPlusAll       	 194220	       5950 ns/op	     5200 B/op     26 allocs/op
+BenchmarkChi_ParseStatic    	3365324	        356 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_ParseParam     	2976614	        404 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_Parse2Params   	2638084	        439 ns/op	      400 B/op      2 allocs/op
+BenchmarkChi_ParseAll       	 109567	      11295 ns/op	    10400 B/op     52 allocs/op
+BenchmarkChi_StaticAll      	  16846	      71308 ns/op	    62802 B/op    314 allocs/op
+</code></pre>
+<p>Comparison with other routers: <a href="https://gist.github.com/pkieltyka/123032f12052520aaccab752bd3e78cc" rel="noopener" target="_blank">https://gist.github.com/pkieltyka/123032f12052520aaccab752bd3e78cc</a></p>
+<p>NOTE: the allocs in the benchmark above are from the calls to http.Request's
+<code>WithContext(context.Context)</code> method that clones the http.Request, sets the <code>Context()</code>
+on the duplicated (alloc'd) request and returns it the new request object. This is just
+how setting context on a request in Go works.</p>
+<h4 class="h2" id="readme-credits">Credits</h4>
+<ul>
+<li>Carl Jackson for <a href="https://github.com/zenazn/goji" rel="noopener" target="_blank">https://github.com/zenazn/goji</a>
+<ul>
+<li>Parts of chi's thinking comes from goji, and chi's middleware package
+sources from <a href="https://github.com/zenazn/goji/tree/master/web/middleware" rel="noopener" target="_blank">goji</a>.</li>
+<li>Please see goji's <a href="https://github.com/zenazn/goji/raw/master/LICENSE" rel="noopener" target="_blank">LICENSE</a> (MIT)</li>
+</ul>
+</li>
+<li>Armon Dadgar for <a href="https://github.com/armon/go-radix" rel="noopener" target="_blank">https://github.com/armon/go-radix</a></li>
+<li>Contributions: <a href="https://github.com/VojtechVitek" rel="noopener" target="_blank">@VojtechVitek</a></li>
+</ul>
+<p>We'll be more than happy to see <a href="https://github.com/go-chi/chi/blob/v5.2.5/CONTRIBUTING.md" rel="noopener" target="_blank">your contributions</a>!</p>
+<h4 class="h2" id="readme-beyond-rest">Beyond REST</h4>
+<p>chi is just a http router that lets you decompose request handling into many smaller layers.
+Many companies use chi to write REST services for their public APIs. But, REST is just a convention
+for managing state via HTTP, and there's a lot of other pieces required to write a complete client-server
+system or network of microservices.</p>
+<p>Looking beyond REST, I also recommend some newer works in the field:</p>
+<ul>
+<li><a href="https://github.com/webrpc/webrpc" rel="noopener" target="_blank">webrpc</a> - Web-focused RPC client+server framework with code-gen</li>
+<li><a href="https://github.com/grpc/grpc-go" rel="noopener" target="_blank">gRPC</a> - Google's RPC framework via protobufs</li>
+<li><a href="https://github.com/99designs/gqlgen" rel="noopener" target="_blank">graphql</a> - Declarative query language</li>
+<li><a href="https://nats.io" rel="noopener" target="_blank">NATS</a> - lightweight pub-sub</li>
+</ul>
+<h4 class="h2" id="readme-license">License</h4>
+<p>Copyright (c) 2015-present <a href="https://github.com/pkieltyka" rel="noopener" target="_blank">Peter Kieltyka</a></p>
+<p>Licensed under <a href="https://github.com/go-chi/chi/blob/v5.2.5/LICENSE" rel="noopener" target="_blank">MIT License</a></p>
+</div>
+</div>
+
+
+</div>
+<div class="UnitDoc">
+<h2 class="UnitDoc-title" id="section-documentation">
+<img alt="" class="go-Icon" height="24" src="/static/shared/icon/code_gm_grey_24dp.svg" width="24"/>
+      Documentation
+      
+</h2>
+<div class="Documentation js-documentation">
+<div class="Documentation-content js-docContent"> <section class="Documentation-overview">
+<h3 class="Documentation-overviewHeader" id="pkg-overview" tabindex="-1">Overview </h3>
+<p>Package chi is a small, idiomatic and composable router for building HTTP services.
+</p><p>chi supports the four most recent major versions of Go.
+</p><p>Example:
+</p><pre>package main
+
+import (
+	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+)
+
+func main() {
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("root."))
+	})
+
+	http.ListenAndServe(":3333", r)
+}
+</pre><p>See github.com/go-chi/chi/_examples/ for more in-depth examples.
+</p><p>URL patterns allow for easy matching of path components in HTTP
+requests. The matching components can then be accessed using
+chi.URLParam(). All patterns must begin with a slash.
+</p><p>A simple named placeholder {name} matches any sequence of characters
+up to the next / or the end of the URL. Trailing slashes on paths must
+be handled explicitly.
+</p><p>A placeholder with a name followed by a colon allows a regular
+expression match, for example {number:\\d+}. The regular expression
+syntax is Go's normal regexp RE2 syntax, except that / will never be
+matched. An anonymous regexp pattern is allowed, using an empty string
+before the colon in the placeholder, such as {:\\d+}
+</p><p>The special placeholder of asterisk matches the rest of the requested
+URL. Any trailing characters in the pattern are ignored. This is the only
+placeholder which will match / characters.
+</p><p>Examples:
+</p><pre>"/user/{name}" matches "/user/jsmith" but not "/user/jsmith/info" or "/user/jsmith/"
+"/user/{name}/info" matches "/user/jsmith/info"
+"/page/*" matches "/page/intro/latest"
+"/page/{other}/latest" also matches "/page/intro/latest"
+"/date/{yyyy:\\d\\d\\d\\d}/{mm:\\d\\d}/{dd:\\d\\d}" matches "/date/2017/04/01"
+</pre>
+</section><section class="Documentation-index">
+<h3 class="Documentation-indexHeader" id="pkg-index">Index </h3>
+<ul class="Documentation-indexList">
+<li class="Documentation-indexVariables"><a href="https://pkg.go.dev/github.com/go-chi/chi/v5#pkg-variables" rel="noopener" target="_blank">Variables</a></li>
+<li class="Documentation-indexFunction">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#RegisterMethod" rel="noopener" target="_blank">func RegisterMethod(method string)</a></li>
+<li class="Documentation-indexFunction">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#URLParam" rel="noopener" target="_blank">func URLParam(r *http.Request, key string) string</a></li>
+<li class="Documentation-indexFunction">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#URLParamFromCtx" rel="noopener" target="_blank">func URLParamFromCtx(ctx context.Context, key string) string</a></li>
+<li class="Documentation-indexFunction">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Walk" rel="noopener" target="_blank">func Walk(r Routes, walkFn WalkFunc) error</a></li>
+<li class="Documentation-indexType">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#ChainHandler" rel="noopener" target="_blank">type ChainHandler</a></li>
+<li><ul class="Documentation-indexTypeMethods">
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#ChainHandler.ServeHTTP" rel="noopener" target="_blank">func (c *ChainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request)</a></li>
+</ul></li>
+<li class="Documentation-indexType">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context" rel="noopener" target="_blank">type Context</a></li>
+<li><ul class="Documentation-indexTypeFunctions">
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#NewRouteContext" rel="noopener" target="_blank">func NewRouteContext() *Context</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#RouteContext" rel="noopener" target="_blank">func RouteContext(ctx context.Context) *Context</a></li>
+</ul></li>
+<li><ul class="Documentation-indexTypeMethods">
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context.Reset" rel="noopener" target="_blank">func (x *Context) Reset()</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context.RoutePattern" rel="noopener" target="_blank">func (x *Context) RoutePattern() string</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context.URLParam" rel="noopener" target="_blank">func (x *Context) URLParam(key string) string</a></li>
+</ul></li>
+<li class="Documentation-indexType">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Middlewares" rel="noopener" target="_blank">type Middlewares</a></li>
+<li><ul class="Documentation-indexTypeFunctions">
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Chain" rel="noopener" target="_blank">func Chain(middlewares ...func(http.Handler) http.Handler) Middlewares</a></li>
+</ul></li>
+<li><ul class="Documentation-indexTypeMethods">
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Middlewares.Handler" rel="noopener" target="_blank">func (mws Middlewares) Handler(h http.Handler) http.Handler</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Middlewares.HandlerFunc" rel="noopener" target="_blank">func (mws Middlewares) HandlerFunc(h http.HandlerFunc) http.Handler</a></li>
+</ul></li>
+<li class="Documentation-indexType">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">type Mux</a></li>
+<li><ul class="Documentation-indexTypeFunctions">
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#NewMux" rel="noopener" target="_blank">func NewMux() *Mux</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#NewRouter" rel="noopener" target="_blank">func NewRouter() *Mux</a></li>
+</ul></li>
+<li><ul class="Documentation-indexTypeMethods">
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Connect" rel="noopener" target="_blank">func (mx *Mux) Connect(pattern string, handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Delete" rel="noopener" target="_blank">func (mx *Mux) Delete(pattern string, handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Find" rel="noopener" target="_blank">func (mx *Mux) Find(rctx *Context, method, path string) string</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Get" rel="noopener" target="_blank">func (mx *Mux) Get(pattern string, handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Group" rel="noopener" target="_blank">func (mx *Mux) Group(fn func(r Router)) Router</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Handle" rel="noopener" target="_blank">func (mx *Mux) Handle(pattern string, handler http.Handler)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.HandleFunc" rel="noopener" target="_blank">func (mx *Mux) HandleFunc(pattern string, handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Head" rel="noopener" target="_blank">func (mx *Mux) Head(pattern string, handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Match" rel="noopener" target="_blank">func (mx *Mux) Match(rctx *Context, method, path string) bool</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Method" rel="noopener" target="_blank">func (mx *Mux) Method(method, pattern string, handler http.Handler)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.MethodFunc" rel="noopener" target="_blank">func (mx *Mux) MethodFunc(method, pattern string, handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.MethodNotAllowed" rel="noopener" target="_blank">func (mx *Mux) MethodNotAllowed(handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.MethodNotAllowedHandler" rel="noopener" target="_blank">func (mx *Mux) MethodNotAllowedHandler(methodsAllowed ...methodTyp) http.HandlerFunc</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Middlewares" rel="noopener" target="_blank">func (mx *Mux) Middlewares() Middlewares</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Mount" rel="noopener" target="_blank">func (mx *Mux) Mount(pattern string, handler http.Handler)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.NotFound" rel="noopener" target="_blank">func (mx *Mux) NotFound(handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.NotFoundHandler" rel="noopener" target="_blank">func (mx *Mux) NotFoundHandler() http.HandlerFunc</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Options" rel="noopener" target="_blank">func (mx *Mux) Options(pattern string, handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Patch" rel="noopener" target="_blank">func (mx *Mux) Patch(pattern string, handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Post" rel="noopener" target="_blank">func (mx *Mux) Post(pattern string, handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Put" rel="noopener" target="_blank">func (mx *Mux) Put(pattern string, handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Route" rel="noopener" target="_blank">func (mx *Mux) Route(pattern string, fn func(r Router)) Router</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Routes" rel="noopener" target="_blank">func (mx *Mux) Routes() []Route</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.ServeHTTP" rel="noopener" target="_blank">func (mx *Mux) ServeHTTP(w http.ResponseWriter, r *http.Request)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Trace" rel="noopener" target="_blank">func (mx *Mux) Trace(pattern string, handlerFn http.HandlerFunc)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.Use" rel="noopener" target="_blank">func (mx *Mux) Use(middlewares ...func(http.Handler) http.Handler)</a></li>
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux.With" rel="noopener" target="_blank">func (mx *Mux) With(middlewares ...func(http.Handler) http.Handler) Router</a></li>
+</ul></li>
+<li class="Documentation-indexType">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Route" rel="noopener" target="_blank">type Route</a></li>
+<li class="Documentation-indexType">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#RouteParams" rel="noopener" target="_blank">type RouteParams</a></li>
+<li><ul class="Documentation-indexTypeMethods">
+<li>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#RouteParams.Add" rel="noopener" target="_blank">func (s *RouteParams) Add(key, value string)</a></li>
+</ul></li>
+<li class="Documentation-indexType">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Router" rel="noopener" target="_blank">type Router</a></li>
+<li class="Documentation-indexType">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Routes" rel="noopener" target="_blank">type Routes</a></li>
+<li class="Documentation-indexType">
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#WalkFunc" rel="noopener" target="_blank">type WalkFunc</a></li>
+</ul>
+</section><h3 class="Documentation-constantsHeader" id="pkg-constants" tabindex="-1">Constants </h3>
+<section class="Documentation-constants"><p class="Documentation-empty">This section is empty.</p></section>
+<h3 class="Documentation-variablesHeader" id="pkg-variables" tabindex="-1">Variables </h3>
+<section class="Documentation-variables">
+<div class="Documentation-declaration">
+
+<pre>var (
+<span data-kind="variable" id="RouteCtxKey">	<span class="comment">// RouteCtxKey is the context.Context key to store the request context.</span>
+</span>	RouteCtxKey = &amp;contextKey{"RouteContext"}
+)</pre>
+</div>
+</section>
+<h3 class="Documentation-functionsHeader" id="pkg-functions" tabindex="-1">Functions </h3>
+<section class="Documentation-functions"><div class="Documentation-function">
+<h4 class="Documentation-functionHeader" data-kind="function" id="RegisterMethod" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/tree.go#L60" rel="noopener" target="_blank">RegisterMethod</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func RegisterMethod(method <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>)</pre>
+</div>
+<p>RegisterMethod adds support for custom HTTP method handlers, available
+via Router#Method and Router#MethodFunc
+</p>
+</div><div class="Documentation-function">
+<h4 class="Documentation-functionHeader" data-kind="function" id="URLParam" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/context.go#L10" rel="noopener" target="_blank">URLParam</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func URLParam(r *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>, key <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a></pre>
+</div>
+<p>URLParam returns the url parameter from a http.Request object.
+</p>
+</div><div class="Documentation-function">
+<h4 class="Documentation-functionHeader" data-kind="function" id="URLParamFromCtx" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/context.go#L18" rel="noopener" target="_blank">URLParamFromCtx</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func URLParamFromCtx(ctx <a href="https://pkg.go.dev/context" rel="noopener" target="_blank">context</a>.<a href="https://pkg.go.dev/context#Context" rel="noopener" target="_blank">Context</a>, key <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a></pre>
+</div>
+<p>URLParamFromCtx returns the url parameter from a http.Request Context.
+</p>
+</div><div class="Documentation-function">
+<h4 class="Documentation-functionHeader" data-kind="function" id="Walk" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/tree.go#L833" rel="noopener" target="_blank">Walk</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func Walk(r <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Routes" rel="noopener" target="_blank">Routes</a>, walkFn <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#WalkFunc" rel="noopener" target="_blank">WalkFunc</a>) <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a></pre>
+</div>
+<p>Walk walks any router tree that implements Routes interface.
+</p>
+</div></section>
+<h3 class="Documentation-typesHeader" id="pkg-types" tabindex="-1">Types </h3>
+<section class="Documentation-types"><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="ChainHandler" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/chain.go#L24" rel="noopener" target="_blank">ChainHandler</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type ChainHandler struct {
+<span data-kind="field" id="ChainHandler.Endpoint">	Endpoint <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>
+</span>
+<span data-kind="field" id="ChainHandler.Middlewares">	Middlewares <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Middlewares" rel="noopener" target="_blank">Middlewares</a>
+</span>	<span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+</div>
+<p>ChainHandler is a http.Handler with support for handler composition and
+execution.
+</p>
+<div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="ChainHandler.ServeHTTP" tabindex="-1">
+<span>func (*ChainHandler) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/chain.go#L30" rel="noopener" target="_blank">ServeHTTP</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (c *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#ChainHandler" rel="noopener" target="_blank">ChainHandler</a>) ServeHTTP(w <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#ResponseWriter" rel="noopener" target="_blank">ResponseWriter</a>, r *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>)</pre>
+</div>
+</div>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="Context" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/context.go#L45" rel="noopener" target="_blank">Context</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type Context struct {
+<span data-kind="field" id="Context.Routes">	Routes <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Routes" rel="noopener" target="_blank">Routes</a>
+</span>
+	<span class="comment">// Routing path/method override used during the route search.</span>
+	<span class="comment">// See Mux#routeHTTP method.</span>
+<span data-kind="field" id="Context.RoutePath">	RoutePath   <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>
+</span><span data-kind="field" id="Context.RouteMethod">	RouteMethod <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>
+</span>
+<span data-kind="field" id="Context.URLParams">	<span class="comment">// URLParams are the stack of routeParams captured during the</span>
+</span>	<span class="comment">// routing lifecycle across a stack of sub-routers.</span>
+	URLParams <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#RouteParams" rel="noopener" target="_blank">RouteParams</a>
+
+<span data-kind="field" id="Context.RoutePatterns">	<span class="comment">// Routing pattern stack throughout the lifecycle of the request,</span>
+</span>	<span class="comment">// across all connected routers. It is a record of all matching</span>
+	<span class="comment">// patterns across a stack of sub-routers.</span>
+	RoutePatterns []<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>
+	<span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+</div>
+<p>Context is the default routing context set on the root node of a
+request context to track route patterns, URL parameters and
+an optional routing path.
+</p>
+<div class="Documentation-typeFunc">
+<h4 class="Documentation-typeFuncHeader" data-kind="function" id="NewRouteContext" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/context.go#L33" rel="noopener" target="_blank">NewRouteContext</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func NewRouteContext() *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context" rel="noopener" target="_blank">Context</a></pre>
+</div>
+<p>NewRouteContext returns a new routing Context object.
+</p>
+</div><div class="Documentation-typeFunc">
+<h4 class="Documentation-typeFuncHeader" data-kind="function" id="RouteContext" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/context.go#L27" rel="noopener" target="_blank">RouteContext</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func RouteContext(ctx <a href="https://pkg.go.dev/context" rel="noopener" target="_blank">context</a>.<a href="https://pkg.go.dev/context#Context" rel="noopener" target="_blank">Context</a>) *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context" rel="noopener" target="_blank">Context</a></pre>
+</div>
+<p>RouteContext returns chi's routing Context object from a
+http.Request Context.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Context.Reset" tabindex="-1">
+<span>func (*Context) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/context.go#L82" rel="noopener" target="_blank">Reset</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (x *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context" rel="noopener" target="_blank">Context</a>) Reset()</pre>
+</div>
+<p>Reset a routing context to its initial state.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Context.RoutePattern" tabindex="-1">
+<span>func (*Context) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/context.go#L123" rel="noopener" target="_blank">RoutePattern</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (x *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context" rel="noopener" target="_blank">Context</a>) RoutePattern() <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a></pre>
+</div>
+<p>RoutePattern builds the routing pattern string for the particular
+request, at the particular point during routing. This means, the value
+will change throughout the execution of a request in a router. That is
+why it's advised to only use this value after calling the next handler.
+</p><p>For example,
+</p><pre>func Instrument(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r)
+		routePattern := chi.RouteContext(r.Context()).RoutePattern()
+		measure(w, r, routePattern)
+	})
+}
+</pre>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Context.URLParam" tabindex="-1">
+<span>func (*Context) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/context.go#L100" rel="noopener" target="_blank">URLParam</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (x *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context" rel="noopener" target="_blank">Context</a>) URLParam(key <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a></pre>
+</div>
+<p>URLParam returns the corresponding URL parameter value from the request
+routing context.
+</p>
+</div>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="Middlewares" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/chi.go#L137" rel="noopener" target="_blank">Middlewares</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type Middlewares []func(<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a></pre>
+</div>
+<p>Middlewares type is a slice of standard middleware handlers with methods
+to compose middleware chains and http.Handler's.
+</p>
+<div class="Documentation-typeFunc">
+<h4 class="Documentation-typeFuncHeader" data-kind="function" id="Chain" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/chain.go#L6" rel="noopener" target="_blank">Chain</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func Chain(middlewares ...func(<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Middlewares" rel="noopener" target="_blank">Middlewares</a></pre>
+</div>
+<p>Chain returns a Middlewares type from a slice of middleware handlers.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Middlewares.Handler" tabindex="-1">
+<span>func (Middlewares) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/chain.go#L12" rel="noopener" target="_blank">Handler</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mws <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Middlewares" rel="noopener" target="_blank">Middlewares</a>) Handler(h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a></pre>
+</div>
+<p>Handler builds and returns a http.Handler from the chain of middlewares,
+with `h http.Handler` as the final handler.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Middlewares.HandlerFunc" tabindex="-1">
+<span>func (Middlewares) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/chain.go#L18" rel="noopener" target="_blank">HandlerFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mws <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Middlewares" rel="noopener" target="_blank">Middlewares</a>) HandlerFunc(h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a></pre>
+</div>
+<p>HandlerFunc builds and returns a http.Handler from the chain of middlewares,
+with `h http.Handler` as the final handler.
+</p>
+</div>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="Mux" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L21" rel="noopener" target="_blank">Mux</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type Mux struct {
+	<span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+</div>
+<p>Mux is a simple HTTP route multiplexer that parses a request path,
+records any URL params, and executes an end handler. It implements
+the http.Handler interface and is friendly with the standard library.
+</p><p>Mux is designed to be fast, minimal and offer a powerful API for building
+modular and composable HTTP services with a large set of handlers. It's
+particularly useful for writing large REST API services that break a handler
+into many smaller parts composed of middlewares and end handlers.
+</p>
+<div class="Documentation-typeFunc">
+<h4 class="Documentation-typeFuncHeader" data-kind="function" id="NewMux" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L52" rel="noopener" target="_blank">NewMux</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func NewMux() *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a></pre>
+</div>
+<p>NewMux returns a newly initialized Mux object that implements the Router
+interface.
+</p>
+</div><div class="Documentation-typeFunc">
+<h4 class="Documentation-typeFuncHeader" data-kind="function" id="NewRouter" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/chi.go#L60" rel="noopener" target="_blank">NewRouter</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func NewRouter() *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a></pre>
+</div>
+<p>NewRouter returns a new Mux object that implements the Router interface.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Connect" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L143" rel="noopener" target="_blank">Connect</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Connect(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>Connect adds the route `pattern` that matches a CONNECT http method to
+execute the `handlerFn` http.HandlerFunc.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Delete" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L149" rel="noopener" target="_blank">Delete</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Delete(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>Delete adds the route `pattern` that matches a DELETE http method to
+execute the `handlerFn` http.HandlerFunc.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Find" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L368" rel="noopener" target="_blank">Find</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v5.2.0</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Find(rctx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context" rel="noopener" target="_blank">Context</a>, method, path <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a></pre>
+</div>
+<p>Find searches the routing tree for the pattern that matches
+the method/path.
+</p><p>Note: the *Context state is updated during execution, so manage
+the state carefully or make a NewRouteContext().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Get" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L155" rel="noopener" target="_blank">Get</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Get(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>Get adds the route `pattern` that matches a GET http method to
+execute the `handlerFn` http.HandlerFunc.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Group" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L262" rel="noopener" target="_blank">Group</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Group(fn func(r <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Router" rel="noopener" target="_blank">Router</a>)) <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Router" rel="noopener" target="_blank">Router</a></pre>
+</div>
+<p>Group creates a new inline-Mux with a copy of middleware stack. It's useful
+for a group of handlers along the same routing path that use an additional
+set of middlewares. See _examples/.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Handle" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L109" rel="noopener" target="_blank">Handle</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Handle(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handler <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>)</pre>
+</div>
+<p>Handle adds the route `pattern` that matches any http method to
+execute the `handler` http.Handler.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.HandleFunc" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L121" rel="noopener" target="_blank">HandleFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) HandleFunc(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>HandleFunc adds the route `pattern` that matches any http method to
+execute the `handlerFn` http.HandlerFunc.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Head" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L161" rel="noopener" target="_blank">Head</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Head(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>Head adds the route `pattern` that matches a HEAD http method to
+execute the `handlerFn` http.HandlerFunc.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Match" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L359" rel="noopener" target="_blank">Match</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Match(rctx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context" rel="noopener" target="_blank">Context</a>, method, path <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) <a href="https://pkg.go.dev/builtin#bool" rel="noopener" target="_blank">bool</a></pre>
+</div>
+<p>Match searches the routing tree for a handler that matches the method/path.
+It's similar to routing a http request, but without executing the handler
+thereafter.
+</p><p>Note: the *Context state is updated during execution, so manage
+the state carefully or make a NewRouteContext().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Method" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L127" rel="noopener" target="_blank">Method</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Method(method, pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handler <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>)</pre>
+</div>
+<p>Method adds the route `pattern` that matches `method` http method to
+execute the `handler` http.Handler.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.MethodFunc" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L137" rel="noopener" target="_blank">MethodFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) MethodFunc(method, pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>MethodFunc adds the route `pattern` that matches `method` http method to
+execute the `handlerFn` http.HandlerFunc.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.MethodNotAllowed" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L217" rel="noopener" target="_blank">MethodNotAllowed</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) MethodNotAllowed(handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>MethodNotAllowed sets a custom http.HandlerFunc for routing paths where the
+method is unresolved. The default handler returns a 405 with an empty body.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.MethodNotAllowedHandler" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L407" rel="noopener" target="_blank">MethodNotAllowedHandler</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) MethodNotAllowedHandler(methodsAllowed ...methodTyp) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a></pre>
+</div>
+<p>MethodNotAllowedHandler returns the default Mux 405 responder whenever
+a method cannot be resolved for a route.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Middlewares" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L349" rel="noopener" target="_blank">Middlewares</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Middlewares() <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Middlewares" rel="noopener" target="_blank">Middlewares</a></pre>
+</div>
+<p>Middlewares returns a slice of middleware handler functions.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Mount" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L289" rel="noopener" target="_blank">Mount</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Mount(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handler <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>)</pre>
+</div>
+<p>Mount attaches another http.Handler or chi Router as a subrouter along a routing
+path. It's very useful to split up a large API as many independent routers and
+compose them as a single service using Mount. See _examples/.
+</p><p>Note that Mount() simply sets a wildcard along the `pattern` that will continue
+routing at the `handler`, which in most cases is another chi.Router. As a result,
+if you define two Mount() routes on the exact same pattern the mount will panic.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.NotFound" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L197" rel="noopener" target="_blank">NotFound</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) NotFound(handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>NotFound sets a custom http.HandlerFunc for routing paths that could
+not be found. The default 404 handler is `http.NotFound`.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.NotFoundHandler" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L398" rel="noopener" target="_blank">NotFoundHandler</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) NotFoundHandler() <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a></pre>
+</div>
+<p>NotFoundHandler returns the default Mux 404 responder whenever a route
+cannot be found.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Options" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L167" rel="noopener" target="_blank">Options</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Options(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>Options adds the route `pattern` that matches an OPTIONS http method to
+execute the `handlerFn` http.HandlerFunc.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Patch" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L173" rel="noopener" target="_blank">Patch</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Patch(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>Patch adds the route `pattern` that matches a PATCH http method to
+execute the `handlerFn` http.HandlerFunc.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Post" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L179" rel="noopener" target="_blank">Post</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Post(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>Post adds the route `pattern` that matches a POST http method to
+execute the `handlerFn` http.HandlerFunc.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Put" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L185" rel="noopener" target="_blank">Put</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Put(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>Put adds the route `pattern` that matches a PUT http method to
+execute the `handlerFn` http.HandlerFunc.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Route" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L272" rel="noopener" target="_blank">Route</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Route(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, fn func(r <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Router" rel="noopener" target="_blank">Router</a>)) <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Router" rel="noopener" target="_blank">Router</a></pre>
+</div>
+<p>Route creates a new Mux and mounts it along the `pattern` as a subrouter.
+Effectively, this is a short-hand call to Mount. See _examples/.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Routes" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L344" rel="noopener" target="_blank">Routes</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Routes() []<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Routes returns a slice of routing information from the tree,
+useful for traversing available routes of a router.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.ServeHTTP" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L63" rel="noopener" target="_blank">ServeHTTP</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) ServeHTTP(w <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#ResponseWriter" rel="noopener" target="_blank">ResponseWriter</a>, r *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>)</pre>
+</div>
+<p>ServeHTTP is the single method of the http.Handler interface that makes
+Mux interoperable with the standard library. It uses a sync.Pool to get and
+reuse routing contexts for each request.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Trace" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L191" rel="noopener" target="_blank">Trace</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Trace(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handlerFn <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)</pre>
+</div>
+<p>Trace adds the route `pattern` that matches a TRACE http method to
+execute the `handlerFn` http.HandlerFunc.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.Use" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L100" rel="noopener" target="_blank">Use</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) Use(middlewares ...func(<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>)</pre>
+</div>
+<p>Use appends a middleware handler to the Mux middleware stack.
+</p><p>The middleware stack for any Mux will execute before searching for a matching
+route to a specific handler, which provides opportunity to respond early,
+change the course of the request execution, or set request-scoped values for
+the next http.Handler.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Mux.With" tabindex="-1">
+<span>func (*Mux) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go#L236" rel="noopener" target="_blank">With</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Mux" rel="noopener" target="_blank">Mux</a>) With(middlewares ...func(<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Router" rel="noopener" target="_blank">Router</a></pre>
+</div>
+<p>With adds inline middlewares for an endpoint handler.
+</p>
+</div>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="Route" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/tree.go#L823" rel="noopener" target="_blank">Route</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type Route struct {
+<span data-kind="field" id="Route.SubRoutes">	SubRoutes <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Routes" rel="noopener" target="_blank">Routes</a>
+</span><span data-kind="field" id="Route.Handlers">	Handlers  map[<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>]<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>
+</span><span data-kind="field" id="Route.Pattern">	Pattern   <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>
+</span>}</pre>
+</div>
+<p>Route describes the details of a routing handler.
+Handlers map key is an HTTP method
+</p>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="RouteParams" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/context.go#L147" rel="noopener" target="_blank">RouteParams</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type RouteParams struct {
+<span data-kind="field" id="RouteParams.Keys"><span data-kind="field" id="RouteParams.Values">	Keys, Values []<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>
+</span>}</span></pre>
+</div>
+<p>RouteParams is a structure to track URL routing parameters efficiently.
+</p>
+<div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="RouteParams.Add" tabindex="-1">
+<span>func (*RouteParams) <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/context.go#L152" rel="noopener" target="_blank">Add</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (s *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#RouteParams" rel="noopener" target="_blank">RouteParams</a>) Add(key, value <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>)</pre>
+</div>
+<p>Add will append a URL parameter to the end of the route param
+</p>
+</div>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="Router" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/chi.go#L66" rel="noopener" target="_blank">Router</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type Router interface {
+	<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>
+	<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Routes" rel="noopener" target="_blank">Routes</a>
+
+<span data-kind="method" id="Router.Use">	<span class="comment">// Use appends one or more middlewares onto the Router stack.</span>
+</span>	Use(middlewares ...func(<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>)
+
+<span data-kind="method" id="Router.With">	<span class="comment">// With adds inline middlewares for an endpoint handler.</span>
+</span>	With(middlewares ...func(<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Router" rel="noopener" target="_blank">Router</a>
+
+<span data-kind="method" id="Router.Group">	<span class="comment">// Group adds a new inline-Router along the current routing</span>
+</span>	<span class="comment">// path, with a fresh middleware stack for the inline-Router.</span>
+	Group(fn func(r <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Router" rel="noopener" target="_blank">Router</a>)) <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Router" rel="noopener" target="_blank">Router</a>
+
+<span data-kind="method" id="Router.Route">	<span class="comment">// Route mounts a sub-Router along a `pattern“ string.</span>
+</span>	Route(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, fn func(r <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Router" rel="noopener" target="_blank">Router</a>)) <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Router" rel="noopener" target="_blank">Router</a>
+
+<span data-kind="method" id="Router.Mount">	<span class="comment">// Mount attaches another http.Handler along ./pattern/*</span>
+</span>	Mount(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>)
+
+	<span class="comment">// Handle and HandleFunc adds routes for `pattern` that matches</span>
+	<span class="comment">// all HTTP methods.</span>
+<span data-kind="method" id="Router.Handle">	Handle(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>)
+</span><span data-kind="method" id="Router.HandleFunc">	HandleFunc(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+</span>
+	<span class="comment">// Method and MethodFunc adds routes for `pattern` that matches</span>
+	<span class="comment">// the `method` HTTP method.</span>
+<span data-kind="method" id="Router.Method">	Method(method, pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>)
+</span><span data-kind="method" id="Router.MethodFunc">	MethodFunc(method, pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+</span>
+	<span class="comment">// HTTP-method routing along `pattern`</span>
+<span data-kind="method" id="Router.Connect">	Connect(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+</span><span data-kind="method" id="Router.Delete">	Delete(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+</span><span data-kind="method" id="Router.Get">	Get(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+</span><span data-kind="method" id="Router.Head">	Head(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+</span><span data-kind="method" id="Router.Options">	Options(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+</span><span data-kind="method" id="Router.Patch">	Patch(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+</span><span data-kind="method" id="Router.Post">	Post(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+</span><span data-kind="method" id="Router.Put">	Put(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+</span><span data-kind="method" id="Router.Trace">	Trace(pattern <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+</span>
+<span data-kind="method" id="Router.NotFound">	<span class="comment">// NotFound defines a handler to respond whenever a route could</span>
+</span>	<span class="comment">// not be found.</span>
+	NotFound(h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+
+<span data-kind="method" id="Router.MethodNotAllowed">	<span class="comment">// MethodNotAllowed defines a handler to respond whenever a method is</span>
+</span>	<span class="comment">// not allowed.</span>
+	MethodNotAllowed(h <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#HandlerFunc" rel="noopener" target="_blank">HandlerFunc</a>)
+}</pre>
+</div>
+<p>Router consisting of the core routing methods used by chi's Mux,
+using only the standard net/http.
+</p>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="Routes" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/chi.go#L118" rel="noopener" target="_blank">Routes</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type Routes interface {
+<span data-kind="method" id="Routes.Routes">	<span class="comment">// Routes returns the routing tree in an easily traversable structure.</span>
+</span>	Routes() []<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Route" rel="noopener" target="_blank">Route</a>
+
+<span data-kind="method" id="Routes.Middlewares">	<span class="comment">// Middlewares returns the list of middlewares in use by the router.</span>
+</span>	Middlewares() <a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Middlewares" rel="noopener" target="_blank">Middlewares</a>
+
+<span data-kind="method" id="Routes.Match">	<span class="comment">// Match searches the routing tree for a handler that matches</span>
+</span>	<span class="comment">// the method/path - similar to routing a http request, but without</span>
+	<span class="comment">// executing the handler thereafter.</span>
+	Match(rctx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context" rel="noopener" target="_blank">Context</a>, method, path <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) <a href="https://pkg.go.dev/builtin#bool" rel="noopener" target="_blank">bool</a>
+
+<span data-kind="method" id="Routes.Find">	<span class="comment">// Find searches the routing tree for the pattern that matches</span>
+</span>	<span class="comment">// the method/path.</span>
+	Find(rctx *<a href="https://pkg.go.dev/github.com/go-chi/chi/v5#Context" rel="noopener" target="_blank">Context</a>, method, path <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>
+}</pre>
+</div>
+<p>Routes interface adds two methods for router traversal, which is also
+used by the `docgen` subpackage to generation documentation for Routers.
+</p>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="WalkFunc" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/go-chi/chi/blob/v5.2.5/tree.go#L830" rel="noopener" target="_blank">WalkFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type WalkFunc func(method <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, route <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handler <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>, middlewares ...func(<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a></pre>
+</div>
+<p>WalkFunc is the type of the function called for each method and route visited by Walk.
+</p>
+</div></section></div>
+</div>
+</div>
+<div class="UnitFiles js-unitFiles">
+<h2 class="UnitFiles-title" id="section-sourcefiles">
+<img alt="" class="go-Icon" height="24" src="/static/shared/icon/insert_drive_file_gm_grey_24dp.svg" width="24"/>
+      Source Files
+      
+</h2><div class="UnitFiles-titleLink">
+<a href="https://github.com/go-chi/chi/tree/v5.2.5" rel="noopener" target="_blank">View all Source files</a>
+</div><div>
+<ul class="UnitFiles-fileList"><li><a href="https://github.com/go-chi/chi/blob/v5.2.5/chain.go" rel="noopener" target="_blank" title="chain.go">chain.go</a></li><li><a href="https://github.com/go-chi/chi/blob/v5.2.5/chi.go" rel="noopener" target="_blank" title="chi.go">chi.go</a></li><li><a href="https://github.com/go-chi/chi/blob/v5.2.5/context.go" rel="noopener" target="_blank" title="context.go">context.go</a></li><li><a href="https://github.com/go-chi/chi/blob/v5.2.5/mux.go" rel="noopener" target="_blank" title="mux.go">mux.go</a></li><li><a href="https://github.com/go-chi/chi/blob/v5.2.5/pattern.go" rel="noopener" target="_blank" title="pattern.go">pattern.go</a></li><li><a href="https://github.com/go-chi/chi/blob/v5.2.5/tree.go" rel="noopener" target="_blank" title="tree.go">tree.go</a></li></ul>
+</div>
+</div>
+<div class="UnitDirectories js-unitDirectories">
+<h2 class="UnitDirectories-title" id="section-directories">
+<img alt="" class="go-Icon" height="24" src="/static/shared/icon/folder_gm_grey_24dp.svg" width="24"/>
+      Directories
+      
+</h2>
+<div class="UnitDirectories-toggles">
+
+</div>
+<table class="UnitDirectories-table UnitDirectories-table--tree js-expandableTable" data-test-id="UnitDirectories-table">
+<tr class="UnitDirectories-tableHeader UnitDirectories-tableHeader--tree">
+<th>Path</th>
+<th class="UnitDirectories-desktopSynopsis">Synopsis</th>
+</tr>
+<tr class="" data-aria-controls="_examples-custom-handler _examples-custom-method _examples-fileserver _examples-graceful _examples-hello-world _examples-limits _examples-logging _examples-pathvalue _examples-router-walk _examples-todos-resource ">
+<td data-aria-owns="_examples-custom-handler _examples-custom-method _examples-fileserver _examples-graceful _examples-hello-world _examples-limits _examples-logging _examples-pathvalue _examples-router-walk _examples-todos-resource " data-id="_examples">
+<div class="UnitDirectories-pathCell">
+<div><span>_examples</span>
+</div></div></td>
+<td class="UnitDirectories-desktopSynopsis"></td></tr><tr class="" data-id="_examples-custom-handler">
+<td>
+<div class="UnitDirectories-subdirectory">
+<span>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5@v5.2.5/_examples/custom-handler" rel="noopener" target="_blank">custom-handler</a>
+<span class="go-Chip go-Chip--inverted">command</span>
+</span>
+
+</div>
+</td>
+<td class="UnitDirectories-desktopSynopsis"></td></tr><tr class="" data-id="_examples-custom-method">
+<td>
+<div class="UnitDirectories-subdirectory">
+<span>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5@v5.2.5/_examples/custom-method" rel="noopener" target="_blank">custom-method</a>
+<span class="go-Chip go-Chip--inverted">command</span>
+</span>
+
+</div>
+</td>
+<td class="UnitDirectories-desktopSynopsis"></td></tr><tr class="" data-id="_examples-fileserver">
+<td>
+<div class="UnitDirectories-subdirectory">
+<span>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5@v5.2.5/_examples/fileserver" rel="noopener" target="_blank">fileserver</a>
+<span class="go-Chip go-Chip--inverted">command</span>
+</span>
+<div class="UnitDirectories-mobileSynopsis">This example demonstrates how to serve static files from your filesystem.</div>
+</div>
+</td>
+<td class="UnitDirectories-desktopSynopsis">This example demonstrates how to serve static files from your filesystem.</td></tr><tr class="" data-id="_examples-graceful">
+<td>
+<div class="UnitDirectories-subdirectory">
+<span>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5@v5.2.5/_examples/graceful" rel="noopener" target="_blank">graceful</a>
+<span class="go-Chip go-Chip--inverted">command</span>
+</span>
+
+</div>
+</td>
+<td class="UnitDirectories-desktopSynopsis"></td></tr><tr class="" data-id="_examples-hello-world">
+<td>
+<div class="UnitDirectories-subdirectory">
+<span>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5@v5.2.5/_examples/hello-world" rel="noopener" target="_blank">hello-world</a>
+<span class="go-Chip go-Chip--inverted">command</span>
+</span>
+
+</div>
+</td>
+<td class="UnitDirectories-desktopSynopsis"></td></tr><tr class="" data-id="_examples-limits">
+<td>
+<div class="UnitDirectories-subdirectory">
+<span>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5@v5.2.5/_examples/limits" rel="noopener" target="_blank">limits</a>
+<span class="go-Chip go-Chip--inverted">command</span>
+</span>
+<div class="UnitDirectories-mobileSynopsis">This example demonstrates the use of Timeout, and Throttle middlewares.</div>
+</div>
+</td>
+<td class="UnitDirectories-desktopSynopsis">This example demonstrates the use of Timeout, and Throttle middlewares.</td></tr><tr class="" data-id="_examples-logging">
+<td>
+<div class="UnitDirectories-subdirectory">
+<span>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5@v5.2.5/_examples/logging" rel="noopener" target="_blank">logging</a>
+<span class="go-Chip go-Chip--inverted">command</span>
+</span>
+
+</div>
+</td>
+<td class="UnitDirectories-desktopSynopsis"></td></tr><tr class="" data-id="_examples-pathvalue">
+<td>
+<div class="UnitDirectories-subdirectory">
+<span>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5@v5.2.5/_examples/pathvalue" rel="noopener" target="_blank">pathvalue</a>
+<span class="go-Chip go-Chip--inverted">command</span>
+</span>
+
+</div>
+</td>
+<td class="UnitDirectories-desktopSynopsis"></td></tr><tr class="" data-id="_examples-router-walk">
+<td>
+<div class="UnitDirectories-subdirectory">
+<span>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5@v5.2.5/_examples/router-walk" rel="noopener" target="_blank">router-walk</a>
+<span class="go-Chip go-Chip--inverted">command</span>
+</span>
+
+</div>
+</td>
+<td class="UnitDirectories-desktopSynopsis"></td></tr><tr class="" data-id="_examples-todos-resource">
+<td>
+<div class="UnitDirectories-subdirectory">
+<span>
+<a href="https://pkg.go.dev/github.com/go-chi/chi/v5@v5.2.5/_examples/todos-resource" rel="noopener" target="_blank">todos-resource</a>
+<span class="go-Chip go-Chip--inverted">command</span>
+</span>
+<div class="UnitDirectories-mobileSynopsis">This example demonstrates a project structure that defines a subrouter and its handlers on a struct, and mounting them as subrouters to a parent router.</div>
+</div>
+</td>
+<td class="UnitDirectories-desktopSynopsis">This example demonstrates a project structure that defines a subrouter and its handlers on a struct, and mounting them as subrouters to a parent router.</td></tr>
+<tr class="">
+<td data-aria-owns="" data-id="middleware">
+<div class="UnitDirectories-pathCell">
+<div><a href="https://pkg.go.dev/github.com/go-chi/chi/v5@v5.2.5/middleware" rel="noopener" target="_blank">middleware</a>
+</div>
+
+</div>
+</td>
+<td class="UnitDirectories-desktopSynopsis"></td></tr>
+</table>
+</div>
+</div>
+</div>
+<div hidden="" id="showInternal-description"> Click to show internal directories. </div>
+<div hidden="" id="hideInternal-description"> Click to hide internal directories. </div>
+</article>
+
+</main>
+</article>
+</body>
+</html>
