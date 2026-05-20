@@ -1,0 +1,82 @@
+{
+  "directory": "config_cli_bootstrap",
+  "description": "Руководства и примеры по управлению конфигурацией, созданию CLI и начальной загрузке (bootstrap) приложений на Go: Viper, Cobra, переменные окружения, DI, тестирование.",
+  "tags": ["go", "config", "cli", "bootstrap", "viper", "cobra", "env", "dependency-injection"],
+  "files": {
+    "intro-config-cli.md": {
+      "title": "Введение в конфигурацию и CLI в Go",
+      "summary": "Обзор подходов к управлению конфигурацией и созданию интерфейсов командной строки.",
+      "order": 1
+    },
+    "config-files.md": {
+      "title": "Работа с файлами конфигурации",
+      "summary": "Чтение JSON, YAML, TOML с помощью Viper и стандартных средств.",
+      "order": 2
+    },
+    "environment-variables.md": {
+      "title": "Переменные окружения и .env",
+      "summary": "Использование envconfig, godotenv и встроенного os.Getenv.",
+      "order": 3
+    },
+    "cli-cobra.md": {
+      "title": "CLI с Cobra и флагами",
+      "summary": "Построение многофункционального CLI с помощью spf13/cobra, команды, флаги.",
+      "order": 4
+    },
+    "bootstrap-patterns.md": {
+      "title": "Паттерны начальной загрузки",
+      "summary": "Структурирование main.go: инициализация конфигурации, логгера, БД, graceful shutdown.",
+      "order": 5
+    },
+    "dependency-injection.md": {
+      "title": "Внедрение зависимостей в bootstrap",
+      "summary": "Создание компонентов приложения и связывание их в процессе запуска.",
+      "order": 6
+    },
+    "testing-config.md": {
+      "title": "Тестирование конфигурации",
+      "summary": "Подходы к тестированию конфигурационных файлов и логики bootstrap.",
+      "order": 7
+    },
+    "logging-setup.md": {
+      "title": "Инициализация логгера",
+      "summary": "Настройка структурированного логгера (slog, zerolog) при старте.",
+      "order": 8
+    },
+    "examples/viper-yaml.go": {
+      "title": "Загрузка YAML-конфига через Viper",
+      "summary": "Чтение конфигурационного файла и заполнение структуры."
+    },
+    "examples/viper-yaml.md": {
+      "title": "Документация к viper-yaml"
+    },
+    "examples/cobra-cli.go": {
+      "title": "CLI с командами на Cobra",
+      "summary": "Пример приложения с корневой командой и флагами."
+    },
+    "examples/cobra-cli.md": {
+      "title": "Документация к cobra-cli"
+    },
+    "examples/bootstrap.go": {
+      "title": "Типичный main() с bootstrap",
+      "summary": "Инициализация конфигурации, логгера, БД, запуск сервера."
+    },
+    "examples/bootstrap.md": {
+      "title": "Документация к bootstrap"
+    },
+    "examples/envconfig.go": {
+      "title": "Загрузка из переменных окружения",
+      "summary": "Использование библиотеки envconfig для маппинга env в структуру."
+    },
+    "examples/envconfig.md": {
+      "title": "Документация к envconfig"
+    },
+    "examples/config-validation.go": {
+      "title": "Валидация конфигурации",
+      "summary": "Проверка обязательных полей и диапазонов после загрузки."
+    },
+    "examples/config-validation.md": {
+      "title": "Документация к config-validation"
+    }
+  }
+}
