@@ -1,0 +1,82 @@
+{
+  "directory": "stdlib_web",
+  "description": "Руководства и примеры по веб-разработке с использованием стандартной библиотеки Go: net/http, context, html/template.",
+  "tags": ["go", "stdlib", "web", "net/http", "context", "templates", "testing"],
+  "files": {
+    "intro-stdlib-web.md": {
+      "title": "Введение в веб-разработку со stdlib",
+      "summary": "Обзор возможностей стандартной библиотеки Go для создания веб-приложений.",
+      "order": 1
+    },
+    "http-client.md": {
+      "title": "HTTP-клиент: GET, POST, настройки",
+      "summary": "Создание и настройка HTTP-клиента, отправка запросов, обработка ответов.",
+      "order": 2
+    },
+    "http-server.md": {
+      "title": "HTTP-сервер: ListenAndServe, Handler",
+      "summary": "Запуск HTTP-сервера, использование DefaultServeMux и кастомных обработчиков.",
+      "order": 3
+    },
+    "routing-handlers.md": {
+      "title": "Маршрутизация и обработчики",
+      "summary": "Продвинутая маршрутизация в Go 1.22+, методы, параметры пути.",
+      "order": 4
+    },
+    "middleware-patterns-stdlib.md": {
+      "title": "Middleware в стандартной библиотеке",
+      "summary": "Создание цепочек middleware без сторонних библиотек.",
+      "order": 5
+    },
+    "context-usage.md": {
+      "title": "Пакет context в веб-приложениях",
+      "summary": "Передача контекста, таймауты, отмена запросов, хранение значений.",
+      "order": 6
+    },
+    "html-templates.md": {
+      "title": "Работа с html/template",
+      "summary": "Парсинг и выполнение HTML-шаблонов, передача данных.",
+      "order": 7
+    },
+    "testing-stdlib-web.md": {
+      "title": "Тестирование HTTP-сервисов",
+      "summary": "Использование пакета httptest для тестирования серверов и клиентов.",
+      "order": 8
+    },
+    "examples/simple-server.go": {
+      "title": "Простейший HTTP-сервер",
+      "summary": "Демонстрация запуска сервера с обработчиком."
+    },
+    "examples/simple-server.md": {
+      "title": "Документация к simple-server"
+    },
+    "examples/http-client.go": {
+      "title": "HTTP-клиент (GET/POST)",
+      "summary": "Примеры отправки GET и POST запросов к серверу."
+    },
+    "examples/http-client.md": {
+      "title": "Документация к http-client"
+    },
+    "examples/routing-example.go": {
+      "title": "Маршрутизация и параметры",
+      "summary": "Использование различных методов и параметров пути."
+    },
+    "examples/routing-example.md": {
+      "title": "Документация к routing-example"
+    },
+    "examples/middleware-example.go": {
+      "title": "Цепочка middleware",
+      "summary": "Логирование и аутентификация в одном сервере."
+    },
+    "examples/middleware-example.md": {
+      "title": "Документация к middleware-example"
+    },
+    "examples/template-server.go": {
+      "title": "Сервер с HTML-шаблонами",
+      "summary": "Рендеринг HTML-страниц с передачей данных из обработчика."
+    },
+    "examples/template-server.md": {
+      "title": "Документация к template-server"
+    }
+  }
+}
