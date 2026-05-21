@@ -1,0 +1,84 @@
+{
+    "project_info": {
+      "name": "fx-master-examples",
+      "description": "Коллекция примеров и документации для фреймворка внедрения зависимостей Uber Fx",
+      "library": "Uber Fx",
+      "github_url": "https://github.com/uber-go/fx",
+      "language": "Go",
+      "version": "latest"
+    },
+    "files": [
+      {
+        "path": "getting-started.go",
+        "type": "code",
+        "category": "basics",
+        "title": "Быстрый старт (Getting Started)",
+        "description": "Базовая инициализация Fx приложения, использование fx.Provide и fx.Invoke для создания графа зависимостей.",
+        "tags": ["fx.App", "Provide", "Invoke", "setup"],
+        "pairs_with": "getting-started.md"
+      },
+      {
+        "path": "getting-started.md",
+        "type": "documentation",
+        "category": "basics",
+        "title": "Документация: Быстрый старт",
+        "description": "Объяснение концепции IoC, принципов работы Fx и описание структуры базового примера.",
+        "tags": ["docs", "tutorial", "basics"],
+        "pairs_with": "getting-started.go"
+      },
+      {
+        "path": "lifecycle.go",
+        "type": "code",
+        "category": "lifecycle",
+        "title": "Управление жизненным циклом (Lifecycle)",
+        "description": "Пример использования хуков OnStart и OnStop для управления ресурсами (например, запуск сервера и БД).",
+        "tags": ["fx.Lifecycle", "OnStart", "OnStop", "hooks", "graceful-shutdown"],
+        "pairs_with": "lifecycle.md"
+      },
+      {
+        "path": "lifecycle.md",
+        "type": "documentation",
+        "category": "lifecycle",
+        "title": "Документация: Жизненный цикл",
+        "description": "Описание механизма Lifecycle, порядка выполнения хуков и работы с таймаутами.",
+        "tags": ["docs", "lifecycle", "hooks"],
+        "pairs_with": "lifecycle.go"
+      },
+      {
+        "path": "dependency-injection.go",
+        "type": "code",
+        "category": "di",
+        "title": "Внедрение зависимостей (Dependency Injection)",
+        "description": "Пример передачи параметров в конструкторы, создание структур данных и логирование через DI.",
+        "tags": ["DI", "IoC", "struct", "logging"],
+        "pairs_with": "dependency-injection.md"
+      },
+      {
+        "path": "dependency-injection.md",
+        "type": "documentation",
+        "category": "di",
+        "title": "Документация: Внедрение зависимостей",
+        "description": "Теория Dependency Injection, разбор работы контейнера Fx и графа зависимостей.",
+        "tags": ["docs", "DI", "architecture"],
+        "pairs_with": "dependency-injection.go"
+      },
+      {
+        "path": "modules.go",
+        "type": "code",
+        "category": "architecture",
+        "title": "Модульная архитектура (Modules)",
+        "description": "Разделение приложения на изолированные модули (LoggerModule, DatabaseModule) с приватными зависимостями.",
+        "tags": ["fx.Module", "Private", "architecture", "encapsulation"],
+        "pairs_with": "modules.md"
+      },
+      {
+        "path": "modules.md",
+        "type": "documentation",
+        "category": "architecture",
+        "title": "Документация: Модульная архитектура",
+        "description": "Руководство по созданию переиспользуемых модулей и скрытию внутренних деталей реализации.",
+        "tags": ["docs", "modules", "best-practices"],
+        "pairs_with": "modules.go"
+      }
+    ]
+  }

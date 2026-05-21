@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Очищенная документация</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 25px; background: #fafafa; color: #333; }
+        article { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 6px; overflow-x: auto; }
+        pre code { background: none; color: inherit; padding: 0; }
+        a { color: #00979d; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        blockquote { border-left: 4px solid #ddd; padding-left: 15px; margin: 15px 0; color: #666; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { padding: 8px 12px; border: 1px solid #ddd; }
+        th { background: #f9f9f9; }
+    </style>
+</head>
+<body>
+<article>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+
+</div>
+</div>
+<div class="md-content" data-md-component="content">
+<article class="md-content__inner md-typeset">
+
+<h1 id="fx">Fx</h1>
+<p>Fx is <strong>a dependency injection system for Go</strong>.</p>
+<div class="grid cards">
+<ul>
+<li>
+<p><strong>Eliminate globals</strong></p>
+<hr/>
+<p>By using Fx-managed singletons,
+you can eliminate global state from your application.
+With Fx, you don't have to rely on <code>init()</code> functions for setup,
+instead relying on Fx to manage the lifecycle of your application.</p>
+</li>
+<li>
+<p><strong>Reduce boilerplate</strong></p>
+<hr/>
+<p>Fx reduces the amount of code copy-pasted across your services.
+It lets you define shared application setup in a single place,
+and then reuse it across all your services.</p>
+</li>
+<li>
+<p><strong>Automatic plumbing</strong></p>
+<hr/>
+<p>Fx automatically constructs your application's dependency graph.
+A component added to the application can be used by any other component
+without any additional configuration.</p>
+<p><a href="container.html" rel="noopener" target="_blank">Learn more about the dependency container </a></p>
+</li>
+<li>
+<p><strong>Code reuse</strong></p>
+<hr/>
+<p>Fx lets teams within your organization build loosely-coupled
+and well-integrated shareable components referred to as modules.</p>
+<p><a href="modules.html" rel="noopener" target="_blank">Learn more about modules </a></p>
+</li>
+<li>
+<p><strong>Battle-tested</strong></p>
+<p>Fx is the backbone of nearly all Go services at Uber.</p>
+</li>
+</ul>
+</div>
+<p><a class="md-button md-button--primary" href="get-started/index.html" rel="noopener" target="_blank">Get started </a></p>
+
+</article>
+</div>
+
+</div>
+</main>
+</article>
+</body>
+</html>
