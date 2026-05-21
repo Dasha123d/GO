@@ -1,0 +1,44 @@
+{
+    "collection": "mux-main",
+    "framework": "Gorilla Mux",
+    "version": "v1.8.1",
+    "language": "Go",
+    "go_min_version": "1.21",
+    "topics": ["web", "routing", "http", "middleware", "url-matching", "regex"],
+    "pipeline": {
+      "encoding": "UTF-8",
+      "chunk_strategy": "headings_or_paragraphs",
+      "max_chunk_size": 1000,
+      "skip_patterns": ["vendor", "*.sum", "*.lock"],
+      "metadata_fields": ["title", "source_url", "license", "topics"]
+    },
+    "sources": [
+      {
+        "name": "GitHub Repository",
+        "url": "https://github.com/gorilla/mux",
+        "license": "BSD-3-Clause",
+        "last_checked": "2026-05-20"
+      },
+      {
+        "name": "Gorilla Toolkit Docs",
+        "url": "https://www.gorillatoolkit.org/pkg/mux",
+        "license": "BSD-3-Clause",
+        "last_checked": "2026-05-20"
+      }
+    ],
+    "files": [
+      {"path": "official-docs/getting-started.md", "title": "Быстрый старт: установка и базовое использование", "format": "markdown", "topics": ["basics", "setup"], "source_url": "https://github.com/gorilla/mux"},
+      {"path": "official-docs/routing-guide.md", "title": "Маршруты и сопоставление URL", "format": "markdown", "topics": ["routing"], "source_url": "https://github.com/gorilla/mux#matching-routes"},
+      {"path": "official-docs/variables.md", "title": "Переменные URL и извлечение параметров", "format": "markdown", "topics": ["routing", "variables"], "source_url": "https://github.com/gorilla/mux#variables"},
+      {"path": "official-docs/middleware.md", "title": "Middleware и обработка запросов", "format": "markdown", "topics": ["middleware"], "source_url": "https://github.com/gorilla/mux#middleware"},
+      {"path": "tutorials/basic-examples.md", "title": "Базовые примеры использования", "format": "markdown", "topics": ["tutorial", "examples"], "source_url": "https://github.com/gorilla/mux#examples"},
+      {"path": "tutorials/advanced-routing.md", "title": "Продвинутый роутинг", "format": "markdown", "topics": ["routing", "advanced"], "source_url": "https://github.com/gorilla/mux#matching-routes"},
+      {"path": "examples-with-docs/basic-router/main.go", "title": "Базовый роутер", "format": "go", "topics": ["example", "basics"], "source_url": "https://github.com/gorilla/mux"},
+      {"path": "examples-with-docs/url-variables/main.go", "title": "Переменные URL", "format": "go", "topics": ["example", "variables"], "source_url": "https://github.com/gorilla/mux#variables"},
+      {"path": "examples-with-docs/middleware/main.go", "title": "Middleware", "format": "go", "topics": ["example", "middleware"], "source_url": "https://github.com/gorilla/mux#middleware"}
+    ],
+    "metadata_version": "1.0",
+    "created_at": "2026-05-20T00:00:00Z",
+    "updated_at": "2026-05-20T12:00:00Z",
+    "notes": "Материалы отобраны для RAG-пайплайна. Код сопровождается документацией. Дубликаты исключены."
+  }

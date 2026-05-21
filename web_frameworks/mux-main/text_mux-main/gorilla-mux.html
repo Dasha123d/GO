@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Очищенная документация</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 25px; background: #fafafa; color: #333; }
+        article { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        h1 { border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 6px; overflow-x: auto; }
+        pre code { background: none; color: inherit; padding: 0; }
+        a { color: #00979d; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        blockquote { border-left: 4px solid #ddd; padding-left: 15px; margin: 15px 0; color: #666; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { padding: 8px 12px; border: 1px solid #ddd; }
+        th { background: #f9f9f9; }
+    </style>
+</head>
+<body>
+<article>
+<main class="go-Main" id="main-content">
+
+
+
+
+<article class="go-Main-article js-mainContent">
+<div class="UnitDetails" data-test-id="UnitDetails" style="display: block;">
+<div class="UnitDetails-content js-unitDetailsContent" data-test-id="UnitDetails-content">
+<div class="UnitReadme UnitReadme--expanded js-readme">
+<h2 class="UnitReadme-title" id="section-readme">
+<img alt="" class="go-Icon" height="24" src="/static/shared/icon/chrome_reader_mode_gm_grey_24dp.svg" width="24"/>
+      README
+      
+</h2>
+<div class="UnitReadme-content" data-test-id="Unit-readmeContent">
+<div class="Overview-readmeContent js-readmeContent"><h3 class="h1" id="readme-gorilla-mux">gorilla/mux</h3>
+<p><img alt="testing" src="https://github.com/gorilla/mux/actions/workflows/test.yml/badge.svg"/>
+
+
+</p>
+<p><img alt="Gorilla Logo" src="https://github.com/gorilla/.github/assets/53367916/d92caabf-98e0-473e-bfbf-ab554ba435e5"/></p>
+<p>Package <code>gorilla/mux</code> implements a request router and dispatcher for matching incoming requests to
+their respective handler.</p>
+<p>The name mux stands for "HTTP request multiplexer". Like the standard <code>http.ServeMux</code>, <code>mux.Router</code> matches incoming requests against a list of registered routes and calls a handler for the route that matches the URL or other conditions. The main features are:</p>
+<ul>
+<li>It implements the <code>http.Handler</code> interface so it is compatible with the standard <code>http.ServeMux</code>.</li>
+<li>Requests can be matched based on URL host, path, path prefix, schemes, header and query values, HTTP methods or using custom matchers.</li>
+<li>URL hosts, paths and query values can have variables with an optional regular expression.</li>
+<li>Registered URLs can be built, or "reversed", which helps maintaining references to resources.</li>
+<li>Routes can be used as subrouters: nested routes are only tested if the parent route matches. This is useful to define groups of routes that share common conditions like a host, a path prefix or other repeated attributes. As a bonus, this optimizes request matching.</li>
+</ul>
+<hr/>
+<ul>
+<li><a href="#readme-install" rel="noopener" target="_blank">Install</a></li>
+<li><a href="#readme-examples" rel="noopener" target="_blank">Examples</a></li>
+<li><a href="#readme-matching-routes" rel="noopener" target="_blank">Matching Routes</a></li>
+<li><a href="#readme-static-files" rel="noopener" target="_blank">Static Files</a></li>
+<li><a href="#readme-serving-single-page-applications" rel="noopener" target="_blank">Serving Single Page Applications</a> (e.g. React, Vue, Ember.js, etc.)</li>
+<li><a href="#readme-registered-urls" rel="noopener" target="_blank">Registered URLs</a></li>
+<li><a href="#readme-walking-routes" rel="noopener" target="_blank">Walking Routes</a></li>
+<li><a href="#readme-graceful-shutdown" rel="noopener" target="_blank">Graceful Shutdown</a></li>
+<li><a href="#readme-middleware" rel="noopener" target="_blank">Middleware</a></li>
+<li><a href="#readme-handling-cors-requests" rel="noopener" target="_blank">Handling CORS Requests</a></li>
+<li><a href="#readme-testing-handlers" rel="noopener" target="_blank">Testing Handlers</a></li>
+<li><a href="#readme-full-example" rel="noopener" target="_blank">Full Example</a></li>
+</ul>
+<hr/>
+<h4 class="h2" id="readme-install">Install</h4>
+<p>With a <a href="https://golang.org/doc/install#testing" rel="noopener" target="_blank">correctly configured</a> Go toolchain:</p>
+<pre><code>go get -u github.com/gorilla/mux
+</code></pre>
+<h4 class="h2" id="readme-examples">Examples</h4>
+<p>Let's start registering a couple of URL paths and handlers:</p>
+<pre><code>func main() {
+    r := mux.NewRouter()
+    r.HandleFunc("/", HomeHandler)
+    r.HandleFunc("/products", ProductsHandler)
+    r.HandleFunc("/articles", ArticlesHandler)
+    http.Handle("/", r)
+}
+</code></pre>
+<p>Here we register three routes mapping URL paths to handlers. This is equivalent to how <code>http.HandleFunc()</code> works: if an incoming request URL matches one of the paths, the corresponding handler is called passing (<code>http.ResponseWriter</code>, <code>*http.Request</code>) as parameters.</p>
+<p>Paths can have variables. They are defined using the format <code>{name}</code> or <code>{name:pattern}</code>. If a regular expression pattern is not defined, the matched variable will be anything until the next slash. For example:</p>
+<pre><code>r := mux.NewRouter()
+r.HandleFunc("/products/{key}", ProductHandler)
+r.HandleFunc("/articles/{category}/", ArticlesCategoryHandler)
+r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler)
+</code></pre>
+<p>The names are used to create a map of route variables which can be retrieved calling <code>mux.Vars()</code>:</p>
+<pre><code>func ArticlesCategoryHandler(w http.ResponseWriter, r *http.Request) {
+    vars := mux.Vars(r)
+    w.WriteHeader(http.StatusOK)
+    fmt.Fprintf(w, "Category: %v\n", vars["category"])
+}
+</code></pre>
+<p>And this is all you need to know about the basic usage. More advanced options are explained below.</p>
+<h5 class="h3" id="readme-matching-routes">Matching Routes</h5>
+<p>Routes can also be restricted to a domain or subdomain. Just define a host pattern to be matched. They can also have variables:</p>
+<pre><code>r := mux.NewRouter()
+// Only matches if domain is "www.example.com".
+r.Host("www.example.com")
+// Matches a dynamic subdomain.
+r.Host("{subdomain:[a-z]+}.example.com")
+</code></pre>
+<p>There are several other matchers that can be added. To match path prefixes:</p>
+<pre><code>r.PathPrefix("/products/")
+</code></pre>
+<p>...or HTTP methods:</p>
+<pre><code>r.Methods("GET", "POST")
+</code></pre>
+<p>...or URL schemes:</p>
+<pre><code>r.Schemes("https")
+</code></pre>
+<p>...or header values:</p>
+<pre><code>r.Headers("X-Requested-With", "XMLHttpRequest")
+</code></pre>
+<p>...or query values:</p>
+<pre><code>r.Queries("key", "value")
+</code></pre>
+<p>...or to use a custom matcher function:</p>
+<pre><code>r.MatcherFunc(func(r *http.Request, rm *RouteMatch) bool {
+    return r.ProtoMajor == 0
+})
+</code></pre>
+<p>...and finally, it is possible to combine several matchers in a single route:</p>
+<pre><code>r.HandleFunc("/products", ProductsHandler).
+  Host("www.example.com").
+  Methods("GET").
+  Schemes("http")
+</code></pre>
+<p>Routes are tested in the order they were added to the router. If two routes match, the first one wins:</p>
+<pre><code>r := mux.NewRouter()
+r.HandleFunc("/specific", specificHandler)
+r.PathPrefix("/").Handler(catchAllHandler)
+</code></pre>
+<p>Setting the same matching conditions again and again can be boring, so we have a way to group several routes that share the same requirements. We call it "subrouting".</p>
+<p>For example, let's say we have several URLs that should only match when the host is <code>www.example.com</code>. Create a route for that host and get a "subrouter" from it:</p>
+<pre><code>r := mux.NewRouter()
+s := r.Host("www.example.com").Subrouter()
+</code></pre>
+<p>Then register routes in the subrouter:</p>
+<pre><code>s.HandleFunc("/products/", ProductsHandler)
+s.HandleFunc("/products/{key}", ProductHandler)
+s.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler)
+</code></pre>
+<p>The three URL paths we registered above will only be tested if the domain is <code>www.example.com</code>, because the subrouter is tested first. This is not only convenient, but also optimizes request matching. You can create subrouters combining any attribute matchers accepted by a route.</p>
+<p>Subrouters can be used to create domain or path "namespaces": you define subrouters in a central place and then parts of the app can register its paths relatively to a given subrouter.</p>
+<p>There's one more thing about subroutes. When a subrouter has a path prefix, the inner routes use it as base for their paths:</p>
+<pre><code>r := mux.NewRouter()
+s := r.PathPrefix("/products").Subrouter()
+// "/products/"
+s.HandleFunc("/", ProductsHandler)
+// "/products/{key}/"
+s.HandleFunc("/{key}/", ProductHandler)
+// "/products/{key}/details"
+s.HandleFunc("/{key}/details", ProductDetailsHandler)
+</code></pre>
+<h5 class="h3" id="readme-static-files">Static Files</h5>
+<p>Note that the path provided to <code>PathPrefix()</code> represents a "wildcard": calling
+<code>PathPrefix("/static/").Handler(...)</code> means that the handler will be passed any
+request that matches "/static/*". This makes it easy to serve static files with mux:</p>
+<pre><code>func main() {
+    var dir string
+
+    flag.StringVar(&amp;dir, "dir", ".", "the directory to serve files from. Defaults to the current dir")
+    flag.Parse()
+    r := mux.NewRouter()
+
+    // This will serve files under http://localhost:8000/static/&lt;filename&gt;
+    r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
+
+    srv := &amp;http.Server{
+        Handler:      r,
+        Addr:         "127.0.0.1:8000",
+        // Good practice: enforce timeouts for servers you create!
+        WriteTimeout: 15 * time.Second,
+        ReadTimeout:  15 * time.Second,
+    }
+
+    log.Fatal(srv.ListenAndServe())
+}
+</code></pre>
+<h5 class="h3" id="readme-serving-single-page-applications">Serving Single Page Applications</h5>
+<p>Most of the time it makes sense to serve your SPA on a separate web server from your API,
+but sometimes it's desirable to serve them both from one place. It's possible to write a simple
+handler for serving your SPA (for use with React Router's <a href="https://reacttraining.com/react-router/web/api/BrowserRouter" rel="noopener" target="_blank">BrowserRouter</a> for example), and leverage
+mux's powerful routing for your API endpoints.</p>
+<pre><code>package main
+
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"time"
+
+	"github.com/gorilla/mux"
+)
+
+// spaHandler implements the http.Handler interface, so we can use it
+// to respond to HTTP requests. The path to the static directory and
+// path to the index file within that static directory are used to
+// serve the SPA in the given static directory.
+type spaHandler struct {
+	staticPath string
+	indexPath  string
+}
+
+// ServeHTTP inspects the URL path to locate a file within the static dir
+// on the SPA handler. If a file is found, it will be served. If not, the
+// file located at the index path on the SPA handler will be served. This
+// is suitable behavior for serving an SPA (single page application).
+func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Join internally call path.Clean to prevent directory traversal
+	path := filepath.Join(h.staticPath, r.URL.Path)
+
+	// check whether a file exists or is a directory at the given path
+	fi, err := os.Stat(path)
+	if os.IsNotExist(err) || fi.IsDir() {
+		// file does not exist or path is a directory, serve index.html
+		http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
+		return
+	}
+
+	if err != nil {
+		// if we got an error (that wasn't that the file doesn't exist) stating the
+		// file, return a 500 internal server error and stop
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+	}
+
+	// otherwise, use http.FileServer to serve the static file
+	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
+}
+
+func main() {
+	router := mux.NewRouter()
+
+	router.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
+		// an example API handler
+		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
+	})
+
+	spa := spaHandler{staticPath: "build", indexPath: "index.html"}
+	router.PathPrefix("/").Handler(spa)
+
+	srv := &amp;http.Server{
+		Handler: router,
+		Addr:    "127.0.0.1:8000",
+		// Good practice: enforce timeouts for servers you create!
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	log.Fatal(srv.ListenAndServe())
+}
+</code></pre>
+<h5 class="h3" id="readme-registered-urls">Registered URLs</h5>
+<p>Now let's see how to build registered URLs.</p>
+<p>Routes can be named. All routes that define a name can have their URLs built, or "reversed". We define a name calling <code>Name()</code> on a route. For example:</p>
+<pre><code>r := mux.NewRouter()
+r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler).
+  Name("article")
+</code></pre>
+<p>To build a URL, get the route and call the <code>URL()</code> method, passing a sequence of key/value pairs for the route variables. For the previous route, we would do:</p>
+<pre><code>url, err := r.Get("article").URL("category", "technology", "id", "42")
+</code></pre>
+<p>...and the result will be a <code>url.URL</code> with the following path:</p>
+<pre><code>"/articles/technology/42"
+</code></pre>
+<p>This also works for host and query value variables:</p>
+<pre><code>r := mux.NewRouter()
+r.Host("{subdomain}.example.com").
+  Path("/articles/{category}/{id:[0-9]+}").
+  Queries("filter", "{filter}").
+  HandlerFunc(ArticleHandler).
+  Name("article")
+
+// url.String() will be "http://news.example.com/articles/technology/42?filter=gorilla"
+url, err := r.Get("article").URL("subdomain", "news",
+                                 "category", "technology",
+                                 "id", "42",
+                                 "filter", "gorilla")
+</code></pre>
+<p>All variables defined in the route are required, and their values must conform to the corresponding patterns. These requirements guarantee that a generated URL will always match a registered route -- the only exception is for explicitly defined "build-only" routes which never match.</p>
+<p>Regex support also exists for matching Headers within a route. For example, we could do:</p>
+<pre><code>r.HeadersRegexp("Content-Type", "application/(text|json)")
+</code></pre>
+<p>...and the route will match both requests with a Content-Type of <code>application/json</code> as well as <code>application/text</code></p>
+<p>There's also a way to build only the URL host or path for a route: use the methods <code>URLHost()</code> or <code>URLPath()</code> instead. For the previous route, we would do:</p>
+<pre><code>// "http://news.example.com/"
+host, err := r.Get("article").URLHost("subdomain", "news")
+
+// "/articles/technology/42"
+path, err := r.Get("article").URLPath("category", "technology", "id", "42")
+</code></pre>
+<p>And if you use subrouters, host and path defined separately can be built as well:</p>
+<pre><code>r := mux.NewRouter()
+s := r.Host("{subdomain}.example.com").Subrouter()
+s.Path("/articles/{category}/{id:[0-9]+}").
+  HandlerFunc(ArticleHandler).
+  Name("article")
+
+// "http://news.example.com/articles/technology/42"
+url, err := r.Get("article").URL("subdomain", "news",
+                                 "category", "technology",
+                                 "id", "42")
+</code></pre>
+<p>To find all the required variables for a given route when calling <code>URL()</code>, the method <code>GetVarNames()</code> is available:</p>
+<pre><code>r := mux.NewRouter()
+r.Host("{domain}").
+    Path("/{group}/{item_id}").
+    Queries("some_data1", "{some_data1}").
+    Queries("some_data2", "{some_data2}").
+    Name("article")
+
+// Will print [domain group item_id some_data1 some_data2] &lt;nil&gt;
+fmt.Println(r.Get("article").GetVarNames())
+
+</code></pre>
+<h5 class="h3" id="readme-walking-routes">Walking Routes</h5>
+<p>The <code>Walk</code> function on <code>mux.Router</code> can be used to visit all of the routes that are registered on a router. For example,
+the following prints all of the registered routes:</p>
+<pre><code>package main
+
+import (
+	"fmt"
+	"net/http"
+	"strings"
+
+	"github.com/gorilla/mux"
+)
+
+func handler(w http.ResponseWriter, r *http.Request) {
+	return
+}
+
+func main() {
+	r := mux.NewRouter()
+	r.HandleFunc("/", handler)
+	r.HandleFunc("/products", handler).Methods("POST")
+	r.HandleFunc("/articles", handler).Methods("GET")
+	r.HandleFunc("/articles/{id}", handler).Methods("GET", "PUT")
+	r.HandleFunc("/authors", handler).Queries("surname", "{surname}")
+	err := r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
+		pathTemplate, err := route.GetPathTemplate()
+		if err == nil {
+			fmt.Println("ROUTE:", pathTemplate)
+		}
+		pathRegexp, err := route.GetPathRegexp()
+		if err == nil {
+			fmt.Println("Path regexp:", pathRegexp)
+		}
+		queriesTemplates, err := route.GetQueriesTemplates()
+		if err == nil {
+			fmt.Println("Queries templates:", strings.Join(queriesTemplates, ","))
+		}
+		queriesRegexps, err := route.GetQueriesRegexp()
+		if err == nil {
+			fmt.Println("Queries regexps:", strings.Join(queriesRegexps, ","))
+		}
+		methods, err := route.GetMethods()
+		if err == nil {
+			fmt.Println("Methods:", strings.Join(methods, ","))
+		}
+		fmt.Println()
+		return nil
+	})
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	http.Handle("/", r)
+}
+</code></pre>
+<h5 class="h3" id="readme-graceful-shutdown">Graceful Shutdown</h5>
+<p>Go 1.8 introduced the ability to <a href="https://golang.org/doc/go1.8#http_shutdown" rel="noopener" target="_blank">gracefully shutdown</a> a <code>*http.Server</code>. Here's how to do that alongside <code>mux</code>:</p>
+<pre><code>package main
+
+import (
+    "context"
+    "flag"
+    "log"
+    "net/http"
+    "os"
+    "os/signal"
+    "time"
+
+    "github.com/gorilla/mux"
+)
+
+func main() {
+    var wait time.Duration
+    flag.DurationVar(&amp;wait, "graceful-timeout", time.Second * 15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
+    flag.Parse()
+
+    r := mux.NewRouter()
+    // Add your routes as needed
+
+    srv := &amp;http.Server{
+        Addr:         "0.0.0.0:8080",
+        // Good practice to set timeouts to avoid Slowloris attacks.
+        WriteTimeout: time.Second * 15,
+        ReadTimeout:  time.Second * 15,
+        IdleTimeout:  time.Second * 60,
+        Handler: r, // Pass our instance of gorilla/mux in.
+    }
+
+    // Run our server in a goroutine so that it doesn't block.
+    go func() {
+        if err := srv.ListenAndServe(); err != nil {
+            log.Println(err)
+        }
+    }()
+
+    c := make(chan os.Signal, 1)
+    // We'll accept graceful shutdowns when quit via SIGINT (Ctrl+C)
+    // SIGKILL, SIGQUIT or SIGTERM (Ctrl+/) will not be caught.
+    signal.Notify(c, os.Interrupt)
+
+    // Block until we receive our signal.
+    &lt;-c
+
+    // Create a deadline to wait for.
+    ctx, cancel := context.WithTimeout(context.Background(), wait)
+    defer cancel()
+    // Doesn't block if no connections, but will otherwise wait
+    // until the timeout deadline.
+    srv.Shutdown(ctx)
+    // Optionally, you could run srv.Shutdown in a goroutine and block on
+    // &lt;-ctx.Done() if your application should wait for other services
+    // to finalize based on context cancellation.
+    log.Println("shutting down")
+    os.Exit(0)
+}
+</code></pre>
+<h5 class="h3" id="readme-middleware">Middleware</h5>
+<p>Mux supports the addition of middlewares to a <a href="https://godoc.org/github.com/gorilla/mux#Router" rel="noopener" target="_blank">Router</a>, which are executed in the order they are added if a match is found, including its subrouters.
+Middlewares are (typically) small pieces of code which take one request, do something with it, and pass it down to another middleware or the final handler. Some common use cases for middleware are request logging, header manipulation, or <code>ResponseWriter</code> hijacking.</p>
+<p>Mux middlewares are defined using the de facto standard type:</p>
+<pre><code>type MiddlewareFunc func(http.Handler) http.Handler
+</code></pre>
+<p>Typically, the returned handler is a closure which does something with the http.ResponseWriter and http.Request passed to it, and then calls the handler passed as parameter to the MiddlewareFunc. This takes advantage of closures being able access variables from the context where they are created, while retaining the signature enforced by the receivers.</p>
+<p>A very basic middleware which logs the URI of the request being handled could be written as:</p>
+<pre><code>func loggingMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // Do stuff here
+        log.Println(r.RequestURI)
+        // Call the next handler, which can be another middleware in the chain, or the final handler.
+        next.ServeHTTP(w, r)
+    })
+}
+</code></pre>
+<p>Middlewares can be added to a router using <code>Router.Use()</code>:</p>
+<pre><code>r := mux.NewRouter()
+r.HandleFunc("/", handler)
+r.Use(loggingMiddleware)
+</code></pre>
+<p>A more complex authentication middleware, which maps session token to users, could be written as:</p>
+<pre><code>// Define our struct
+type authenticationMiddleware struct {
+	tokenUsers map[string]string
+}
+
+// Initialize it somewhere
+func (amw *authenticationMiddleware) Populate() {
+	amw.tokenUsers["00000000"] = "user0"
+	amw.tokenUsers["aaaaaaaa"] = "userA"
+	amw.tokenUsers["05f717e5"] = "randomUser"
+	amw.tokenUsers["deadbeef"] = "user0"
+}
+
+// Middleware function, which will be called for each request
+func (amw *authenticationMiddleware) Middleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        token := r.Header.Get("X-Session-Token")
+
+        if user, found := amw.tokenUsers[token]; found {
+        	// We found the token in our map
+        	log.Printf("Authenticated user %s\n", user)
+        	// Pass down the request to the next middleware (or final handler)
+        	next.ServeHTTP(w, r)
+        } else {
+        	// Write an error and stop the handler chain
+        	http.Error(w, "Forbidden", http.StatusForbidden)
+        }
+    })
+}
+</code></pre>
+<pre><code>r := mux.NewRouter()
+r.HandleFunc("/", handler)
+
+amw := authenticationMiddleware{tokenUsers: make(map[string]string)}
+amw.Populate()
+
+r.Use(amw.Middleware)
+</code></pre>
+<p>Note: The handler chain will be stopped if your middleware doesn't call <code>next.ServeHTTP()</code> with the corresponding parameters. This can be used to abort a request if the middleware writer wants to. Middlewares <em>should</em> write to <code>ResponseWriter</code> if they <em>are</em> going to terminate the request, and they <em>should not</em> write to <code>ResponseWriter</code> if they <em>are not</em> going to terminate it.</p>
+<h5 class="h3" id="readme-handling-cors-requests">Handling CORS Requests</h5>
+<p><a href="https://godoc.org/github.com/gorilla/mux#CORSMethodMiddleware" rel="noopener" target="_blank">CORSMethodMiddleware</a> intends to make it easier to strictly set the <code>Access-Control-Allow-Methods</code> response header.</p>
+<ul>
+<li>You will still need to use your own CORS handler to set the other CORS headers such as <code>Access-Control-Allow-Origin</code></li>
+<li>The middleware will set the <code>Access-Control-Allow-Methods</code> header to all the method matchers (e.g. <code>r.Methods(http.MethodGet, http.MethodPut, http.MethodOptions)</code> -&gt; <code>Access-Control-Allow-Methods: GET,PUT,OPTIONS</code>) on a route</li>
+<li>If you do not specify any methods, then:</li>
+</ul>
+<blockquote>
+<p><em>Important</em>: there must be an <code>OPTIONS</code> method matcher for the middleware to set the headers.</p>
+</blockquote>
+<p>Here is an example of using <code>CORSMethodMiddleware</code> along with a custom <code>OPTIONS</code> handler to set all the required CORS headers:</p>
+<pre><code>package main
+
+import (
+	"net/http"
+	"github.com/gorilla/mux"
+)
+
+func main() {
+    r := mux.NewRouter()
+
+    // IMPORTANT: you must specify an OPTIONS method matcher for the middleware to set CORS headers
+    r.HandleFunc("/foo", fooHandler).Methods(http.MethodGet, http.MethodPut, http.MethodPatch, http.MethodOptions)
+    r.Use(mux.CORSMethodMiddleware(r))
+    
+    http.ListenAndServe(":8080", r)
+}
+
+func fooHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    if r.Method == http.MethodOptions {
+        return
+    }
+
+    w.Write([]byte("foo"))
+}
+</code></pre>
+<p>And an request to <code>/foo</code> using something like:</p>
+<pre><code>curl localhost:8080/foo -v
+</code></pre>
+<p>Would look like:</p>
+<pre><code>*   Trying ::1...
+* TCP_NODELAY set
+* Connected to localhost (::1) port 8080 (#0)
+&gt; GET /foo HTTP/1.1
+&gt; Host: localhost:8080
+&gt; User-Agent: curl/7.59.0
+&gt; Accept: */*
+&gt; 
+&lt; HTTP/1.1 200 OK
+&lt; Access-Control-Allow-Methods: GET,PUT,PATCH,OPTIONS
+&lt; Access-Control-Allow-Origin: *
+&lt; Date: Fri, 28 Jun 2019 20:13:30 GMT
+&lt; Content-Length: 3
+&lt; Content-Type: text/plain; charset=utf-8
+&lt; 
+* Connection #0 to host localhost left intact
+foo
+</code></pre>
+<h5 class="h3" id="readme-testing-handlers">Testing Handlers</h5>
+<p>Testing handlers in a Go web application is straightforward, and <em>mux</em> doesn't complicate this any further. Given two files: <code>endpoints.go</code> and <code>endpoints_test.go</code>, here's how we'd test an application using <em>mux</em>.</p>
+<p>First, our simple HTTP handler:</p>
+<pre><code>// endpoints.go
+package main
+
+func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+    // A very simple health check.
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusOK)
+
+    // In the future we could report back on the status of our DB, or our cache
+    // (e.g. Redis) by performing a simple PING, and include them in the response.
+    io.WriteString(w, `{"alive": true}`)
+}
+
+func main() {
+    r := mux.NewRouter()
+    r.HandleFunc("/health", HealthCheckHandler)
+
+    log.Fatal(http.ListenAndServe("localhost:8080", r))
+}
+</code></pre>
+<p>Our test code:</p>
+<pre><code>// endpoints_test.go
+package main
+
+import (
+    "net/http"
+    "net/http/httptest"
+    "testing"
+)
+
+func TestHealthCheckHandler(t *testing.T) {
+    // Create a request to pass to our handler. We don't have any query parameters for now, so we'll
+    // pass 'nil' as the third parameter.
+    req, err := http.NewRequest("GET", "/health", nil)
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    // We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
+    rr := httptest.NewRecorder()
+    handler := http.HandlerFunc(HealthCheckHandler)
+
+    // Our handlers satisfy http.Handler, so we can call their ServeHTTP method
+    // directly and pass in our Request and ResponseRecorder.
+    handler.ServeHTTP(rr, req)
+
+    // Check the status code is what we expect.
+    if status := rr.Code; status != http.StatusOK {
+        t.Errorf("handler returned wrong status code: got %v want %v",
+            status, http.StatusOK)
+    }
+
+    // Check the response body is what we expect.
+    expected := `{"alive": true}`
+    if rr.Body.String() != expected {
+        t.Errorf("handler returned unexpected body: got %v want %v",
+            rr.Body.String(), expected)
+    }
+}
+</code></pre>
+<p>In the case that our routes have <a href="#readme-examples" rel="noopener" target="_blank">variables</a>, we can pass those in the request. We could write
+<a href="https://dave.cheney.net/2013/06/09/writing-table-driven-tests-in-go" rel="noopener" target="_blank">table-driven tests</a> to test multiple
+possible route variables as needed.</p>
+<pre><code>// endpoints.go
+func main() {
+    r := mux.NewRouter()
+    // A route with a route variable:
+    r.HandleFunc("/metrics/{type}", MetricsHandler)
+
+    log.Fatal(http.ListenAndServe("localhost:8080", r))
+}
+</code></pre>
+<p>Our test file, with a table-driven test of <code>routeVariables</code>:</p>
+<pre><code>// endpoints_test.go
+func TestMetricsHandler(t *testing.T) {
+    tt := []struct{
+        routeVariable string
+        shouldPass bool
+    }{
+        {"goroutines", true},
+        {"heap", true},
+        {"counters", true},
+        {"queries", true},
+        {"adhadaeqm3k", false},
+    }
+
+    for _, tc := range tt {
+        path := fmt.Sprintf("/metrics/%s", tc.routeVariable)
+        req, err := http.NewRequest("GET", path, nil)
+        if err != nil {
+            t.Fatal(err)
+        }
+
+        rr := httptest.NewRecorder()
+	
+	// To add the vars to the context, 
+	// we need to create a router through which we can pass the request.
+	router := mux.NewRouter()
+        router.HandleFunc("/metrics/{type}", MetricsHandler)
+        router.ServeHTTP(rr, req)
+
+        // In this case, our MetricsHandler returns a non-200 response
+        // for a route variable it doesn't know about.
+        if rr.Code == http.StatusOK &amp;&amp; !tc.shouldPass {
+            t.Errorf("handler should have failed on routeVariable %s: got %v want %v",
+                tc.routeVariable, rr.Code, http.StatusOK)
+        }
+    }
+}
+</code></pre>
+<h4 class="h2" id="readme-full-example">Full Example</h4>
+<p>Here's a complete, runnable example of a small <code>mux</code> based server:</p>
+<pre><code>package main
+
+import (
+    "net/http"
+    "log"
+    "github.com/gorilla/mux"
+)
+
+func YourHandler(w http.ResponseWriter, r *http.Request) {
+    w.Write([]byte("Gorilla!\n"))
+}
+
+func main() {
+    r := mux.NewRouter()
+    // Routes consist of a path and a handler function.
+    r.HandleFunc("/", YourHandler)
+
+    // Bind to a port and pass our router in
+    log.Fatal(http.ListenAndServe(":8000", r))
+}
+</code></pre>
+<h4 class="h2" id="readme-license">License</h4>
+<p>BSD licensed. See the LICENSE file for details.</p>
+</div>
+</div>
+
+
+</div>
+<div class="UnitDoc">
+<h2 class="UnitDoc-title" id="section-documentation">
+<img alt="" class="go-Icon" height="24" src="/static/shared/icon/code_gm_grey_24dp.svg" width="24"/>
+      Documentation
+      
+</h2>
+<div class="Documentation js-documentation">
+<div class="Documentation-content js-docContent"> <section class="Documentation-overview">
+<h3 class="Documentation-overviewHeader" id="pkg-overview" tabindex="-1">Overview </h3>
+<p>Package mux implements a request router and dispatcher.
+</p><p>The name mux stands for "HTTP request multiplexer". Like the standard
+http.ServeMux, mux.Router matches incoming requests against a list of
+registered routes and calls a handler for the route that matches the URL
+or other conditions. The main features are:
+</p><ul class="Documentation-bulletList">
+<li>Requests can be matched based on URL host, path, path prefix, schemes,
+header and query values, HTTP methods or using custom matchers.</li>
+<li>URL hosts, paths and query values can have variables with an optional
+regular expression.</li>
+<li>Registered URLs can be built, or "reversed", which helps maintaining
+references to resources.</li>
+<li>Routes can be used as subrouters: nested routes are only tested if the
+parent route matches. This is useful to define groups of routes that
+share common conditions like a host, a path prefix or other repeated
+attributes. As a bonus, this optimizes request matching.</li>
+<li>It implements the http.Handler interface so it is compatible with the
+standard http.ServeMux.</li>
+</ul><p>Let's start registering a couple of URL paths and handlers:
+</p><pre>func main() {
+	r := mux.NewRouter()
+	r.HandleFunc("/", HomeHandler)
+	r.HandleFunc("/products", ProductsHandler)
+	r.HandleFunc("/articles", ArticlesHandler)
+	http.Handle("/", r)
+}
+</pre><p>Here we register three routes mapping URL paths to handlers. This is
+equivalent to how http.HandleFunc() works: if an incoming request URL matches
+one of the paths, the corresponding handler is called passing
+(http.ResponseWriter, *http.Request) as parameters.
+</p><p>Paths can have variables. They are defined using the format {name} or
+{name:pattern}. If a regular expression pattern is not defined, the matched
+variable will be anything until the next slash. For example:
+</p><pre>r := mux.NewRouter()
+r.HandleFunc("/products/{key}", ProductHandler)
+r.HandleFunc("/articles/{category}/", ArticlesCategoryHandler)
+r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler)
+</pre><p>Groups can be used inside patterns, as long as they are non-capturing (?:re). For example:
+</p><pre>r.HandleFunc("/articles/{category}/{sort:(?:asc|desc|new)}", ArticlesCategoryHandler)
+</pre><p>The names are used to create a map of route variables which can be retrieved
+calling mux.Vars():
+</p><pre>vars := mux.Vars(request)
+category := vars["category"]
+</pre><p>Note that if any capturing groups are present, mux will panic() during parsing. To prevent
+this, convert any capturing groups to non-capturing, e.g. change "/{sort:(asc|desc)}" to
+"/{sort:(?:asc|desc)}". This is a change from prior versions which behaved unpredictably
+when capturing groups were present.
+</p><p>And this is all you need to know about the basic usage. More advanced options
+are explained below.
+</p><p>Routes can also be restricted to a domain or subdomain. Just define a host
+pattern to be matched. They can also have variables:
+</p><pre>r := mux.NewRouter()
+// Only matches if domain is "www.example.com".
+r.Host("www.example.com")
+// Matches a dynamic subdomain.
+r.Host("{subdomain:[a-z]+}.domain.com")
+</pre><p>There are several other matchers that can be added. To match path prefixes:
+</p><pre>r.PathPrefix("/products/")
+</pre><p>...or HTTP methods:
+</p><pre>r.Methods("GET", "POST")
+</pre><p>...or URL schemes:
+</p><pre>r.Schemes("https")
+</pre><p>...or header values:
+</p><pre>r.Headers("X-Requested-With", "XMLHttpRequest")
+</pre><p>...or query values:
+</p><pre>r.Queries("key", "value")
+</pre><p>...or to use a custom matcher function:
+</p><pre>r.MatcherFunc(func(r *http.Request, rm *RouteMatch) bool {
+	return r.ProtoMajor == 0
+})
+</pre><p>...and finally, it is possible to combine several matchers in a single route:
+</p><pre>r.HandleFunc("/products", ProductsHandler).
+  Host("www.example.com").
+  Methods("GET").
+  Schemes("http")
+</pre><p>Setting the same matching conditions again and again can be boring, so we have
+a way to group several routes that share the same requirements.
+We call it "subrouting".
+</p><p>For example, let's say we have several URLs that should only match when the
+host is "www.example.com". Create a route for that host and get a "subrouter"
+from it:
+</p><pre>r := mux.NewRouter()
+s := r.Host("www.example.com").Subrouter()
+</pre><p>Then register routes in the subrouter:
+</p><pre>s.HandleFunc("/products/", ProductsHandler)
+s.HandleFunc("/products/{key}", ProductHandler)
+s.HandleFunc("/articles/{category}/{id:[0-9]+}"), ArticleHandler)
+</pre><p>The three URL paths we registered above will only be tested if the domain is
+"www.example.com", because the subrouter is tested first. This is not
+only convenient, but also optimizes request matching. You can create
+subrouters combining any attribute matchers accepted by a route.
+</p><p>Subrouters can be used to create domain or path "namespaces": you define
+subrouters in a central place and then parts of the app can register its
+paths relatively to a given subrouter.
+</p><p>There's one more thing about subroutes. When a subrouter has a path prefix,
+the inner routes use it as base for their paths:
+</p><pre>r := mux.NewRouter()
+s := r.PathPrefix("/products").Subrouter()
+// "/products/"
+s.HandleFunc("/", ProductsHandler)
+// "/products/{key}/"
+s.HandleFunc("/{key}/", ProductHandler)
+// "/products/{key}/details"
+s.HandleFunc("/{key}/details", ProductDetailsHandler)
+</pre><p>Note that the path provided to PathPrefix() represents a "wildcard": calling
+PathPrefix("/static/").Handler(...) means that the handler will be passed any
+request that matches "/static/*". This makes it easy to serve static files with mux:
+</p><pre>func main() {
+	var dir string
+
+	flag.StringVar(&amp;dir, "dir", ".", "the directory to serve files from. Defaults to the current dir")
+	flag.Parse()
+	r := mux.NewRouter()
+
+	// This will serve files under http://localhost:8000/static/&lt;filename&gt;
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
+
+	srv := &amp;http.Server{
+		Handler:      r,
+		Addr:         "127.0.0.1:8000",
+		// Good practice: enforce timeouts for servers you create!
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
+	log.Fatal(srv.ListenAndServe())
+}
+</pre><p>Now let's see how to build registered URLs.
+</p><p>Routes can be named. All routes that define a name can have their URLs built,
+or "reversed". We define a name calling Name() on a route. For example:
+</p><pre>r := mux.NewRouter()
+r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler).
+  Name("article")
+</pre><p>To build a URL, get the route and call the URL() method, passing a sequence of
+key/value pairs for the route variables. For the previous route, we would do:
+</p><pre>url, err := r.Get("article").URL("category", "technology", "id", "42")
+</pre><p>...and the result will be a url.URL with the following path:
+</p><pre>"/articles/technology/42"
+</pre><p>This also works for host and query value variables:
+</p><pre>r := mux.NewRouter()
+r.Host("{subdomain}.domain.com").
+  Path("/articles/{category}/{id:[0-9]+}").
+  Queries("filter", "{filter}").
+  HandlerFunc(ArticleHandler).
+  Name("article")
+
+// url.String() will be "http://news.domain.com/articles/technology/42?filter=gorilla"
+url, err := r.Get("article").URL("subdomain", "news",
+                                 "category", "technology",
+                                 "id", "42",
+                                 "filter", "gorilla")
+</pre><p>All variables defined in the route are required, and their values must
+conform to the corresponding patterns. These requirements guarantee that a
+generated URL will always match a registered route -- the only exception is
+for explicitly defined "build-only" routes which never match.
+</p><p>Regex support also exists for matching Headers within a route. For example, we could do:
+</p><pre>r.HeadersRegexp("Content-Type", "application/(text|json)")
+</pre><p>...and the route will match both requests with a Content-Type of `application/json` as well as
+`application/text`
+</p><p>There's also a way to build only the URL host or path for a route:
+use the methods URLHost() or URLPath() instead. For the previous route,
+we would do:
+</p><pre>// "http://news.domain.com/"
+host, err := r.Get("article").URLHost("subdomain", "news")
+
+// "/articles/technology/42"
+path, err := r.Get("article").URLPath("category", "technology", "id", "42")
+</pre><p>And if you use subrouters, host and path defined separately can be built
+as well:
+</p><pre>r := mux.NewRouter()
+s := r.Host("{subdomain}.domain.com").Subrouter()
+s.Path("/articles/{category}/{id:[0-9]+}").
+  HandlerFunc(ArticleHandler).
+  Name("article")
+
+// "http://news.domain.com/articles/technology/42"
+url, err := r.Get("article").URL("subdomain", "news",
+                                 "category", "technology",
+                                 "id", "42")
+</pre><p>Mux supports the addition of middlewares to a Router, which are executed in the order they are added if a match is found, including its subrouters. Middlewares are (typically) small pieces of code which take one request, do something with it, and pass it down to another middleware or the final handler. Some common use cases for middleware are request logging, header manipulation, or ResponseWriter hijacking.
+</p><pre>type MiddlewareFunc func(http.Handler) http.Handler
+</pre><p>Typically, the returned handler is a closure which does something with the http.ResponseWriter and http.Request passed to it, and then calls the handler passed as parameter to the MiddlewareFunc (closures can access variables from the context where they are created).
+</p><p>A very basic middleware which logs the URI of the request being handled could be written as:
+</p><pre>func simpleMw(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Do stuff here
+		log.Println(r.RequestURI)
+		// Call the next handler, which can be another middleware in the chain, or the final handler.
+		next.ServeHTTP(w, r)
+	})
+}
+</pre><p>Middlewares can be added to a router using `Router.Use()`:
+</p><pre>r := mux.NewRouter()
+r.HandleFunc("/", handler)
+r.Use(simpleMw)
+</pre><p>A more complex authentication middleware, which maps session token to users, could be written as:
+</p><pre>// Define our struct
+type authenticationMiddleware struct {
+	tokenUsers map[string]string
+}
+
+// Initialize it somewhere
+func (amw *authenticationMiddleware) Populate() {
+	amw.tokenUsers["00000000"] = "user0"
+	amw.tokenUsers["aaaaaaaa"] = "userA"
+	amw.tokenUsers["05f717e5"] = "randomUser"
+	amw.tokenUsers["deadbeef"] = "user0"
+}
+
+// Middleware function, which will be called for each request
+func (amw *authenticationMiddleware) Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("X-Session-Token")
+
+		if user, found := amw.tokenUsers[token]; found {
+			// We found the token in our map
+			log.Printf("Authenticated user %s\n", user)
+			next.ServeHTTP(w, r)
+		} else {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+		}
+	})
+}
+
+r := mux.NewRouter()
+r.HandleFunc("/", handler)
+
+amw := authenticationMiddleware{tokenUsers: make(map[string]string)}
+amw.Populate()
+
+r.Use(amw.Middleware)
+</pre><p>Note: The handler chain will be stopped if your middleware doesn't call `next.ServeHTTP()` with the corresponding parameters. This can be used to abort a request if the middleware writer wants to.
+</p>
+<details class="Documentation-exampleDetails js-exampleContainer" id="example-package-AuthenticationMiddleware" tabindex="-1">
+<summary class="Documentation-exampleDetailsHeader">Example (AuthenticationMiddleware) </summary>
+<div class="Documentation-exampleDetailsBody">
+<pre class="Documentation-exampleCode">
+package main
+
+import (
+	"log"
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
+
+// Define our struct
+type authenticationMiddleware struct {
+	tokenUsers map[string]string
+}
+
+// Initialize it somewhere
+func (amw *authenticationMiddleware) Populate() {
+	amw.tokenUsers["00000000"] = "user0"
+	amw.tokenUsers["aaaaaaaa"] = "userA"
+	amw.tokenUsers["05f717e5"] = "randomUser"
+	amw.tokenUsers["deadbeef"] = "user0"
+}
+
+// Middleware function, which will be called for each request
+func (amw *authenticationMiddleware) Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("X-Session-Token")
+
+		if user, found := amw.tokenUsers[token]; found {
+			// We found the token in our map
+			log.Printf("Authenticated user %s\n", user)
+			next.ServeHTTP(w, r)
+		} else {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+		}
+	})
+}
+
+func main() {
+	r := mux.NewRouter()
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// Do something here
+	})
+	amw := authenticationMiddleware{make(map[string]string)}
+	amw.Populate()
+	r.Use(amw.Middleware)
+}
+</pre>
+<pre class="Documentation-exampleOutputContainer js-exampleOutputContainer" hidden=""><span class="Documentation-exampleOutputLabel">Output:</span>
+</pre>
+</div>
+<div class="Documentation-exampleButtonsContainer">
+
+
+
+
+</div></details>
+</section><section class="Documentation-index">
+<h3 class="Documentation-indexHeader" id="pkg-index">Index </h3>
+<ul class="Documentation-indexList">
+<li class="Documentation-indexVariables"><a href="#pkg-variables" rel="noopener" target="_blank">Variables</a></li>
+<li class="Documentation-indexFunction">
+<a href="#SetURLVars" rel="noopener" target="_blank">func SetURLVars(r *http.Request, val map[string]string) *http.Request</a></li>
+<li class="Documentation-indexFunction">
+<a href="#Vars" rel="noopener" target="_blank">func Vars(r *http.Request) map[string]string</a></li>
+<li class="Documentation-indexType">
+<a href="#BuildVarsFunc" rel="noopener" target="_blank">type BuildVarsFunc</a></li>
+<li class="Documentation-indexType">
+<a href="#MatcherFunc" rel="noopener" target="_blank">type MatcherFunc</a></li>
+<li><ul class="Documentation-indexTypeMethods">
+<li>
+<a href="#MatcherFunc.Match" rel="noopener" target="_blank">func (m MatcherFunc) Match(r *http.Request, match *RouteMatch) bool</a></li>
+</ul></li>
+<li class="Documentation-indexType">
+<a href="#MiddlewareFunc" rel="noopener" target="_blank">type MiddlewareFunc</a></li>
+<li><ul class="Documentation-indexTypeFunctions">
+<li>
+<a href="#CORSMethodMiddleware" rel="noopener" target="_blank">func CORSMethodMiddleware(r *Router) MiddlewareFunc</a></li>
+</ul></li>
+<li><ul class="Documentation-indexTypeMethods">
+<li>
+<a href="#MiddlewareFunc.Middleware" rel="noopener" target="_blank">func (mw MiddlewareFunc) Middleware(handler http.Handler) http.Handler</a></li>
+</ul></li>
+<li class="Documentation-indexType">
+<a href="#Route" rel="noopener" target="_blank">type Route</a></li>
+<li><ul class="Documentation-indexTypeFunctions">
+<li>
+<a href="#CurrentRoute" rel="noopener" target="_blank">func CurrentRoute(r *http.Request) *Route</a></li>
+</ul></li>
+<li><ul class="Documentation-indexTypeMethods">
+<li>
+<a href="#Route.BuildOnly" rel="noopener" target="_blank">func (r *Route) BuildOnly() *Route</a></li>
+<li>
+<a href="#Route.BuildVarsFunc" rel="noopener" target="_blank">func (r *Route) BuildVarsFunc(f BuildVarsFunc) *Route</a></li>
+<li>
+<a href="#Route.GetError" rel="noopener" target="_blank">func (r *Route) GetError() error</a></li>
+<li>
+<a href="#Route.GetHandler" rel="noopener" target="_blank">func (r *Route) GetHandler() http.Handler</a></li>
+<li>
+<a href="#Route.GetHostTemplate" rel="noopener" target="_blank">func (r *Route) GetHostTemplate() (string, error)</a></li>
+<li>
+<a href="#Route.GetMethods" rel="noopener" target="_blank">func (r *Route) GetMethods() ([]string, error)</a></li>
+<li>
+<a href="#Route.GetName" rel="noopener" target="_blank">func (r *Route) GetName() string</a></li>
+<li>
+<a href="#Route.GetPathRegexp" rel="noopener" target="_blank">func (r *Route) GetPathRegexp() (string, error)</a></li>
+<li>
+<a href="#Route.GetPathTemplate" rel="noopener" target="_blank">func (r *Route) GetPathTemplate() (string, error)</a></li>
+<li>
+<a href="#Route.GetQueriesRegexp" rel="noopener" target="_blank">func (r *Route) GetQueriesRegexp() ([]string, error)</a></li>
+<li>
+<a href="#Route.GetQueriesTemplates" rel="noopener" target="_blank">func (r *Route) GetQueriesTemplates() ([]string, error)</a></li>
+<li>
+<a href="#Route.GetVarNames" rel="noopener" target="_blank">func (r *Route) GetVarNames() ([]string, error)</a></li>
+<li>
+<a href="#Route.Handler" rel="noopener" target="_blank">func (r *Route) Handler(handler http.Handler) *Route</a></li>
+<li>
+<a href="#Route.HandlerFunc" rel="noopener" target="_blank">func (r *Route) HandlerFunc(f func(http.ResponseWriter, *http.Request)) *Route</a></li>
+<li>
+<a href="#Route.Headers" rel="noopener" target="_blank">func (r *Route) Headers(pairs ...string) *Route</a></li>
+<li>
+<a href="#Route.HeadersRegexp" rel="noopener" target="_blank">func (r *Route) HeadersRegexp(pairs ...string) *Route</a></li>
+<li>
+<a href="#Route.Host" rel="noopener" target="_blank">func (r *Route) Host(tpl string) *Route</a></li>
+<li>
+<a href="#Route.Match" rel="noopener" target="_blank">func (r *Route) Match(req *http.Request, match *RouteMatch) bool</a></li>
+<li>
+<a href="#Route.MatcherFunc" rel="noopener" target="_blank">func (r *Route) MatcherFunc(f MatcherFunc) *Route</a></li>
+<li>
+<a href="#Route.Methods" rel="noopener" target="_blank">func (r *Route) Methods(methods ...string) *Route</a></li>
+<li>
+<a href="#Route.Name" rel="noopener" target="_blank">func (r *Route) Name(name string) *Route</a></li>
+<li>
+<a href="#Route.Path" rel="noopener" target="_blank">func (r *Route) Path(tpl string) *Route</a></li>
+<li>
+<a href="#Route.PathPrefix" rel="noopener" target="_blank">func (r *Route) PathPrefix(tpl string) *Route</a></li>
+<li>
+<a href="#Route.Queries" rel="noopener" target="_blank">func (r *Route) Queries(pairs ...string) *Route</a></li>
+<li>
+<a href="#Route.Schemes" rel="noopener" target="_blank">func (r *Route) Schemes(schemes ...string) *Route</a></li>
+<li>
+<a href="#Route.SkipClean" rel="noopener" target="_blank">func (r *Route) SkipClean() bool</a></li>
+<li>
+<a href="#Route.Subrouter" rel="noopener" target="_blank">func (r *Route) Subrouter() *Router</a></li>
+<li>
+<a href="#Route.URL" rel="noopener" target="_blank">func (r *Route) URL(pairs ...string) (*url.URL, error)</a></li>
+<li>
+<a href="#Route.URLHost" rel="noopener" target="_blank">func (r *Route) URLHost(pairs ...string) (*url.URL, error)</a></li>
+<li>
+<a href="#Route.URLPath" rel="noopener" target="_blank">func (r *Route) URLPath(pairs ...string) (*url.URL, error)</a></li>
+</ul></li>
+<li class="Documentation-indexType">
+<a href="#RouteMatch" rel="noopener" target="_blank">type RouteMatch</a></li>
+<li class="Documentation-indexType">
+<a href="#Router" rel="noopener" target="_blank">type Router</a></li>
+<li><ul class="Documentation-indexTypeFunctions">
+<li>
+<a href="#NewRouter" rel="noopener" target="_blank">func NewRouter() *Router</a></li>
+</ul></li>
+<li><ul class="Documentation-indexTypeMethods">
+<li>
+<a href="#Router.BuildVarsFunc" rel="noopener" target="_blank">func (r *Router) BuildVarsFunc(f BuildVarsFunc) *Route</a></li>
+<li>
+<a href="#Router.Get" rel="noopener" target="_blank">func (r *Router) Get(name string) *Route</a></li>
+<li>
+<a href="#Router.GetRoute" rel="noopener" target="_blank">func (r *Router) GetRoute(name string) *Route</a></li>
+<li>
+<a href="#Router.Handle" rel="noopener" target="_blank">func (r *Router) Handle(path string, handler http.Handler) *Route</a></li>
+<li>
+<a href="#Router.HandleFunc" rel="noopener" target="_blank">func (r *Router) HandleFunc(path string, f func(http.ResponseWriter, *http.Request)) *Route</a></li>
+<li>
+<a href="#Router.Headers" rel="noopener" target="_blank">func (r *Router) Headers(pairs ...string) *Route</a></li>
+<li>
+<a href="#Router.Host" rel="noopener" target="_blank">func (r *Router) Host(tpl string) *Route</a></li>
+<li>
+<a href="#Router.Match" rel="noopener" target="_blank">func (r *Router) Match(req *http.Request, match *RouteMatch) bool</a></li>
+<li>
+<a href="#Router.MatcherFunc" rel="noopener" target="_blank">func (r *Router) MatcherFunc(f MatcherFunc) *Route</a></li>
+<li>
+<a href="#Router.Methods" rel="noopener" target="_blank">func (r *Router) Methods(methods ...string) *Route</a></li>
+<li>
+<a href="#Router.Name" rel="noopener" target="_blank">func (r *Router) Name(name string) *Route</a></li>
+<li>
+<a href="#Router.NewRoute" rel="noopener" target="_blank">func (r *Router) NewRoute() *Route</a></li>
+<li>
+<a href="#Router.Path" rel="noopener" target="_blank">func (r *Router) Path(tpl string) *Route</a></li>
+<li>
+<a href="#Router.PathPrefix" rel="noopener" target="_blank">func (r *Router) PathPrefix(tpl string) *Route</a></li>
+<li>
+<a href="#Router.Queries" rel="noopener" target="_blank">func (r *Router) Queries(pairs ...string) *Route</a></li>
+<li>
+<a href="#Router.Schemes" rel="noopener" target="_blank">func (r *Router) Schemes(schemes ...string) *Route</a></li>
+<li>
+<a href="#Router.ServeHTTP" rel="noopener" target="_blank">func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request)</a></li>
+<li>
+<a href="#Router.SkipClean" rel="noopener" target="_blank">func (r *Router) SkipClean(value bool) *Router</a></li>
+<li>
+<a href="#Router.StrictSlash" rel="noopener" target="_blank">func (r *Router) StrictSlash(value bool) *Router</a></li>
+<li>
+<a href="#Router.Use" rel="noopener" target="_blank">func (r *Router) Use(mwf ...MiddlewareFunc)</a></li>
+<li>
+<a href="#Router.UseEncodedPath" rel="noopener" target="_blank">func (r *Router) UseEncodedPath() *Router</a></li>
+<li>
+<a href="#Router.Walk" rel="noopener" target="_blank">func (r *Router) Walk(walkFn WalkFunc) error</a></li>
+</ul></li>
+<li class="Documentation-indexType">
+<a href="#WalkFunc" rel="noopener" target="_blank">type WalkFunc</a></li>
+</ul>
+</section><section class="Documentation-examples">
+<h3 class="Documentation-examplesHeader" id="pkg-examples" tabindex="-1">Examples </h3>
+<ul class="Documentation-examplesList">
+<li><a class="js-exampleHref" href="#example-package-AuthenticationMiddleware" rel="noopener" target="_blank">Package (AuthenticationMiddleware)</a></li>
+<li><a class="js-exampleHref" href="#example-CORSMethodMiddleware" rel="noopener" target="_blank">CORSMethodMiddleware</a></li>
+<li><a class="js-exampleHref" href="#example-Route.GetVarNames" rel="noopener" target="_blank">Route.GetVarNames</a></li>
+<li><a class="js-exampleHref" href="#example-Route.HeadersRegexp" rel="noopener" target="_blank">Route.HeadersRegexp</a></li>
+<li><a class="js-exampleHref" href="#example-Route.HeadersRegexp-ExactMatch" rel="noopener" target="_blank">Route.HeadersRegexp (ExactMatch)</a></li>
+<li><a class="js-exampleHref" href="#example-SetURLVars" rel="noopener" target="_blank">SetURLVars</a></li>
+</ul>
+</section><h3 class="Documentation-constantsHeader" id="pkg-constants" tabindex="-1">Constants </h3>
+<section class="Documentation-constants"><p class="Documentation-empty">This section is empty.</p></section>
+<h3 class="Documentation-variablesHeader" id="pkg-variables" tabindex="-1">Variables </h3>
+<section class="Documentation-variables">
+<div class="Documentation-declaration">
+
+<pre>var (
+<span data-kind="variable" id="ErrMethodMismatch">	<span class="comment">// ErrMethodMismatch is returned when the method in the request does not match</span>
+</span>	<span class="comment">// the method defined against the route.</span>
+	ErrMethodMismatch = <a href="https://pkg.go.dev/errors" rel="noopener" target="_blank">errors</a>.<a href="https://pkg.go.dev/errors#New" rel="noopener" target="_blank">New</a>("method is not allowed")
+<span data-kind="variable" id="ErrNotFound">	<span class="comment">// ErrNotFound is returned when no route match is found.</span>
+</span>	ErrNotFound = <a href="https://pkg.go.dev/errors" rel="noopener" target="_blank">errors</a>.<a href="https://pkg.go.dev/errors#New" rel="noopener" target="_blank">New</a>("no matching route was found")
+)</pre>
+</div>
+<div class="Documentation-declaration">
+
+<pre><span data-kind="variable" id="SkipRouter">var SkipRouter = <a href="https://pkg.go.dev/errors" rel="noopener" target="_blank">errors</a>.<a href="https://pkg.go.dev/errors#New" rel="noopener" target="_blank">New</a>("skip this router")</span></pre>
+</div>
+<p>SkipRouter is used as a return value from WalkFuncs to indicate that the
+router that walk is about to descend down to should be skipped.
+</p>
+</section>
+<h3 class="Documentation-functionsHeader" id="pkg-functions" tabindex="-1">Functions </h3>
+<section class="Documentation-functions"><div class="Documentation-function">
+<h4 class="Documentation-functionHeader" data-kind="function" id="SetURLVars" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/test_helpers.go#L17" rel="noopener" target="_blank">SetURLVars</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v1.6.1</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>func SetURLVars(r *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>, val map[<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>]<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a></pre>
+</div>
+<p>SetURLVars sets the URL variables for the given request, to be accessed via
+mux.Vars for testing route behaviour. Arguments are not modified, a shallow
+copy is returned.
+</p><p>This API should only be used for testing purposes; it provides a way to
+inject variables into the request context. Alternatively, URL variables
+can be set by making a route that captures the required variables,
+starting a server and sending the request to that server.
+</p>
+<details class="Documentation-exampleDetails js-exampleContainer" id="example-SetURLVars" tabindex="-1">
+<summary class="Documentation-exampleDetailsHeader">Example </summary>
+<div class="Documentation-exampleDetailsBody">
+<pre class="Documentation-exampleCode">
+req, _ := http.NewRequest("GET", "/foo", nil)
+req = SetURLVars(req, map[string]string{"foo": "bar"})
+
+fmt.Println(Vars(req)["foo"])
+</pre>
+<pre class="Documentation-exampleOutputContainer js-exampleOutputContainer"><span class="Documentation-exampleOutputLabel">Output:</span>
+<span class="Documentation-exampleOutput">bar
+</span></pre>
+</div>
+</details>
+</div><div class="Documentation-function">
+<h4 class="Documentation-functionHeader" data-kind="function" id="Vars" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L430" rel="noopener" target="_blank">Vars</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func Vars(r *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>) map[<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>]<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a></pre>
+</div>
+<p>Vars returns the route variables for the current request, if any.
+</p>
+</div></section>
+<h3 class="Documentation-typesHeader" id="pkg-types" tabindex="-1">Types </h3>
+<section class="Documentation-types"><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="BuildVarsFunc" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L463" rel="noopener" target="_blank">BuildVarsFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type BuildVarsFunc func(map[<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>]<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) map[<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>]<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a></pre>
+</div>
+<p>BuildVarsFunc is the function signature used by custom build variable
+functions (which can modify route variables before a route's URL is built).
+</p>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="MatcherFunc" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L311" rel="noopener" target="_blank">MatcherFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type MatcherFunc func(*<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>, *<a href="#RouteMatch" rel="noopener" target="_blank">RouteMatch</a>) <a href="https://pkg.go.dev/builtin#bool" rel="noopener" target="_blank">bool</a></pre>
+</div>
+<p>MatcherFunc is the function signature used by custom matchers.
+</p>
+<div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="MatcherFunc.Match" tabindex="-1">
+<span>func (MatcherFunc) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L314" rel="noopener" target="_blank">Match</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (m <a href="#MatcherFunc" rel="noopener" target="_blank">MatcherFunc</a>) Match(r *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>, match *<a href="#RouteMatch" rel="noopener" target="_blank">RouteMatch</a>) <a href="https://pkg.go.dev/builtin#bool" rel="noopener" target="_blank">bool</a></pre>
+</div>
+<p>Match returns the match for a given request.
+</p>
+</div>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="MiddlewareFunc" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/middleware.go#L11" rel="noopener" target="_blank">MiddlewareFunc</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v1.6.1</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>type MiddlewareFunc func(<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a></pre>
+</div>
+<p>MiddlewareFunc is a function which receives an http.Handler and returns another http.Handler.
+Typically, the returned handler is a closure which does something with the http.ResponseWriter and http.Request passed
+to it, and then calls the handler passed as parameter to the MiddlewareFunc.
+</p>
+<div class="Documentation-typeFunc">
+<h4 class="Documentation-typeFuncHeader" data-kind="function" id="CORSMethodMiddleware" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/middleware.go#L39" rel="noopener" target="_blank">CORSMethodMiddleware</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v1.6.2</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>func CORSMethodMiddleware(r *<a href="#Router" rel="noopener" target="_blank">Router</a>) <a href="#MiddlewareFunc" rel="noopener" target="_blank">MiddlewareFunc</a></pre>
+</div>
+<p>CORSMethodMiddleware automatically sets the Access-Control-Allow-Methods response header
+on requests for routes that have an OPTIONS method matcher to all the method matchers on
+the route. Routes that do not explicitly handle OPTIONS requests will not be processed
+by the middleware. See examples for usage.
+</p>
+<details class="Documentation-exampleDetails js-exampleContainer" id="example-CORSMethodMiddleware" tabindex="-1">
+<summary class="Documentation-exampleDetailsHeader">Example </summary>
+<div class="Documentation-exampleDetailsBody">
+<pre class="Documentation-exampleCode">
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+
+	"github.com/gorilla/mux"
+)
+
+func main() {
+	r := mux.NewRouter()
+
+	r.HandleFunc("/foo", func(w http.ResponseWriter, r *http.Request) {
+		// Handle the request
+	}).Methods(http.MethodGet, http.MethodPut, http.MethodPatch)
+	r.HandleFunc("/foo", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://example.com")
+		w.Header().Set("Access-Control-Max-Age", "86400")
+	}).Methods(http.MethodOptions)
+
+	r.Use(mux.CORSMethodMiddleware(r))
+
+	rw := httptest.NewRecorder()
+	req, _ := http.NewRequest("OPTIONS", "/foo", nil)                 // needs to be OPTIONS
+	req.Header.Set("Access-Control-Request-Method", "POST")           // needs to be non-empty
+	req.Header.Set("Access-Control-Request-Headers", "Authorization") // needs to be non-empty
+	req.Header.Set("Origin", "http://example.com")                    // needs to be non-empty
+
+	r.ServeHTTP(rw, req)
+
+	fmt.Println(rw.Header().Get("Access-Control-Allow-Methods"))
+	fmt.Println(rw.Header().Get("Access-Control-Allow-Origin"))
+}
+</pre>
+<pre class="Documentation-exampleOutputContainer js-exampleOutputContainer"><span class="Documentation-exampleOutputLabel">Output:</span>
+<span class="Documentation-exampleOutput">GET,PUT,PATCH,OPTIONS
+http://example.com
+</span></pre>
+</div>
+<div class="Documentation-exampleButtonsContainer">
+
+
+
+
+</div></details>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="MiddlewareFunc.Middleware" tabindex="-1">
+<span>func (MiddlewareFunc) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/middleware.go#L19" rel="noopener" target="_blank">Middleware</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v1.6.1</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>func (mw <a href="#MiddlewareFunc" rel="noopener" target="_blank">MiddlewareFunc</a>) Middleware(handler <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a></pre>
+</div>
+<p>Middleware allows MiddlewareFunc to implement the middleware interface.
+</p>
+</div>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="Route" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L17" rel="noopener" target="_blank">Route</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type Route struct {
+	<span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+</div>
+<p>Route stores information to match a request and build URLs.
+</p>
+<div class="Documentation-typeFunc">
+<h4 class="Documentation-typeFuncHeader" data-kind="function" id="CurrentRoute" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L441" rel="noopener" target="_blank">CurrentRoute</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func CurrentRoute(r *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>CurrentRoute returns the matched route for the current request, if any.
+This only works when called inside the handler of the matched route
+because the matched route is stored in the request context which is cleared
+after the handler returns.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.BuildOnly" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L120" rel="noopener" target="_blank">BuildOnly</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) BuildOnly() *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>BuildOnly sets the route to never match: it is only used to build URLs.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.BuildVarsFunc" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L467" rel="noopener" target="_blank">BuildVarsFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) BuildVarsFunc(f <a href="#BuildVarsFunc" rel="noopener" target="_blank">BuildVarsFunc</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>BuildVarsFunc adds a custom function to be used to modify build variables
+before a route's URL is built.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.GetError" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L115" rel="noopener" target="_blank">GetError</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) GetError() <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a></pre>
+</div>
+<p>GetError returns an error resulted from building the route, if any.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.GetHandler" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L141" rel="noopener" target="_blank">GetHandler</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) GetHandler() <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a></pre>
+</div>
+<p>GetHandler returns the handler for the route, if any.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.GetHostTemplate" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L721" rel="noopener" target="_blank">GetHostTemplate</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) GetHostTemplate() (<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a>)</pre>
+</div>
+<p>GetHostTemplate returns the template used to build the
+route match.
+This is useful for building simple REST API documentation and for instrumentation
+against third-party services.
+An error will be returned if the route does not define a host.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.GetMethods" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L704" rel="noopener" target="_blank">GetMethods</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v1.4.0</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) GetMethods() ([]<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a>)</pre>
+</div>
+<p>GetMethods returns the methods the route matches against
+This is useful for building simple REST API documentation and for instrumentation
+against third-party services.
+An error will be returned if route does not have methods.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.GetName" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L162" rel="noopener" target="_blank">GetName</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) GetName() <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a></pre>
+</div>
+<p>GetName returns the name for the route, if any.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.GetPathRegexp" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L652" rel="noopener" target="_blank">GetPathRegexp</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v1.4.0</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) GetPathRegexp() (<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a>)</pre>
+</div>
+<p>GetPathRegexp returns the expanded regular expression used to match route path.
+This is useful for building simple REST API documentation and for instrumentation
+against third-party services.
+An error will be returned if the route does not define a path.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.GetPathTemplate" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L638" rel="noopener" target="_blank">GetPathTemplate</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) GetPathTemplate() (<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a>)</pre>
+</div>
+<p>GetPathTemplate returns the template used to build the
+route match.
+This is useful for building simple REST API documentation and for instrumentation
+against third-party services.
+An error will be returned if the route does not define a path.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.GetQueriesRegexp" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L667" rel="noopener" target="_blank">GetQueriesRegexp</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v1.6.0</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) GetQueriesRegexp() ([]<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a>)</pre>
+</div>
+<p>GetQueriesRegexp returns the expanded regular expressions used to match the
+route queries.
+This is useful for building simple REST API documentation and for instrumentation
+against third-party services.
+An error will be returned if the route does not have queries.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.GetQueriesTemplates" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L686" rel="noopener" target="_blank">GetQueriesTemplates</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v1.6.0</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) GetQueriesTemplates() ([]<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a>)</pre>
+</div>
+<p>GetQueriesTemplates returns the templates used to build the
+query matching.
+This is useful for building simple REST API documentation and for instrumentation
+against third-party services.
+An error will be returned if the route does not define queries.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.GetVarNames" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L733" rel="noopener" target="_blank">GetVarNames</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v1.8.1</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) GetVarNames() ([]<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a>)</pre>
+</div>
+<p>GetVarNames returns the names of all variables added by regexp matchers
+These can be used to know which route variables should be passed into r.URL()
+</p>
+<details class="Documentation-exampleDetails js-exampleContainer" id="example-Route.GetVarNames" tabindex="-1">
+<summary class="Documentation-exampleDetailsHeader">Example </summary>
+<div class="Documentation-exampleDetailsBody">
+<p>This example demonstrates building a dynamic URL using
+required vars and values retrieve from another source
+</p>
+<pre class="Documentation-exampleCode">
+package main
+
+import (
+	"fmt"
+	"github.com/gorilla/mux"
+)
+
+func main() {
+	r := mux.NewRouter()
+
+	route := r.Host("{domain}").
+		Path("/{group}/{item_id}").
+		Queries("some_data1", "{some_data1}").
+		Queries("some_data2_and_3", "{some_data2}.{some_data3}")
+
+	dataSource := func(key string) string {
+		return "my_value_for_" + key
+	}
+
+	varNames, _ := route.GetVarNames()
+
+	pairs := make([]string, 0, len(varNames)*2)
+
+	for _, varName := range varNames {
+		pairs = append(pairs, varName, dataSource(varName))
+	}
+
+	url, err := route.URL(pairs...)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(url.String())
+}
+</pre>
+<pre class="Documentation-exampleOutputContainer js-exampleOutputContainer" hidden=""><span class="Documentation-exampleOutputLabel">Output:</span>
+</pre>
+</div>
+<div class="Documentation-exampleButtonsContainer">
+
+
+
+
+</div></details>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.Handler" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L128" rel="noopener" target="_blank">Handler</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) Handler(handler <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Handler sets a handler for the route.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.HandlerFunc" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L136" rel="noopener" target="_blank">HandlerFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) HandlerFunc(f func(<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#ResponseWriter" rel="noopener" target="_blank">ResponseWriter</a>, *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>)) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>HandlerFunc sets a handler function for the route.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.Headers" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L249" rel="noopener" target="_blank">Headers</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) Headers(pairs ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Headers adds a matcher for request header values.
+It accepts a sequence of key/value pairs to be matched. For example:
+</p><pre>r := mux.NewRouter().NewRoute()
+r.Headers("Content-Type", "application/json",
+          "X-Requested-With", "XMLHttpRequest")
+</pre><p>The above route will only match if both request header values match.
+If the value is an empty string, it will match any value if the key is set.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.HeadersRegexp" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L275" rel="noopener" target="_blank">HeadersRegexp</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) HeadersRegexp(pairs ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>HeadersRegexp accepts a sequence of key/value pairs, where the value has regex
+support. For example:
+</p><pre>r := mux.NewRouter().NewRoute()
+r.HeadersRegexp("Content-Type", "application/(text|json)",
+          "X-Requested-With", "XMLHttpRequest")
+</pre><p>The above route will only match if both the request header matches both regular expressions.
+If the value is an empty string, it will match any value if the key is set.
+Use the start and end of string anchors (^ and $) to match an exact value.
+</p>
+<details class="Documentation-exampleDetails js-exampleContainer" id="example-Route.HeadersRegexp" tabindex="-1">
+<summary class="Documentation-exampleDetailsHeader">Example </summary>
+<div class="Documentation-exampleDetailsBody">
+<p>This example demonstrates setting a regular expression matcher for
+the header value. A plain word will match any value that contains a
+matching substring as if the pattern was wrapped with `.*`.
+</p>
+<pre class="Documentation-exampleCode">
+package main
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
+
+func main() {
+	r := mux.NewRouter()
+	route := r.NewRoute().HeadersRegexp("Accept", "html")
+
+	req1, _ := http.NewRequest("GET", "example.com", nil)
+	req1.Header.Add("Accept", "text/plain")
+	req1.Header.Add("Accept", "text/html")
+
+	req2, _ := http.NewRequest("GET", "example.com", nil)
+	req2.Header.Set("Accept", "application/xhtml+xml")
+
+	matchInfo := &amp;mux.RouteMatch{}
+	fmt.Printf("Match: %v %q\n", route.Match(req1, matchInfo), req1.Header["Accept"])
+	fmt.Printf("Match: %v %q\n", route.Match(req2, matchInfo), req2.Header["Accept"])
+}
+</pre>
+<pre class="Documentation-exampleOutputContainer js-exampleOutputContainer"><span class="Documentation-exampleOutputLabel">Output:</span>
+<span class="Documentation-exampleOutput">Match: true ["text/plain" "text/html"]
+Match: true ["application/xhtml+xml"]
+</span></pre>
+</div>
+<div class="Documentation-exampleButtonsContainer">
+
+
+
+
+</div></details>
+<details class="Documentation-exampleDetails js-exampleContainer" id="example-Route.HeadersRegexp-ExactMatch" tabindex="-1">
+<summary class="Documentation-exampleDetailsHeader">Example (ExactMatch) </summary>
+<div class="Documentation-exampleDetailsBody">
+<p>This example demonstrates setting a strict regular expression matcher
+for the header value. Using the start and end of string anchors, the
+value must be an exact match.
+</p>
+<pre class="Documentation-exampleCode">
+package main
+
+import (
+	"fmt"
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
+
+func main() {
+	r := mux.NewRouter()
+	route := r.NewRoute().HeadersRegexp("Origin", "^https://example.co$")
+
+	yes, _ := http.NewRequest("GET", "example.co", nil)
+	yes.Header.Set("Origin", "https://example.co")
+
+	no, _ := http.NewRequest("GET", "example.co.uk", nil)
+	no.Header.Set("Origin", "https://example.co.uk")
+
+	matchInfo := &amp;mux.RouteMatch{}
+	fmt.Printf("Match: %v %q\n", route.Match(yes, matchInfo), yes.Header["Origin"])
+	fmt.Printf("Match: %v %q\n", route.Match(no, matchInfo), no.Header["Origin"])
+}
+</pre>
+<pre class="Documentation-exampleOutputContainer js-exampleOutputContainer"><span class="Documentation-exampleOutputLabel">Output:</span>
+<span class="Documentation-exampleOutput">Match: true ["https://example.co"]
+Match: false ["https://example.co.uk"]
+</span></pre>
+</div>
+<div class="Documentation-exampleButtonsContainer">
+
+
+
+
+</div></details>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.Host" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L303" rel="noopener" target="_blank">Host</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) Host(tpl <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Host adds a matcher for the URL host.
+It accepts a template with zero or more URL variables enclosed by {}.
+Variables can define an optional regexp pattern to be matched:
+</p><p>- {name} matches anything until the next dot.
+</p><p>- {name:pattern} matches the given regexp pattern.
+</p><p>For example:
+</p><pre>r := mux.NewRouter().NewRoute()
+r.Host("www.example.com")
+r.Host("{subdomain}.domain.com")
+r.Host("{subdomain:[a-z]+}.domain.com")
+</pre><p>Variable names must be unique in a given route. They can be retrieved
+calling mux.Vars(request).
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.Match" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L41" rel="noopener" target="_blank">Match</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) Match(req *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>, match *<a href="#RouteMatch" rel="noopener" target="_blank">RouteMatch</a>) <a href="https://pkg.go.dev/builtin#bool" rel="noopener" target="_blank">bool</a></pre>
+</div>
+<p>Match matches the route against the request.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.MatcherFunc" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L319" rel="noopener" target="_blank">MatcherFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) MatcherFunc(f <a href="#MatcherFunc" rel="noopener" target="_blank">MatcherFunc</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>MatcherFunc adds a custom function to be used as request matcher.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.Methods" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L335" rel="noopener" target="_blank">Methods</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) Methods(methods ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Methods adds a matcher for HTTP methods.
+It accepts a sequence of one or more methods to be matched, e.g.:
+"GET", "POST", "PUT".
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.Name" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L149" rel="noopener" target="_blank">Name</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) Name(name <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Name sets the name for the route, used to build URLs.
+It is an error to call Name more than once on a route.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.Path" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L363" rel="noopener" target="_blank">Path</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) Path(tpl <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Path adds a matcher for the URL path.
+It accepts a template with zero or more URL variables enclosed by {}. The
+template must start with a "/".
+Variables can define an optional regexp pattern to be matched:
+</p><p>- {name} matches anything until the next slash.
+</p><p>- {name:pattern} matches the given regexp pattern.
+</p><p>For example:
+</p><pre>r := mux.NewRouter().NewRoute()
+r.Path("/products/").Handler(ProductsHandler)
+r.Path("/products/{key}").Handler(ProductsHandler)
+r.Path("/articles/{category}/{id:[0-9]+}").
+  Handler(ArticleHandler)
+</pre><p>Variable names must be unique in a given route. They can be retrieved
+calling mux.Vars(request).
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.PathPrefix" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L379" rel="noopener" target="_blank">PathPrefix</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) PathPrefix(tpl <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>PathPrefix adds a matcher for the URL path prefix. This matches if the given
+template is a prefix of the full URL path. See Route.Path() for details on
+the tpl argument.
+</p><p>Note that it does not treat slashes specially ("/foobar/" will be matched by
+the prefix "/foo") so you may want to use a trailing slash here.
+</p><p>Also note that the setting of Router.StrictSlash() has no effect on routes
+with a PathPrefix matcher.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.Queries" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L403" rel="noopener" target="_blank">Queries</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) Queries(pairs ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Queries adds a matcher for URL query values.
+It accepts a sequence of key/value pairs. Values may define variables.
+For example:
+</p><pre>r := mux.NewRouter().NewRoute()
+r.Queries("foo", "bar", "id", "{id:[0-9]+}")
+</pre><p>The above route will only match if the URL contains the defined queries
+values, e.g.: ?foo=bar&amp;id=42.
+</p><p>If the value is an empty string, it will match any value if the key is set.
+</p><p>Variables can define an optional regexp pattern to be matched:
+</p><p>- {name} matches anything until the next slash.
+</p><p>- {name:pattern} matches the given regexp pattern.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.Schemes" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L449" rel="noopener" target="_blank">Schemes</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) Schemes(schemes ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Schemes adds a matcher for URL schemes.
+It accepts a sequence of schemes to be matched, e.g.: "http", "https".
+If the request's URL has a scheme set, it will be matched against.
+Generally, the URL scheme will only be set if a previous handler set it,
+such as the ProxyHeaders handler from gorilla/handlers.
+If unset, the scheme will be determined based on the request's TLS
+termination state.
+The first argument to Schemes will be used when constructing a route URL.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.SkipClean" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L36" rel="noopener" target="_blank">SkipClean</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) SkipClean() <a href="https://pkg.go.dev/builtin#bool" rel="noopener" target="_blank">bool</a></pre>
+</div>
+<p>SkipClean reports whether path cleaning is enabled for this route via
+Router.SkipClean.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.Subrouter" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L494" rel="noopener" target="_blank">Subrouter</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) Subrouter() *<a href="#Router" rel="noopener" target="_blank">Router</a></pre>
+</div>
+<p>Subrouter creates a subrouter for the route.
+</p><p>It will test the inner routes only if the parent route matched. For example:
+</p><pre>r := mux.NewRouter().NewRoute()
+s := r.Host("www.example.com").Subrouter()
+s.HandleFunc("/products/", ProductsHandler)
+s.HandleFunc("/products/{key}", ProductHandler)
+s.HandleFunc("/articles/{category}/{id:[0-9]+}"), ArticleHandler)
+</pre><p>Here, the routes registered in the subrouter won't be tested if the host
+doesn't match.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.URL" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L543" rel="noopener" target="_blank">URL</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) URL(pairs ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) (*<a href="https://pkg.go.dev/net/url" rel="noopener" target="_blank">url</a>.<a href="https://pkg.go.dev/net/url#URL" rel="noopener" target="_blank">URL</a>, <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a>)</pre>
+</div>
+<p>URL builds a URL for the route.
+</p><p>It accepts a sequence of key/value pairs for the route variables. For
+example, given this route:
+</p><pre>r := mux.NewRouter()
+r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler).
+  Name("article")
+</pre><p>...a URL for it can be built using:
+</p><pre>url, err := r.Get("article").URL("category", "technology", "id", "42")
+</pre><p>...which will return an url.URL with the following path:
+</p><pre>"/articles/technology/42"
+</pre><p>This also works for host variables:
+</p><pre>r := mux.NewRouter()
+r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler).
+  Host("{subdomain}.domain.com").
+  Name("article")
+
+// url.String() will be "http://news.domain.com/articles/technology/42"
+url, err := r.Get("article").URL("subdomain", "news",
+                                 "category", "technology",
+                                 "id", "42")
+</pre><p>The scheme of the resulting url will be the first argument that was passed to Schemes:
+</p><pre>// url.String() will be "https://example.com"
+r := mux.NewRouter().NewRoute()
+url, err := r.Host("example.com")
+             .Schemes("https", "http").URL()
+</pre><p>All variables defined in the route are required, and their values must
+conform to the corresponding patterns.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.URLHost" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L585" rel="noopener" target="_blank">URLHost</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) URLHost(pairs ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) (*<a href="https://pkg.go.dev/net/url" rel="noopener" target="_blank">url</a>.<a href="https://pkg.go.dev/net/url#URL" rel="noopener" target="_blank">URL</a>, <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a>)</pre>
+</div>
+<p>URLHost builds the host part of the URL for a route. See Route.URL().
+</p><p>The route must have a host defined.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Route.URLPath" tabindex="-1">
+<span>func (*Route) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/route.go#L613" rel="noopener" target="_blank">URLPath</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Route" rel="noopener" target="_blank">Route</a>) URLPath(pairs ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) (*<a href="https://pkg.go.dev/net/url" rel="noopener" target="_blank">url</a>.<a href="https://pkg.go.dev/net/url#URL" rel="noopener" target="_blank">URL</a>, <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a>)</pre>
+</div>
+<p>URLPath builds the path part of the URL for a route. See Route.URL().
+</p><p>The route must have a path defined.
+</p>
+</div>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="RouteMatch" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L411" rel="noopener" target="_blank">RouteMatch</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type RouteMatch struct {
+<span data-kind="field" id="RouteMatch.Route">	Route   *<a href="#Route" rel="noopener" target="_blank">Route</a>
+</span><span data-kind="field" id="RouteMatch.Handler">	Handler <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>
+</span><span data-kind="field" id="RouteMatch.Vars">	Vars    map[<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>]<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>
+</span>
+<span data-kind="field" id="RouteMatch.MatchErr">	<span class="comment">// MatchErr is set to appropriate matching error</span>
+</span>	<span class="comment">// It is set to ErrMethodMismatch if there is a mismatch in</span>
+	<span class="comment">// the request method and route method</span>
+	MatchErr <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a>
+}</pre>
+</div>
+<p>RouteMatch stores information about a matched route.
+</p>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="Router" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L47" rel="noopener" target="_blank">Router</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type Router struct {
+<span data-kind="field" id="Router.NotFoundHandler">	<span class="comment">// Configurable Handler to be used when no route matches.</span>
+</span>	<span class="comment">// This can be used to render your own 404 Not Found errors.</span>
+	NotFoundHandler <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>
+
+<span data-kind="field" id="Router.MethodNotAllowedHandler">	<span class="comment">// Configurable Handler to be used when the request method does not match the route.</span>
+</span>	<span class="comment">// This can be used to render your own 405 Method Not Allowed errors.</span>
+	MethodNotAllowedHandler <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>
+
+<span data-kind="field" id="Router.KeepContext">	<span class="comment">// If true, do not clear the request context after handling the request.</span>
+</span>	<span class="comment">//</span>
+	<span class="comment">// Deprecated: No effect, since the context is stored on the request itself.</span>
+	KeepContext <a href="https://pkg.go.dev/builtin#bool" rel="noopener" target="_blank">bool</a>
+	<span class="comment">// contains filtered or unexported fields</span>
+}</pre>
+</div>
+<p>Router registers routes to be matched and dispatches a handler.
+</p><p>It implements the http.Handler interface, so it can be registered to serve
+requests:
+</p><pre>var router = mux.NewRouter()
+
+func main() {
+    http.Handle("/", router)
+}
+</pre><p>Or, for Google App Engine, register it in a init() function:
+</p><pre>func init() {
+    http.Handle("/", router)
+}
+</pre><p>This will send all incoming requests to the router.
+</p>
+<div class="Documentation-typeFunc">
+<h4 class="Documentation-typeFuncHeader" data-kind="function" id="NewRouter" tabindex="-1">
+<span>func <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L25" rel="noopener" target="_blank">NewRouter</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func NewRouter() *<a href="#Router" rel="noopener" target="_blank">Router</a></pre>
+</div>
+<p>NewRouter returns a new router instance.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.BuildVarsFunc" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L355" rel="noopener" target="_blank">BuildVarsFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) BuildVarsFunc(f <a href="#BuildVarsFunc" rel="noopener" target="_blank">BuildVarsFunc</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>BuildVarsFunc registers a new route with a custom function for modifying
+route variables before building a URL.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Get" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L216" rel="noopener" target="_blank">Get</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Get(name <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Get returns a route registered with the given name.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.GetRoute" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L222" rel="noopener" target="_blank">GetRoute</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) GetRoute(name <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>GetRoute returns a route registered with the given name. This method
+was renamed to Get() and remains here for backwards compatibility.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Handle" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L294" rel="noopener" target="_blank">Handle</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Handle(path <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, handler <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Handler" rel="noopener" target="_blank">Handler</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Handle registers a new route with a matcher for the URL path.
+See Route.Path() and Route.Handler().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.HandleFunc" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L300" rel="noopener" target="_blank">HandleFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) HandleFunc(path <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>, f func(<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#ResponseWriter" rel="noopener" target="_blank">ResponseWriter</a>,
+	*<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>)) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>HandleFunc registers a new route with a matcher for the URL path.
+See Route.Path() and Route.HandlerFunc().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Headers" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L307" rel="noopener" target="_blank">Headers</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Headers(pairs ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Headers registers a new route with a matcher for request header values.
+See Route.Headers().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Host" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L313" rel="noopener" target="_blank">Host</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Host(tpl <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Host registers a new route with a matcher for the URL host.
+See Route.Host().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Match" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L138" rel="noopener" target="_blank">Match</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Match(req *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>, match *<a href="#RouteMatch" rel="noopener" target="_blank">RouteMatch</a>) <a href="https://pkg.go.dev/builtin#bool" rel="noopener" target="_blank">bool</a></pre>
+</div>
+<p>Match attempts to match the given request against the router's registered routes.
+</p><p>If the request matches a route of this router or one of its subrouters the Route,
+Handler, and Vars fields of the the match argument are filled and this function
+returns true.
+</p><p>If the request does not match any of this router's or its subrouters' routes
+then this function returns false. If available, a reason for the match failure
+will be filled in the match argument's MatchErr field. If the match failure type
+(eg: not found) has a registered handler, the handler is assigned to the Handler
+field of the match argument.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.MatcherFunc" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L319" rel="noopener" target="_blank">MatcherFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) MatcherFunc(f <a href="#MatcherFunc" rel="noopener" target="_blank">MatcherFunc</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>MatcherFunc registers a new route with a custom matcher function.
+See Route.MatcherFunc().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Methods" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L325" rel="noopener" target="_blank">Methods</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Methods(methods ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Methods registers a new route with a matcher for HTTP methods.
+See Route.Methods().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Name" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L288" rel="noopener" target="_blank">Name</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v1.7.1</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Name(name <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Name registers a new route with a name.
+See Route.Name().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.NewRoute" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L279" rel="noopener" target="_blank">NewRoute</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) NewRoute() *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>NewRoute registers an empty route.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Path" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L331" rel="noopener" target="_blank">Path</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Path(tpl <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Path registers a new route with a matcher for the URL path.
+See Route.Path().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.PathPrefix" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L337" rel="noopener" target="_blank">PathPrefix</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) PathPrefix(tpl <a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>PathPrefix registers a new route with a matcher for the URL path prefix.
+See Route.PathPrefix().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Queries" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L343" rel="noopener" target="_blank">Queries</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Queries(pairs ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Queries registers a new route with a matcher for URL query values.
+See Route.Queries().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Schemes" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L349" rel="noopener" target="_blank">Schemes</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Schemes(schemes ...<a href="https://pkg.go.dev/builtin#string" rel="noopener" target="_blank">string</a>) *<a href="#Route" rel="noopener" target="_blank">Route</a></pre>
+</div>
+<p>Schemes registers a new route with a matcher for URL schemes.
+See Route.Schemes().
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.ServeHTTP" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L175" rel="noopener" target="_blank">ServeHTTP</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) ServeHTTP(w <a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#ResponseWriter" rel="noopener" target="_blank">ResponseWriter</a>, req *<a href="https://pkg.go.dev/net/http" rel="noopener" target="_blank">http</a>.<a href="https://pkg.go.dev/net/http#Request" rel="noopener" target="_blank">Request</a>)</pre>
+</div>
+<p>ServeHTTP dispatches the handler registered in the matched route.
+</p><p>When there is a match, the route variables can be retrieved calling
+mux.Vars(request).
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.SkipClean" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L258" rel="noopener" target="_blank">SkipClean</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) SkipClean(value <a href="https://pkg.go.dev/builtin#bool" rel="noopener" target="_blank">bool</a>) *<a href="#Router" rel="noopener" target="_blank">Router</a></pre>
+</div>
+<p>SkipClean defines the path cleaning behaviour for new routes. The initial
+value is false. Users should be careful about which routes are not cleaned
+</p><p>When true, if the route path is "/path//to", it will remain with the double
+slash. This is helpful if you have a route like: /fetch/<a href="http://xkcd.com/534/" rel="noopener" target="_blank">http://xkcd.com/534/</a>
+</p><p>When false, the path will be cleaned, so /fetch/<a href="http://xkcd.com/534/" rel="noopener" target="_blank">http://xkcd.com/534/</a> will
+become /fetch/http/xkcd.com/534
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.StrictSlash" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L245" rel="noopener" target="_blank">StrictSlash</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) StrictSlash(value <a href="https://pkg.go.dev/builtin#bool" rel="noopener" target="_blank">bool</a>) *<a href="#Router" rel="noopener" target="_blank">Router</a></pre>
+</div>
+<p>StrictSlash defines the trailing slash behavior for new routes. The initial
+value is false.
+</p><p>When true, if the route path is "/path/", accessing "/path" will perform a redirect
+to the former and vice versa. In other words, your application will always
+see the path as specified in the route.
+</p><p>When false, if the route path is "/path", accessing "/path/" will not match
+this route and vice versa.
+</p><p>The re-direct is a HTTP 301 (Moved Permanently). Note that when this is set for
+routes with a non-idempotent method (e.g. POST, PUT), the subsequent re-directed
+request will be made as a GET by most clients. Use middleware or client settings
+to modify this behaviour as needed.
+</p><p>Special case: when a route sets a path prefix using the PathPrefix() method,
+strict slash is ignored for that route because the redirect behavior can't
+be determined from a prefix alone. However, any subrouters created from that
+route inherit the original StrictSlash setting.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Use" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/middleware.go#L24" rel="noopener" target="_blank">Use</a> </span>
+<span class="Documentation-sinceVersion">
+<span class="Documentation-sinceVersionLabel">added in</span>
+<span class="Documentation-sinceVersionVersion">v1.6.1</span>
+</span>
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Use(mwf ...<a href="#MiddlewareFunc" rel="noopener" target="_blank">MiddlewareFunc</a>)</pre>
+</div>
+<p>Use appends a MiddlewareFunc to the chain. Middleware can be used to intercept or otherwise modify requests and/or responses, and are executed in the order that they are applied to the Router.
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.UseEncodedPath" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L269" rel="noopener" target="_blank">UseEncodedPath</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) UseEncodedPath() *<a href="#Router" rel="noopener" target="_blank">Router</a></pre>
+</div>
+<p>UseEncodedPath tells the router to match the encoded original path
+to the routes.
+For eg. "/path/foo%2Fbar/to" will match the path "/path/{var}/to".
+</p><p>If not called, the router will match the unencoded path to the routes.
+For eg. "/path/foo%2Fbar/to" will match the path "/path/foo/bar/to"
+</p>
+</div><div class="Documentation-typeMethod">
+<h4 class="Documentation-typeMethodHeader" data-kind="method" id="Router.Walk" tabindex="-1">
+<span>func (*Router) <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L362" rel="noopener" target="_blank">Walk</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>func (r *<a href="#Router" rel="noopener" target="_blank">Router</a>) Walk(walkFn <a href="#WalkFunc" rel="noopener" target="_blank">WalkFunc</a>) <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a></pre>
+</div>
+<p>Walk walks the router and all its sub-routers, calling walkFn for each route
+in the tree. The routes are walked in the order they were added. Sub-routers
+are explored depth-first.
+</p>
+</div>
+</div><div class="Documentation-type">
+<h4 class="Documentation-typeHeader" data-kind="type" id="WalkFunc" tabindex="-1">
+<span>type <a class="Documentation-source" href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go#L373" rel="noopener" target="_blank">WalkFunc</a> </span>
+
+</h4>
+<div class="Documentation-declaration">
+<pre>type WalkFunc func(route *<a href="#Route" rel="noopener" target="_blank">Route</a>, router *<a href="#Router" rel="noopener" target="_blank">Router</a>, ancestors []*<a href="#Route" rel="noopener" target="_blank">Route</a>) <a href="https://pkg.go.dev/builtin#error" rel="noopener" target="_blank">error</a></pre>
+</div>
+<p>WalkFunc is the type of the function called for each route visited by Walk.
+At every invocation, it is given the current route, and the current router,
+and a list of ancestor routes that lead to the current route.
+</p>
+</div></section></div>
+</div>
+</div>
+<div class="UnitFiles js-unitFiles">
+<h2 class="UnitFiles-title" id="section-sourcefiles">
+<img alt="" class="go-Icon" height="24" src="/static/shared/icon/insert_drive_file_gm_grey_24dp.svg" width="24"/>
+      Source Files
+      
+</h2><div class="UnitFiles-titleLink">
+<a href="https://github.com/gorilla/mux/tree/v1.8.1" rel="noopener" target="_blank">View all Source files</a>
+</div><div>
+<ul class="UnitFiles-fileList"><li><a href="https://github.com/gorilla/mux/blob/v1.8.1/doc.go" rel="noopener" target="_blank" title="doc.go">doc.go</a></li><li><a href="https://github.com/gorilla/mux/blob/v1.8.1/middleware.go" rel="noopener" target="_blank" title="middleware.go">middleware.go</a></li><li><a href="https://github.com/gorilla/mux/blob/v1.8.1/mux.go" rel="noopener" target="_blank" title="mux.go">mux.go</a></li><li><a href="https://github.com/gorilla/mux/blob/v1.8.1/regexp.go" rel="noopener" target="_blank" title="regexp.go">regexp.go</a></li><li><a href="https://github.com/gorilla/mux/blob/v1.8.1/route.go" rel="noopener" target="_blank" title="route.go">route.go</a></li><li><a href="https://github.com/gorilla/mux/blob/v1.8.1/test_helpers.go" rel="noopener" target="_blank" title="test_helpers.go">test_helpers.go</a></li></ul>
+</div>
+</div>
+</div>
+</div>
+<div hidden="" id="showInternal-description"> Click to show internal directories. </div>
+<div hidden="" id="hideInternal-description"> Click to hide internal directories. </div>
+</article>
+
+</main>
+</article>
+</body>
+</html>

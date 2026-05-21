@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <defs>
+    <style>
+      .text { font-family: sans-serif; font-weight: bold; fill: #24292e; font-size: 28px; }
+      .text-muted { font-family: sans-serif; fill: #586069; font-size: 16px; }
+      .shape { fill: #00A000; }
+    </style>
+  </defs>
+  <!-- Gorilla Icon Placeholder -->
+  <rect class="shape" x="10" y="10" width="40" height="40" rx="8" />
+  <text x="16" y="38" font-family="sans-serif" font-size="24" fill="white">G</text>
+  
+  <!-- Text -->
+  <text x="60" y="38" class="text">gorilla</text>
+  <text x="62" y="55" class="text-muted">/ mux</text>
+</svg>
