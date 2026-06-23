@@ -1,0 +1,76 @@
+{
+  "library": "github.com/aidanwoods/paseto",
+  "description": "Полное руководство по Paseto в Go: local/public, версии, claims, безопасность и интеграция с Gin",
+  "sections": [
+    {
+      "file": "paseto-quick-start.md",
+      "title": "Быстрый старт: установка и первый локальный токен",
+      "description": "Установка библиотеки, создание v4.local токена, шифрование/расшифровка, экспорт ключа PASERK.",
+      "tags": ["установка", "v4.local", "шифрование", "paserk", "начало"],
+      "level": "beginner"
+    },
+    {
+      "file": "paseto-versions-claims.md",
+      "title": "Версии Paseto и работа с утверждениями",
+      "description": "Обзор v2/v3/v4, использование Claims (subject, issuer, audience и кастомные), footer.",
+      "tags": ["версии", "claims", "v2", "v3", "v4", "footer"],
+      "level": "beginner"
+    },
+    {
+      "file": "paseto-local-vs-public.md",
+      "title": "Local vs Public: симметричное и асимметричное использование",
+      "description": "Отличия local и public, генерация ключей, подпись и проверка, экспорт/импорт PASERK.",
+      "tags": ["local", "public", "симметричное", "асимметричное", "ключи", "paserk"],
+      "level": "intermediate"
+    },
+    {
+      "file": "paseto-validation-errors.md",
+      "title": "Валидация токенов и обработка ошибок",
+      "description": "Проверка exp/nbf/iss/aud, leeway, обработка ошибок с errors.Is, кастомная валидация claims.",
+      "tags": ["валидация", "ошибки", "exp", "nbf", "iss", "aud", "leeway"],
+      "level": "intermediate"
+    },
+    {
+      "file": "paseto-security-best-practices.md",
+      "title": "Безопасность Paseto: лучшие практики",
+      "description": "Выбор версии, хранение ключей, footer для kid, implicit assertions, сроки, защита от утечек.",
+      "tags": ["безопасность", "best practices", "implicit assertions", "kid", "хранение"],
+      "level": "advanced"
+    },
+    {
+      "file": "paseto-gin-middleware.md",
+      "title": "Интеграция Paseto с Gin",
+      "description": "Middleware для проверки Bearer токена, извлечение claims в контекст, пример эндпоинта логина.",
+      "tags": ["gin", "middleware", "интеграция", "bearer"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/basic-local-sign.md",
+      "title": "Пример: локальное шифрование v4.local",
+      "description": "Код basic-local-sign.go: создание и расшифровка симметричного токена.",
+      "tags": ["пример", "local", "v4", "код"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/public-signing.md",
+      "title": "Пример: публичная подпись v4.public",
+      "description": "Код public-signing.go: подпись Ed25519 и проверка с публичным ключом.",
+      "tags": ["пример", "public", "ed25519", "код"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-paseto-middleware.md",
+      "title": "Пример: Paseto middleware для Gin",
+      "description": "Код gin-paseto-middleware.go: защита API через Paseto.",
+      "tags": ["пример", "gin", "middleware"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/token-validation.md",
+      "title": "Пример: расширенная валидация токенов",
+      "description": "Код token-validation.go: проверка iss/aud, leeway, обработка ошибок.",
+      "tags": ["пример", "валидация", "ошибки"],
+      "level": "intermediate"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "library": "golang-jwt/jwt",
+  "version": "5.x",
+  "description": "Полное руководство по работе с JWT в Go: создание, парсинг, алгоритмы, безопасность и интеграция с Gin",
+  "sections": [
+    {
+      "file": "jwt-quick-start.md",
+      "title": "Быстрый старт: установка и первый токен",
+      "description": "Установка библиотеки, создание и проверка токена HS256 с MapClaims, минимальный работающий пример.",
+      "tags": ["установка", "hs256", "mapclaims", "начало работы", "парсинг"],
+      "level": "beginner"
+    },
+    {
+      "file": "jwt-claims-guide.md",
+      "title": "Claims: стандартные и кастомные",
+      "description": "Обзор стандартных полей RFC 7519, использование RegisteredClaims, создание пользовательских структур claims, парсинг в кастомный тип.",
+      "tags": ["claims", "registered claims", "кастомные поля", "структуры", "парсинг"],
+      "level": "intermediate"
+    },
+    {
+      "file": "jwt-signing-algorithms.md",
+      "title": "Алгоритмы подписи и выбор ключей",
+      "description": "Обзор HMAC, RSA, ECDSA, Ed25519; загрузка ключей из PEM, выбор алгоритма под разные сценарии.",
+      "tags": ["алгоритмы", "hs256", "rs256", "ecdsa", "ed25519", "ключи", "pem"],
+      "level": "intermediate"
+    },
+    {
+      "file": "jwt-validation-errors.md",
+      "title": "Валидация и обработка ошибок",
+      "description": "Стандартные проверки exp/nbf/iss/aud, левей, кастомная валидация через метод Valid(), обработка ошибок с errors.Is.",
+      "tags": ["валидация", "ошибки", "exp", "nbf", "iss", "aud", "кастомная валидация", "ErrTokenExpired"],
+      "level": "intermediate"
+    },
+    {
+      "file": "jwt-refresh-token-pattern.md",
+      "title": "Refresh-токены и ротация",
+      "description": "Схема access+refresh, генерация пары, механизм ротации с инвалидацией через jti, хранение и best practices.",
+      "tags": ["refresh", "ротация", "jti", "отзыв", "security", "токен пара"],
+      "level": "advanced"
+    },
+    {
+      "file": "jwt-security-best-practices.md",
+      "title": "Безопасность JWT: best practices",
+      "description": "10 правил безопасности: сроки, хранение ключей, защита от alg=none и kid-инъекций, blacklist, HTTPS, логирование.",
+      "tags": ["безопасность", "best practices", "alg=none", "blacklist", "инъекции", "хранение ключей"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-sign-verify.md",
+      "title": "Пример: создание и проверка HS256",
+      "description": "Код примера basic-sign-verify.go: простой токен с симметричным ключом, создание и немедленная проверка.",
+      "tags": ["пример", "hs256", "код", "mapclaims"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/custom-claims.md",
+      "title": "Пример: кастомные Claims и валидация",
+      "description": "Код примера custom-claims.go: структура с полем Role, встроенная валидация, ParseWithClaims в свой тип.",
+      "tags": ["пример", "кастомные claims", "валидация", "код"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/rsa-ecdsa-signing.md",
+      "title": "Пример: подпись RSA/ECDSA",
+      "description": "Код примера rsa-ecdsa-signing.go: создание токена RS256 с приватным PEM, проверка с публичным ключом.",
+      "tags": ["пример", "rsa", "ecdsa", "pem", "rs256"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-jwt-middleware.md",
+      "title": "Пример: JWT middleware для Gin",
+      "description": "Код примера gin-jwt-middleware.go: middleware для Gin, извлечение токена из заголовка, сохранение claims в контексте.",
+      "tags": ["пример", "gin", "middleware", "интеграция"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/refresh-token-flow.md",
+      "title": "Пример: полный flow refresh-токенов",
+      "description": "Код примера refresh-token-flow.go: эндпоинты /login, /refresh, защищённый /data, инвалидация через jti.",
+      "tags": ["пример", "refresh", "ротация", "gin", "безопасность"],
+      "level": "advanced"
+    }
+  ]
+}

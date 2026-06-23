@@ -1,0 +1,83 @@
+{
+  "library": "github.com/casbin/casbin/v2",
+  "description": "Полное руководство по Casbin в Go: модели, политики, RBAC, ABAC, адаптеры, интеграция с Gin и best practices.",
+  "sections": [
+    {
+      "file": "casbin-quick-start.md",
+      "title": "Быстрый старт: установка и первая проверка доступа",
+      "description": "Установка Casbin, базовая модель ACL, файл политики CSV, вызов Enforce.",
+      "tags": ["установка", "acl", "enforce", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "casbin-model-policy.md",
+      "title": "Модели и политики: синтаксис и возможности",
+      "description": "Секции модели, матчеры, функции keyMatch, эффекты, роли (g), примеры.",
+      "tags": ["модель", "политика", "matchers", "keyMatch", "эффекты", "rbac"],
+      "level": "intermediate"
+    },
+    {
+      "file": "casbin-enforcer-advanced.md",
+      "title": "Enforcer: домены, фильтрация и пакетные проверки",
+      "description": "Инициализация, домены (multi-tenancy), LoadFilteredPolicy, BatchEnforce, управление политиками.",
+      "tags": ["enforcer", "домены", "фильтрация", "BatchEnforce", "AutoSave"],
+      "level": "intermediate"
+    },
+    {
+      "file": "casbin-rbac-abac.md",
+      "title": "RBAC и ABAC: роли, иерархия и атрибуты",
+      "description": "Настройка RBAC, наследование ролей, доменные роли, ABAC через атрибуты и пользовательские функции.",
+      "tags": ["rbac", "abac", "иерархия", "роли", "eval", "атрибуты"],
+      "level": "advanced"
+    },
+    {
+      "file": "casbin-adapters.md",
+      "title": "Адаптеры: хранение политик в БД, файлах и Redis",
+      "description": "Обзор адаптеров, пример с GORM и PostgreSQL, фильтрация загрузки, AutoSave.",
+      "tags": ["адаптеры", "gorm", "postgresql", "redis", "хранение"],
+      "level": "intermediate"
+    },
+    {
+      "file": "casbin-gin-middleware.md",
+      "title": "Интеграция Casbin с Gin",
+      "description": "Middleware авторизации для Gin, извлечение пользователя, проверка через Enforce, защита роутов.",
+      "tags": ["gin", "middleware", "интеграция", "авторизация"],
+      "level": "intermediate"
+    },
+    {
+      "file": "casbin-security-best-practices.md",
+      "title": "Безопасность Casbin: лучшие практики",
+      "description": "Использование deny-эффектов, защита модели, валидация входных данных, логирование, тестирование.",
+      "tags": ["безопасность", "best practices", "deny", "валидация", "логирование"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-enforcer.md",
+      "title": "Пример: базовый Enforcer с ACL",
+      "description": "Код примера: модель в строке, политика из массива, вызов Enforce.",
+      "tags": ["пример", "acl", "enforcer"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/rbac-with-roles.md",
+      "title": "Пример: RBAC с иерархией ролей",
+      "description": "Код примера с RBAC, наследованием admin -> editor, проверками.",
+      "tags": ["пример", "rbac", "иерархия", "роли"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-casbin-middleware.md",
+      "title": "Пример: Middleware Casbin для Gin",
+      "description": "Полный код сервера с аутентификацией и авторизацией через Casbin.",
+      "tags": ["пример", "gin", "middleware"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/adapter-sql.md",
+      "title": "Пример: Адаптер SQL (PostgreSQL)",
+      "description": "Код использования GORM-адаптера для хранения политик в PostgreSQL.",
+      "tags": ["пример", "адаптер", "sql", "postgresql"],
+      "level": "intermediate"
+    }
+  ]
+}

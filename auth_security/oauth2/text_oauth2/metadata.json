@@ -1,0 +1,76 @@
+{
+  "library": "golang.org/x/oauth2",
+  "description": "Полное руководство по OAuth2 в Go: Authorization Code, Client Credentials, управление токенами, безопасность и интеграция с Gin",
+  "sections": [
+    {
+      "file": "oauth2-quick-start.md",
+      "title": "Быстрый старт: установка и первый обмен",
+      "description": "Установка библиотеки, конфигурация OAuth2.Config, получение URL для авторизации.",
+      "tags": ["установка", "oauth2", "AuthCodeURL", "конфигурация", "google"],
+      "level": "beginner"
+    },
+    {
+      "file": "oauth2-authorization-code-flow.md",
+      "title": "Authorization Code Flow: полный цикл",
+      "description": "Обработка логина, получение кода, обмен на токен, state для CSRF, запрос API.",
+      "tags": ["authorization code", "state", "обмен кода", "токен", "google"],
+      "level": "intermediate"
+    },
+    {
+      "file": "oauth2-client-credentials.md",
+      "title": "Client Credentials Flow (server-to-server)",
+      "description": "Настройка clientcredentials.Config, получение токена без пользователя, автоматическое обновление.",
+      "tags": ["client credentials", "server-to-server", "токен", "автоматическое обновление"],
+      "level": "intermediate"
+    },
+    {
+      "file": "oauth2-token-management.md",
+      "title": "Управление токенами: сохранение, обновление, кеширование",
+      "description": "TokenSource, ReuseTokenSource, сохранение в файл/БД, кастомный источник токенов.",
+      "tags": ["токен", "refresh", "TokenSource", "ReuseTokenSource", "хранение"],
+      "level": "intermediate"
+    },
+    {
+      "file": "oauth2-security-best-practices.md",
+      "title": "Безопасность OAuth2: лучшие практики",
+      "description": "State, PKCE, валидация redirect URI, минимальные scope, хранение secret, HTTPS, ID Token.",
+      "tags": ["безопасность", "state", "PKCE", "redirect", "scope", "secret"],
+      "level": "advanced"
+    },
+    {
+      "file": "oauth2-gin-integration.md",
+      "title": "Интеграция OAuth2 с Gin",
+      "description": "Middleware для проверки токена, сохранение в сессии, редирект на логин, защита маршрутов.",
+      "tags": ["gin", "middleware", "сессия", "интеграция", "oauth2"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-webapp.md",
+      "title": "Пример: базовое веб-приложение с OAuth2",
+      "description": "Код примера basic-webapp.go: полный flow с Google, вывод email.",
+      "tags": ["пример", "authorization code", "google", "веб"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/client-credentials.md",
+      "title": "Пример: Client Credentials",
+      "description": "Код примера client-credentials.go: запрос к Google Cloud без пользователя.",
+      "tags": ["пример", "client credentials", "google cloud"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-oauth2-middleware.md",
+      "title": "Пример: OAuth2 middleware для Gin",
+      "description": "Код примера gin-oauth2-middleware.go: защита роутов через OAuth2 с сессиями.",
+      "tags": ["пример", "gin", "middleware", "oauth2"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/token-refresh.md",
+      "title": "Пример: Автоматическое обновление токена",
+      "description": "Код примера token-refresh.go: загрузка токена из файла, ReuseTokenSource, сохранение обновлённого токена.",
+      "tags": ["пример", "refresh", "ReuseTokenSource", "хранение"],
+      "level": "intermediate"
+    }
+  ]
+}
