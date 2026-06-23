@@ -1,0 +1,69 @@
+{
+  "library": "github.com/panjf2000/ants/v2",
+  "description": "High-performance goroutine pool for Go. Reuse goroutines, limit concurrency, handle panics, and integrate with any project.",
+  "sections": [
+    {
+      "file": "ants-quick-start.md",
+      "title": "Быстрый старт: установка и первый пул",
+      "description": "Установка ants, создание пула, Submit, глобальный дефолтный пул.",
+      "tags": ["установка", "пул", "Submit", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "ants-advanced-configuration.md",
+      "title": "Продвинутая конфигурация пула",
+      "description": "Опции NewPool: PreAlloc, Nonblocking, MaxBlockingTasks, PanicHandler, ExpiryDuration, Logger.",
+      "tags": ["конфигурация", "опции", "PreAlloc", "Nonblocking"],
+      "level": "intermediate"
+    },
+    {
+      "file": "ants-functions-vs-tasks.md",
+      "title": "Функции и задачи: возврат результатов, пул с функцией",
+      "description": "Submit vs PoolWithFunc, возврат результата через каналы, синхронизация.",
+      "tags": ["PoolWithFunc", "Invoke", "результаты", "каналы"],
+      "level": "intermediate"
+    },
+    {
+      "file": "ants-performance-tuning.md",
+      "title": "Тюнинг производительности ants",
+      "description": "Выбор размера пула, PreAlloc, ExpiryDuration, Nonblocking, мониторинг.",
+      "tags": ["производительность", "тюнинг", "размер пула", "мониторинг"],
+      "level": "advanced"
+    },
+    {
+      "file": "ants-security-best-practices.md",
+      "title": "Безопасность ants: лучшие практики",
+      "description": "Обработка паник, graceful shutdown, WaitGroup, обратное давление, таймауты.",
+      "tags": ["безопасность", "best practices", "паника", "deadlock"],
+      "level": "advanced"
+    },
+    {
+      "file": "ants-gin-integration.md",
+      "title": "Интеграция ants с Gin",
+      "description": "Ограничение параллелизма через middleware, тяжёлые handler'ы, асинхронные задачи.",
+      "tags": ["gin", "интеграция", "middleware", "асинхронность"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/basic-pool.md",
+      "title": "Пример: Базовый пул с ожиданием",
+      "description": "Код basic-pool.go: создание пула и выполнение задач.",
+      "tags": ["пример", "базовый"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/pool-with-results.md",
+      "title": "Пример: Пул с возвратом результатов",
+      "description": "Код pool-with-results.go: получение квадратов чисел.",
+      "tags": ["пример", "результаты"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-ants-middleware.md",
+      "title": "Пример: Gin обработчик с пулом ants",
+      "description": "Код gin-ants-middleware.go: ограничение количества одновременных тяжёлых запросов.",
+      "tags": ["пример", "gin", "middleware"],
+      "level": "intermediate"
+    }
+  ]
+}
