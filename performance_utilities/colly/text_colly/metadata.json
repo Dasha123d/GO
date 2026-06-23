@@ -1,0 +1,69 @@
+{
+  "library": "github.com/gocolly/colly/v2",
+  "description": "Elegant web scraping and crawling framework for Go. Fast, modular, supports async, queues, proxies, and flexible parsing (CSS/XPath).",
+  "sections": [
+    {
+      "file": "colly-quick-start.md",
+      "title": "Быстрый старт: установка и первый краулер",
+      "description": "Установка, создание Collector, обработка HTML-элементов, Visit, базовые события.",
+      "tags": ["установка", "краулер", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "colly-collector-configuration.md",
+      "title": "Конфигурация коллектора",
+      "description": "Опции NewCollector, лимиты, таймауты, транспорт, User-Agent, прокси.",
+      "tags": ["конфигурация", "опции", "лимиты", "прокси"],
+      "level": "intermediate"
+    },
+    {
+      "file": "colly-extensions-usage.md",
+      "title": "Расширения Colly: редиректы, авторизация, куки, случайные задержки",
+      "description": "RandomUserAgent, Referer, редиректы, куки, basic auth, пагинация.",
+      "tags": ["расширения", "куки", "редиректы", "авторизация"],
+      "level": "intermediate"
+    },
+    {
+      "file": "colly-parsing-html.md",
+      "title": "Парсинг HTML с Colly",
+      "description": "CSS-селекторы, XPath, атрибуты, извлечение данных в структуры, JSON внутри скриптов.",
+      "tags": ["парсинг", "css", "xpath", "атрибуты"],
+      "level": "intermediate"
+    },
+    {
+      "file": "colly-queues-and-async.md",
+      "title": "Асинхронная работа и очереди запросов",
+      "description": "Асинхронный режим, Wait, очередь в памяти, Redis-очередь, graceful stop.",
+      "tags": ["асинхронность", "очереди", "redis", "воркеры"],
+      "level": "advanced"
+    },
+    {
+      "file": "colly-security-best-practices.md",
+      "title": "Этика и безопасность Colly: лучшие практики",
+      "description": "robots.txt, лимиты, User-Agent, обработка ошибок, законодательство, защита от банов.",
+      "tags": ["безопасность", "этика", "best practices", "robots.txt"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-crawler.md",
+      "title": "Пример: Базовый краулер",
+      "description": "Код basic-crawler.go: сбор книг с books.toscrape.com.",
+      "tags": ["пример", "краулер"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/scraper-with-storage.md",
+      "title": "Пример: Скрапер с сохранением в CSV",
+      "description": "Код scraper-with-storage.go: запись продуктов в файл.",
+      "tags": ["пример", "csv", "сохранение"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/async-queue.md",
+      "title": "Пример: Асинхронный краулер с Redis-очередью",
+      "description": "Код async-queue.go: масштабируемый обход с постоянной очередью.",
+      "tags": ["пример", "асинхронность", "redis"],
+      "level": "advanced"
+    }
+  ]
+}
