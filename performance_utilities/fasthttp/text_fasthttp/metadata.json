@@ -1,0 +1,83 @@
+{
+  "library": "github.com/valyala/fasthttp",
+  "description": "High-performance HTTP server and client for Go. Zero allocations on hot path, connection pooling, keep-alive, highly tunable.",
+  "sections": [
+    {
+      "file": "fasthttp-quick-start.md",
+      "title": "Быстрый старт: установка и первый сервер",
+      "description": "Установка, минимальный обработчик, запуск ListenAndServe, обработка путей.",
+      "tags": ["установка", "сервер", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "fasthttp-server-advanced.md",
+      "title": "Продвинутый сервер: конфигурация, TLS, graceful shutdown, WebSocket",
+      "description": "Настройка Server, ограничения, graceful shutdown, TLS, WebSocket, сжатие.",
+      "tags": ["сервер", "конфигурация", "TLS", "graceful", "WebSocket"],
+      "level": "advanced"
+    },
+    {
+      "file": "fasthttp-client.md",
+      "title": "HTTP-клиент в fasthttp",
+      "description": "Клиентские запросы, пул объектов, тайм-ауты, стриминг, keep-alive.",
+      "tags": ["клиент", "запросы", "пул", "тайм-ауты", "стриминг"],
+      "level": "intermediate"
+    },
+    {
+      "file": "fasthttp-performance-tuning.md",
+      "title": "Тюнинг производительности fasthttp",
+      "description": "Настройка Concurrency, буферов, keep-alive, zero-copy, сравнение с net/http.",
+      "tags": ["производительность", "тюнинг", "оптимизация", "буферы"],
+      "level": "advanced"
+    },
+    {
+      "file": "fasthttp-gin-comparison.md",
+      "title": "Fasthttp и Gin: сравнение и совместимость",
+      "description": "Сравнение с Gin, Fiber как альтернатива, миграция, когда выбрать чистый fasthttp.",
+      "tags": ["gin", "fiber", "сравнение", "миграция"],
+      "level": "intermediate"
+    },
+    {
+      "file": "fasthttp-security-best-practices.md",
+      "title": "Безопасность fasthttp: лучшие практики",
+      "description": "Ограничение размера, тайм-ауты, защита от Slowloris, заголовки, логирование.",
+      "tags": ["безопасность", "best practices", "Slowloris", "тайм-ауты"],
+      "level": "advanced"
+    },
+    {
+      "file": "fasthttp-middleware.md",
+      "title": "Middleware в fasthttp",
+      "description": "Создание цепочек middleware, примеры: логгер, CORS, recovery.",
+      "tags": ["middleware", "цепочка", "логгер", "CORS", "recovery"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/basic-server.md",
+      "title": "Пример: Базовый сервер с путями",
+      "description": "Код basic-server.go: минимальный сервер с ручной маршрутизацией.",
+      "tags": ["пример", "сервер"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/basic-client.md",
+      "title": "Пример: HTTP-клиент",
+      "description": "Код basic-client.go: GET-запрос с fasthttp.Do.",
+      "tags": ["пример", "клиент"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/fasthttp-router.md",
+      "title": "Пример: Использование fasthttprouter",
+      "description": "Код с маршрутизатором и параметрами путей.",
+      "tags": ["пример", "роутер", "fasthttprouter"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/fasthttp-middleware-example.md",
+      "title": "Пример: Цепочка middleware",
+      "description": "Код с логгером и цепочкой middleware.",
+      "tags": ["пример", "middleware"],
+      "level": "intermediate"
+    }
+  ]
+}
