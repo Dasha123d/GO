@@ -1,0 +1,69 @@
+{
+  "library": "github.com/json-iterator/go",
+  "description": "High-performance 100% compatible drop-in replacement for encoding/json with extensions, lazy parsing (Any), and custom codec registration.",
+  "sections": [
+    {
+      "file": "jsoniter-quick-start.md",
+      "title": "Быстрый старт: установка и замена encoding/json",
+      "description": "Установка, создание переменной json, первый маршалинг.",
+      "tags": ["установка", "замена", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "jsoniter-configuration.md",
+      "title": "Конфигурация jsoniter: API, режимы и тонкая настройка",
+      "description": "ConfigDefault, ConfigFastest, ConfigCompatibleWithStandardLibrary, Froze, настройка полей.",
+      "tags": ["конфигурация", "api", "режимы", "froze"],
+      "level": "intermediate"
+    },
+    {
+      "file": "jsoniter-advanced-usage.md",
+      "title": "Продвинутое использование: extensions, ленивый парсинг, Any",
+      "description": "RegisterTypeEncoder/Decoder, Any для обхода JSON, extra-пакеты, fuzzy decoders.",
+      "tags": ["расширения", "any", "ленивый", "кастомный кодек", "extra"],
+      "level": "advanced"
+    },
+    {
+      "file": "jsoniter-compatibility.md",
+      "title": "Совместимость с encoding/json",
+      "description": "Сравнение режимов, миграция, отличия в поведении, замена глобально.",
+      "tags": ["совместимость", "миграция", "encoding/json"],
+      "level": "intermediate"
+    },
+    {
+      "file": "jsoniter-gin-integration.md",
+      "title": "Интеграция jsoniter с Gin",
+      "description": "Кастомный рендер на основе BorrowStream, биндинг запросов, ленивый Any.",
+      "tags": ["gin", "рендер", "интеграция", "производительность"],
+      "level": "intermediate"
+    },
+    {
+      "file": "jsoniter-security-best-practices.md",
+      "title": "Безопасность jsoniter: лучшие практики",
+      "description": "Ограничение размера, экранирование HTML, выбор конфигурации, thread-safety.",
+      "tags": ["безопасность", "best practices", "DoS", "экранирование"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-usage.md",
+      "title": "Пример: Базовое использование jsoniter",
+      "description": "Код basic-usage.go: простой marshal/unmarshal с jsoniter.",
+      "tags": ["пример", "marshal", "unmarshal"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/gin-jsoniter-render.md",
+      "title": "Пример: Кастомный рендер jsoniter в Gin",
+      "description": "Код gin-jsoniter-render.go: использование BorrowStream.",
+      "tags": ["пример", "gin", "рендер"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/custom-encoder-decoder.md",
+      "title": "Пример: Регистрация пользовательских энкодера/декодера",
+      "description": "Код custom-encoder-decoder.go: кастомная сериализация Color.",
+      "tags": ["пример", "кастомный", "кодек"],
+      "level": "advanced"
+    }
+  ]
+}

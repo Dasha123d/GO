@@ -1,0 +1,69 @@
+{
+  "library": "github.com/mailru/easyjson",
+  "description": "Fast JSON serialization/deserialization for Go via code generation. Drop-in replacement with full encoding/json compatibility.",
+  "sections": [
+    {
+      "file": "easyjson-quick-start.md",
+      "title": "Быстрый старт: установка, кодогенерация и первый пример",
+      "description": "Установка easyjson и утилиты, генерация кода, использование MarshalJSON/UnmarshalJSON.",
+      "tags": ["установка", "кодогенерация", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "easyjson-generation.md",
+      "title": "Кодогенерация easyjson: флаги, теги и настройка",
+      "description": "Флаги easyjson, аннотации, go generate, snake_case, omitempty.",
+      "tags": ["кодогенерация", "флаги", "теги", "go generate"],
+      "level": "intermediate"
+    },
+    {
+      "file": "easyjson-advanced-usage.md",
+      "title": "Продвинутое использование: кастомные маршалеры, вложенные структуры",
+      "description": "Кастомный MarshalEasyJSON/UnmarshalEasyJSON, рекурсивная генерация, omitempty, raw message.",
+      "tags": ["кастомный", "маршалер", "вложенные", "raw"],
+      "level": "advanced"
+    },
+    {
+      "file": "easyjson-compatibility.md",
+      "title": "Совместимость с encoding/json и другими библиотеками",
+      "description": "Интерфейсы json.Marshaler, переход с encoding/json, отличия, поддержка Gin/Echo.",
+      "tags": ["совместимость", "json", "миграция", "gin"],
+      "level": "intermediate"
+    },
+    {
+      "file": "easyjson-gin-integration.md",
+      "title": "Интеграция easyjson с Gin",
+      "description": "Кастомный рендер для Gin, биндинг запросов, производительность.",
+      "tags": ["gin", "рендер", "интеграция", "производительность"],
+      "level": "intermediate"
+    },
+    {
+      "file": "easyjson-security-best-practices.md",
+      "title": "Безопасность easyjson: лучшие практики",
+      "description": "Синхронизация сгенерированного кода, защита от инъекций, валидация размера, CI/CD.",
+      "tags": ["безопасность", "best practices", "инъекции", "CI"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-marshal.md",
+      "title": "Пример: Базовый маршалинг/анмаршалинг easyjson",
+      "description": "Код basic-marshal.go с быстрой сериализацией.",
+      "tags": ["пример", "marshal", "unmarshal"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/gin-easyjson-render.md",
+      "title": "Пример: Кастомный рендер easyjson в Gin",
+      "description": "Код gin-easyjson-render.go с заменой рендера.",
+      "tags": ["пример", "gin", "рендер"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/custom-marshaler.md",
+      "title": "Пример: Кастомный easyjson-маршалер для времени",
+      "description": "Код custom-marshaler.go с реализацией MarshalEasyJSON/UnmarshalEasyJSON.",
+      "tags": ["пример", "кастомный", "время"],
+      "level": "advanced"
+    }
+  ]
+}
