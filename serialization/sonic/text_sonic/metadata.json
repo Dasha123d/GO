@@ -1,0 +1,76 @@
+{
+  "library": "github.com/bytedance/sonic",
+  "description": "Ultra-fast JSON library for Go: drop-in replacement for encoding/json with SIMD acceleration, AST, streaming and advanced configuration.",
+  "sections": [
+    {
+      "file": "sonic-quick-start.md",
+      "title": "Быстрый старт: установка и базовое использование",
+      "description": "Установка, замена json.Marshal/Unmarshal, первый пример.",
+      "tags": ["установка", "marshal", "unmarshal", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "sonic-configuration.md",
+      "title": "Конфигурация Sonic: Pretouch, API и тонкая настройка",
+      "description": "Pretouch, Config, Froze, опции анмаршалинга, потокобезопасность.",
+      "tags": ["config", "pretouch", "настройка", "froze", "опции"],
+      "level": "intermediate"
+    },
+    {
+      "file": "sonic-advanced-usage.md",
+      "title": "Продвинутое использование Sonic: AST, потоковая обработка, кастомные сериализаторы",
+      "description": "AST ноды, поиск/замена, потоковый декодер, Marshaler/Unmarshaler.",
+      "tags": ["ast", "поток", "decoder", "encoder", "кастомные"],
+      "level": "advanced"
+    },
+    {
+      "file": "sonic-compatibility.md",
+      "title": "Совместимость с encoding/json",
+      "description": "Сходства, различия, fallback на других платформах, миграция.",
+      "tags": ["совместимость", "encoding/json", "миграция", "fallback"],
+      "level": "intermediate"
+    },
+    {
+      "file": "sonic-security-best-practices.md",
+      "title": "Безопасность Sonic: лучшие практики",
+      "description": "Защита от инъекций, DoS, валидация полей, обновления, логирование.",
+      "tags": ["безопасность", "инъекции", "DoS", "валидация", "best practices"],
+      "level": "advanced"
+    },
+    {
+      "file": "sonic-gin-integration.md",
+      "title": "Интеграция Sonic с Gin: заменяем стандартный JSON-рендер",
+      "description": "Кастомный рендер Gin на Sonic, ускорение сериализации, биндинг запросов.",
+      "tags": ["gin", "рендер", "интеграция", "производительность"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/basic-marshal-unmarshal.md",
+      "title": "Пример: Базовый маршалинг/анмаршалинг",
+      "description": "Код basic-marshal-unmarshal.go: простое использование.",
+      "tags": ["пример", "marshal", "unmarshal"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/sonic-config-example.md",
+      "title": "Пример: Конфигурация с опциями",
+      "description": "Код с настройкой Config и MarshalIndent.",
+      "tags": ["пример", "config", "опции"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-sonic-render.md",
+      "title": "Пример: Замена рендера Gin на Sonic",
+      "description": "Код gin-sonic-render.go: кастомный Render для Gin.",
+      "tags": ["пример", "gin", "рендер"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/ast-node.md",
+      "title": "Пример: Манипуляция JSON через AST",
+      "description": "Код ast-node.go: парсинг, изменение и обратная сериализация.",
+      "tags": ["пример", "ast", "манипуляция"],
+      "level": "advanced"
+    }
+  ]
+}
