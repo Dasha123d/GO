@@ -1,5 +1,0 @@
-flutter_icons:
-  android: true
-  ios: true
-  image_path: tproger_mobile_app_assets/lib/config/app_icon.png
-  min_sdk_android: 19
