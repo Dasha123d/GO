@@ -1,0 +1,71 @@
+name: tproger_mobile_app
+description: Mobile app for tproger.ru
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ">=2.17.6 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.17.0
+  html: ^0.15.0
+  dio: ^4.0.6
+  logger: ^1.1.0
+  json_annotation: ^4.7.0
+  built_value: ^8.4.0
+  built_collection: ^5.1.1
+  injectable: ^1.5.3
+  injectable_generator: ^1.5.4
+  get_it: ^7.2.0
+  url_launcher: ^6.1.7
+  transparent_image: ^2.0.0
+  flutter_svg: ^1.1.6
+  equatable: ^2.0.5
+  redux: ^5.0.0
+  flutter_redux: ^0.10.0
+  redux_epics: ^0.15.1
+  google_fonts: ^3.0.1
+  flutter_native_splash: ^2.2.14
+  dropdown_button2: ^1.9.1
+  overlayment: ^0.2.1
+  collection: ^1.16.0
+  
+dev_dependencies:
+  flutter_lints: ^2.0.0
+  build_runner: ^2.2.0
+  built_value_generator: ^8.4.0
+  json_serializable: ^6.3.1
+  test: ^1.22.0
+  mocktail: ^0.3.0
+  http_mock_adapter: ^0.3.3
+  flutter_launcher_icons: ^0.11.0
+  rename: ^2.0.1
+  dio_logger: ^4.0.8+8
+  tproger_mobile_app_assets:
+    path: tproger_mobile_app_assets
+  
+flutter:
+  uses-material-design: true
+  assets:
+    - packages/tproger_mobile_app_assets/fonts/Inter-Medium.ttf
+    - packages/tproger_mobile_app_assets/fonts/Inter-Regular.ttf
+    - packages/tproger_mobile_app_assets/fonts/Inter-SemiBold.ttf
+    - packages/tproger_mobile_app_assets/images/eye.svg
+    - packages/tproger_mobile_app_assets/images/angry.svg
+    - packages/tproger_mobile_app_assets/images/bookmark.svg
+    - packages/tproger_mobile_app_assets/images/comment.svg
+    - packages/tproger_mobile_app_assets/images/laugh.svg
+    - packages/tproger_mobile_app_assets/images/like.svg
+    - packages/tproger_mobile_app_assets/images/surprise.svg
+    - packages/tproger_mobile_app_assets/images/think.svg
+    - packages/tproger_mobile_app_assets/images/sleeping_cat.svg
+    - packages/tproger_mobile_app_assets/images/telegram0.svg
+    - packages/tproger_mobile_app_assets/images/telegram1.svg
+    - packages/tproger_mobile_app_assets/images/arrow_up.svg
+    - packages/tproger_mobile_app_assets/images/trash.svg
+    - packages/tproger_mobile_app_assets/images/cross.svg
+    - packages/tproger_mobile_app_assets/images/default_avatar.png
