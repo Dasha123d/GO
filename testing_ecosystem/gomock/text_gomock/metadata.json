@@ -1,0 +1,62 @@
+{
+  "library": "go.uber.org/mock (gomock)",
+  "description": "Official Go mock framework. Generate type-safe mocks for interfaces, strict expectations, ordered calls, and flexible argument matchers.",
+  "sections": [
+    {
+      "file": "gomock-quick-start.md",
+      "title": "Быстрый старт: установка и первый мок",
+      "description": "Установка gomock и mockgen, генерация мока, использование ctrl и EXPECT.",
+      "tags": ["установка", "mockgen", "контроллер", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "gomock-controller-config.md",
+      "title": "Контроллер и его настройка",
+      "description": "NewController, Finish, WithContext, параллельные тесты.",
+      "tags": ["контроллер", "Finish", "настройка"],
+      "level": "intermediate"
+    },
+    {
+      "file": "gomock-mock-creation.md",
+      "title": "Создание моков: mockgen и go:generate",
+      "description": "Способы генерации, флаги mockgen, интеграция с go generate.",
+      "tags": ["mockgen", "генерация", "go:generate"],
+      "level": "intermediate"
+    },
+    {
+      "file": "gomock-expectations.md",
+      "title": "Регистрация ожиданий в gomock",
+      "description": "EXPECT, матчеры, Times/AnyTimes, InOrder, DoAndReturn, After.",
+      "tags": ["ожидания", "матчеры", "Times", "DoAndReturn"],
+      "level": "advanced"
+    },
+    {
+      "file": "gomock-best-practices.md",
+      "title": "Лучшие практики gomock",
+      "description": "Советы по строгим ожиданиям, CI проверки, адаптерам, DoAndReturn.",
+      "tags": ["best practices", "антипаттерны", "CI"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-mock.md",
+      "title": "Пример: Простой мок",
+      "description": "Код теста с моком репозитория.",
+      "tags": ["пример", "базовый"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/mock-with-times.md",
+      "title": "Пример: Ожидание количества вызовов",
+      "description": "Тест с Times(3) для пакетной операции.",
+      "tags": ["пример", "Times"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/mock-integration-test.md",
+      "title": "Пример: Интеграционный тест с моками",
+      "description": "Несколько моков с InOrder.",
+      "tags": ["пример", "InOrder", "интеграционный"],
+      "level": "advanced"
+    }
+  ]
+}
