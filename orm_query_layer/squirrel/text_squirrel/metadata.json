@@ -1,0 +1,62 @@
+{
+  "library": "github.com/Masterminds/squirrel",
+  "description": "Fluent SQL query builder for Go. Compose safe, parameterized SQL for PostgreSQL, MySQL, SQLite without string concatenation.",
+  "sections": [
+    {
+      "file": "squirrel-quick-start.md",
+      "title": "Быстрый старт: установка и первый запрос",
+      "description": "Установка, StatementBuilder, PlaceholderFormat, простой SELECT с ToSql.",
+      "tags": ["установка", "начало работы", "ToSql", "PlaceholderFormat"],
+      "level": "beginner"
+    },
+    {
+      "file": "squirrel-select-queries.md",
+      "title": "Построение SELECT-запросов",
+      "description": "Select, From, Where с мапами, Join, OrderBy, GroupBy, Limit, подзапросы.",
+      "tags": ["SELECT", "Where", "Join", "подзапросы"],
+      "level": "intermediate"
+    },
+    {
+      "file": "squirrel-insert-update-delete.md",
+      "title": "INSERT, UPDATE, DELETE",
+      "description": "Insert с RETURNING, массовая вставка, Update с Set/SetMap, Delete.",
+      "tags": ["INSERT", "UPDATE", "DELETE", "RETURNING"],
+      "level": "intermediate"
+    },
+    {
+      "file": "squirrel-advanced-features.md",
+      "title": "Продвинутые возможности",
+      "description": "Динамические запросы, Expr, разные placeholder, транзакции, сырые куски SQL.",
+      "tags": ["динамические", "Expr", "продвинутые", "транзакции"],
+      "level": "advanced"
+    },
+    {
+      "file": "squirrel-best-practices.md",
+      "title": "Лучшие практики squirrel",
+      "description": "Глобальный билдер, RETURNING, экранирование, безопасность, комбинация с sqlx.",
+      "tags": ["best practices", "безопасность", "sqlx"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-select.md",
+      "title": "Пример: Простой SELECT с фильтрацией",
+      "description": "Генерация SQL с условиями и сортировкой.",
+      "tags": ["пример", "SELECT"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/insert-with-returning.md",
+      "title": "Пример: INSERT с RETURNING (PostgreSQL)",
+      "description": "Вставка с возвратом id.",
+      "tags": ["пример", "INSERT", "RETURNING"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-squirrel-integration.md",
+      "title": "Пример: Интеграция с Gin",
+      "description": "Использование squirrel в веб-приложении с Gin и database/sql.",
+      "tags": ["пример", "gin", "интеграция"],
+      "level": "intermediate"
+    }
+  ]
+}
