@@ -1,0 +1,76 @@
+{
+  "library": "gorm.io/gorm",
+  "description": "The fantastic ORM library for Golang. Full-featured: associations, hooks, transactions, migrations, logger, and more.",
+  "sections": [
+    {
+      "file": "gorm-quick-start.md",
+      "title": "Быстрый старт: установка, подключение и первый CRUD",
+      "description": "Установка, подключение к БД, определение модели, AutoMigrate, базовые Create/Read/Update/Delete.",
+      "tags": ["установка", "подключение", "CRUD", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "gorm-models-and-migrations.md",
+      "title": "Модели и миграции",
+      "description": "Теги полей, gorm.Model, AutoMigrate, настройка конфигурации GORM.",
+      "tags": ["модели", "миграции", "теги", "AutoMigrate"],
+      "level": "intermediate"
+    },
+    {
+      "file": "gorm-queries.md",
+      "title": "Запросы в GORM",
+      "description": "Where, Order, Limit, Offset, Joins, агрегаты, сырые запросы.",
+      "tags": ["запросы", "Where", "Joins", "Raw SQL"],
+      "level": "intermediate"
+    },
+    {
+      "file": "gorm-associations.md",
+      "title": "Ассоциации: связи и предзагрузка",
+      "description": "BelongsTo, HasMany, ManyToMany, Preload, вложенная предзагрузка, Association Mode.",
+      "tags": ["ассоциации", "Preload", "HasMany", "BelongsTo"],
+      "level": "advanced"
+    },
+    {
+      "file": "gorm-transactions.md",
+      "title": "Транзакции",
+      "description": "Автоматическая транзакция, ручное управление, savepoints.",
+      "tags": ["транзакции", "Transaction", "SavePoint"],
+      "level": "intermediate"
+    },
+    {
+      "file": "gorm-hooks.md",
+      "title": "Хуки (жизненный цикл)",
+      "description": "BeforeCreate, AfterUpdate, BeforeSave, возврат ошибки, хуки ассоциаций.",
+      "tags": ["хуки", "BeforeCreate", "AfterFind"],
+      "level": "intermediate"
+    },
+    {
+      "file": "gorm-best-practices.md",
+      "title": "Лучшие практики GORM",
+      "description": "Миграции в проде, контекст, логирование медленных запросов, пул соединений.",
+      "tags": ["best practices", "производительность", "безопасность"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-crud.md",
+      "title": "Пример: Базовый CRUD",
+      "description": "Код создания, чтения, обновления, удаления пользователя.",
+      "tags": ["пример", "CRUD"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/preload-example.md",
+      "title": "Пример: Предзагрузка связей",
+      "description": "Preload Orders для пользователей.",
+      "tags": ["пример", "Preload"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-gorm-integration.md",
+      "title": "Пример: Интеграция GORM с Gin",
+      "description": "Передача *gorm.DB через middleware Gin.",
+      "tags": ["пример", "gin", "интеграция"],
+      "level": "intermediate"
+    }
+  ]
+}
