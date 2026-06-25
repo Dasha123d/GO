@@ -1,0 +1,69 @@
+{
+  "library": "github.com/uptrace/bun",
+  "description": "SQL-first ORM for Go with PostgreSQL, MySQL, SQLite support. Query builder, relations, eager loading, transactions, and migration tools.",
+  "sections": [
+    {
+      "file": "bun-quick-start.md",
+      "title": "Быстрый старт: установка и первый запрос",
+      "description": "Установка, подключение к БД, модель, первый SELECT/INSERT.",
+      "tags": ["установка", "подключение", "SELECT", "INSERT", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "bun-configuration.md",
+      "title": "Конфигурация bun: подключение, пулы, логирование",
+      "description": "Настройка пула соединений, QueryHook, логирование, диалекты.",
+      "tags": ["конфигурация", "пул", "логирование", "QueryHook"],
+      "level": "intermediate"
+    },
+    {
+      "file": "bun-query-builder.md",
+      "title": "Построитель запросов: SELECT, INSERT, UPDATE, DELETE",
+      "description": "CRUD-операции, Where, Order, Limit, сканирование значений, сырые запросы.",
+      "tags": ["запросы", "SELECT", "INSERT", "UPDATE", "DELETE"],
+      "level": "intermediate"
+    },
+    {
+      "file": "bun-relations-and-eager.md",
+      "title": "Отношения: HasMany, BelongsTo, Eager Loading",
+      "description": "Определение связей, Relation, условия при загрузке, M2M, вложенные.",
+      "tags": ["отношения", "HasMany", "Eager", "Relation"],
+      "level": "advanced"
+    },
+    {
+      "file": "bun-transactions.md",
+      "title": "Транзакции",
+      "description": "RunInTx, ручное управление, savepoints, изоляция.",
+      "tags": ["транзакции", "RunInTx", "savepoint"],
+      "level": "intermediate"
+    },
+    {
+      "file": "bun-best-practices.md",
+      "title": "Лучшие практики использования bun",
+      "description": "Контекст с таймаутом, N+1, eager loading, миграции, безопасность.",
+      "tags": ["best practices", "производительность", "безопасность"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-crud.md",
+      "title": "Пример: Полный CRUD",
+      "description": "Код с insert, select, update, delete.",
+      "tags": ["пример", "CRUD"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/relations-example.md",
+      "title": "Пример: Отношения HasMany",
+      "description": "Загрузка пользователей с заказами через Relation.",
+      "tags": ["пример", "отношения"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-bun-integration.md",
+      "title": "Пример: Интеграция bun с Gin",
+      "description": "Передача *bun.DB через middleware Gin.",
+      "tags": ["пример", "gin", "интеграция"],
+      "level": "intermediate"
+    }
+  ]
+}
