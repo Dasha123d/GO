@@ -1,0 +1,69 @@
+{
+  "library": "github.com/volatiletech/sqlboiler/v4",
+  "description": "Database-first ORM for Go. Generates type-safe models and query builders from an existing database schema. Supports PostgreSQL, MySQL, SQLite and more.",
+  "sections": [
+    {
+      "file": "sqlboiler-quick-start.md",
+      "title": "Быстрый старт: установка, генерация и первый код",
+      "description": "Установка SQLBoiler, конфигурация, генерация моделей, базовый CRUD.",
+      "tags": ["установка", "генерация", "CRUD", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "sqlboiler-models-structure.md",
+      "title": "Сгенерированные модели: структура и API",
+      "description": "Структура модели, методы Insert/Update/Delete, слайсы, колонки.",
+      "tags": ["модели", "структура", "API"],
+      "level": "intermediate"
+    },
+    {
+      "file": "sqlboiler-query-building.md",
+      "title": "Построитель запросов: Query Mods",
+      "description": "Where, OrderBy, Limit, Joins, агрегаты, Count, Bind, сырой SQL.",
+      "tags": ["запросы", "Query Mods", "Select", "Bind"],
+      "level": "intermediate"
+    },
+    {
+      "file": "sqlboiler-relationships-eager-loading.md",
+      "title": "Связи и Eager Loading",
+      "description": "Автоматическая генерация связей, Load, вложенная загрузка, Many-to-Many.",
+      "tags": ["связи", "Eager Loading", "Load", "отношения"],
+      "level": "advanced"
+    },
+    {
+      "file": "sqlboiler-transactions.md",
+      "title": "Транзакции",
+      "description": "Ручное управление, WithTx, передача контекста.",
+      "tags": ["транзакции", "WithTx"],
+      "level": "intermediate"
+    },
+    {
+      "file": "sqlboiler-best-practices.md",
+      "title": "Лучшие практики SQLBoiler",
+      "description": "CI генерация, внедрение зависимостей, Eager Loading, массовые вставки, тестирование.",
+      "tags": ["best practices", "CI", "производительность"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-crud.md",
+      "title": "Пример: Базовый CRUD",
+      "description": "Код с созданием, чтением, обновлением и удалением.",
+      "tags": ["пример", "CRUD"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/eager-loading-example.md",
+      "title": "Пример: Eager Loading",
+      "description": "Загрузка пользователей с заказами.",
+      "tags": ["пример", "Eager Loading"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-sqlboiler-integration.md",
+      "title": "Пример: Интеграция с Gin",
+      "description": "Использование SQLBoiler в веб-приложении.",
+      "tags": ["пример", "gin", "интеграция"],
+      "level": "intermediate"
+    }
+  ]
+}
