@@ -1,0 +1,1 @@
+INSERT INTO "models" ("int", "uint", "str", "time", "bool", "empty_str") VALUES (42, 42, 'hello', now(), true, '') RETURNING "int", "uint", "str", "time", "bool", "empty_str"
