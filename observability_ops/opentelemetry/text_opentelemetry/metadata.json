@@ -1,0 +1,69 @@
+{
+  "library": "go.opentelemetry.io/otel",
+  "description": "OpenTelemetry SDK for Go: distributed tracing, metrics, and logging with OTLP exporters, automatic instrumentation for Gin/gRPC/HTTP, and context propagation.",
+  "sections": [
+    {
+      "file": "opentelemetry-quick-start.md",
+      "title": "Быстрый старт: установка и первая трассировка",
+      "description": "Установка, запуск Jaeger, инициализация TracerProvider, создание спана.",
+      "tags": ["установка", "tracer", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "opentelemetry-tracing.md",
+      "title": "Трассировка: спаны, атрибуты, контекст",
+      "description": "Создание и настройка спанов, события, ошибки, SpanKind, сэмплирование.",
+      "tags": ["трассировка", "спаны", "атрибуты", "sampling"],
+      "level": "intermediate"
+    },
+    {
+      "file": "opentelemetry-metrics.md",
+      "title": "Метрики: счётчики, гистограммы, измерения",
+      "description": "Создание метрик, Counter, Histogram, ObservableGauge, экспортёр метрик.",
+      "tags": ["метрики", "counter", "histogram", "экспортёр"],
+      "level": "intermediate"
+    },
+    {
+      "file": "opentelemetry-logs.md",
+      "title": "Логирование в OpenTelemetry",
+      "description": "Корреляция с трассировкой, bridge для logrus/zap, будущий Logs API.",
+      "tags": ["логи", "trace_id", "корреляция"],
+      "level": "intermediate"
+    },
+    {
+      "file": "opentelemetry-gin-integration.md",
+      "title": "Интеграция OpenTelemetry с Gin",
+      "description": "Middleware otelgin, передача контекста, метрики HTTP.",
+      "tags": ["gin", "middleware", "интеграция"],
+      "level": "intermediate"
+    },
+    {
+      "file": "opentelemetry-best-practices.md",
+      "title": "Лучшие практики OpenTelemetry",
+      "description": "Сэмплирование, контекст, семантические конвенции, мониторинг экспортёра.",
+      "tags": ["best practices", "производительность", "безопасность"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-tracing.md",
+      "title": "Пример: Базовая трассировка",
+      "description": "Минимальное приложение с ручным созданием спана.",
+      "tags": ["пример", "трассировка"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/metrics-example.md",
+      "title": "Пример: Счётчик и гистограмма",
+      "description": "Экспорт кастомных метрик через OTLP.",
+      "tags": ["пример", "метрики"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-otel-integration.md",
+      "title": "Пример: Полная интеграция Gin + OTel",
+      "description": "Автоматическое инструментирование Gin с трассировкой и метриками.",
+      "tags": ["пример", "gin", "интеграция"],
+      "level": "intermediate"
+    }
+  ]
+}
