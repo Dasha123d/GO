@@ -1,0 +1,62 @@
+{
+  "library": "github.com/vektra/mockery/v3",
+  "description": "Code generation tool for creating mock implementations of Go interfaces using testify. Supports configuration files, expecter pattern, and automatic assertion cleanup.",
+  "sections": [
+    {
+      "file": "mockery-quick-start.md",
+      "title": "Быстрый старт: установка и первый мок",
+      "description": "Установка mockery, создание интерфейса, генерация мока и использование в тесте.",
+      "tags": ["установка", "генерация", "мок", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "mockery-configuration.md",
+      "title": "Конфигурация mockery через .mockery.yaml",
+      "description": "Файл .mockery.yaml, параметры (all, output, with-expecter), настройка пакетов.",
+      "tags": ["конфигурация", "yaml", "параметры"],
+      "level": "intermediate"
+    },
+    {
+      "file": "mockery-generating-mocks.md",
+      "title": "Генерация моков: CLI, go:generate, expecter",
+      "description": "Запуск из командной строки, интеграция с go generate, стиль expecter.",
+      "tags": ["генерация", "go:generate", "expecter"],
+      "level": "intermediate"
+    },
+    {
+      "file": "mockery-expectations-assertions.md",
+      "title": "Ожидания и утверждения в моках mockery",
+      "description": "Регистрация вызовов, Times/Once/Maybe, проверка порядка, After, ассерты.",
+      "tags": ["ожидания", "assert", "Times", "After"],
+      "level": "intermediate"
+    },
+    {
+      "file": "mockery-best-practices.md",
+      "title": "Лучшие практики использования mockery",
+      "description": "CI генерация, хранение в репозитории, expecter, изоляция, обновление версии.",
+      "tags": ["best practices", "CI", "expecter", "безопасность"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-mock.md",
+      "title": "Пример: Простейший мок с традиционным testify",
+      "description": "Ручное создание мока, On/Return, AssertExpectations.",
+      "tags": ["пример", "базовый", "testify"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/mock-with-expectations.md",
+      "title": "Пример: Мок с expecter-стилем",
+      "description": "Использование EXPECT(), автоматическая проверка ожиданий.",
+      "tags": ["пример", "expecter", "авто-assert"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/mock-testify-example.md",
+      "title": "Пример: Проверка порядка вызовов",
+      "description": "After, последовательность вызовов в транзакционном сценарии.",
+      "tags": ["пример", "порядок", "After"],
+      "level": "intermediate"
+    }
+  ]
+}
