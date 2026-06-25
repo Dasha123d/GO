@@ -1,0 +1,62 @@
+{
+  "library": "github.com/sqlc-dev/sqlc",
+  "description": "SQL compiler to type-safe Go. Write SQL, get generated structs and functions for PostgreSQL, MySQL, and SQLite. Zero ORM overhead, full SQL power.",
+  "sections": [
+    {
+      "file": "sqlc-quick-start.md",
+      "title": "Быстрый старт: установка, схема и первый запрос",
+      "description": "Установка sqlc, структура проекта, конфигурация, первый запрос с аннотациями, генерация и использование.",
+      "tags": ["установка", "конфигурация", "запросы", "генерация", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "sqlc-configuration.md",
+      "title": "Конфигурация sqlc: `sqlc.yaml` и `sqlc.json`",
+      "description": "Формат конфигурации, несколько наборов, нейминг, переопределение типов, опции генерации.",
+      "tags": ["конфигурация", "yaml", "типы", "overrides"],
+      "level": "intermediate"
+    },
+    {
+      "file": "sqlc-query-annotations.md",
+      "title": "Аннотации запросов: `:one`, `:many`, `:exec` и другие",
+      "description": "Обзор аннотаций, генерация структур параметров, sqlc.arg, IN/ANY клаузы.",
+      "tags": ["аннотации", "one", "many", "exec", "параметры"],
+      "level": "intermediate"
+    },
+    {
+      "file": "sqlc-advanced-features.md",
+      "title": "Продвинутые возможности: CTE, JOIN, enum, транзакции",
+      "description": "Вложенные структуры через sqlc.embed, CTE, batch, COPY, транзакции, кастомные типы.",
+      "tags": ["CTE", "JOIN", "embed", "batch", "транзакции", "enum"],
+      "level": "advanced"
+    },
+    {
+      "file": "sqlc-best-practices.md",
+      "title": "Лучшие практики sqlc",
+      "description": "CI проверка, разделение файлов, тестирование, мокирование через интерфейс, выбор драйвера.",
+      "tags": ["best practices", "CI", "тестирование", "мокирование"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-crud.md",
+      "title": "Пример: Базовый CRUD",
+      "description": "Полный код CRUD с использованием сгенерированных функций.",
+      "tags": ["пример", "CRUD"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/joins-and-subqueries.md",
+      "title": "Пример: JOIN и вложенные структуры",
+      "description": "Пример запроса с LEFT JOIN и sqlc.embed.",
+      "tags": ["пример", "JOIN", "embed"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-sqlc-integration.md",
+      "title": "Пример: Интеграция с Gin",
+      "description": "Использование sqlc в веб-приложении с Gin.",
+      "tags": ["пример", "gin", "интеграция"],
+      "level": "intermediate"
+    }
+  ]
+}
