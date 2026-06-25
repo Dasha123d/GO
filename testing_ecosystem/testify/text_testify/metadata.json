@@ -1,0 +1,69 @@
+{
+  "library": "github.com/stretchr/testify",
+  "description": "Comprehensive testing toolkit for Go with assertions, mocking, and test suites. The most popular testing helper library for Go.",
+  "sections": [
+    {
+      "file": "testify-quick-start.md",
+      "title": "Быстрый старт: установка и первое утверждение",
+      "description": "Установка testify, первый assert, require, mock, suite.",
+      "tags": ["установка", "assert", "require", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "testify-assert-api.md",
+      "title": "Пакет `assert`: мягкие утверждения",
+      "description": "Основные функции: Equal, Nil, True, Error, Contains, коллекции, паники.",
+      "tags": ["assert", "утверждения", "API"],
+      "level": "beginner"
+    },
+    {
+      "file": "testify-require-api.md",
+      "title": "Пакет `require`: жёсткие утверждения",
+      "description": "Отличия от assert, идентичный API, применение для предусловий.",
+      "tags": ["require", "утверждения", "прерывание"],
+      "level": "beginner"
+    },
+    {
+      "file": "testify-mock-api.md",
+      "title": "Пакет `mock`: создание заглушек",
+      "description": "On/Return, матчеры, AssertExpectations, порядок вызовов, функции-возвраты.",
+      "tags": ["mock", "моки", "заглушки", "тестирование"],
+      "level": "intermediate"
+    },
+    {
+      "file": "testify-suite-api.md",
+      "title": "Пакет `suite`: группы тестов и фикстуры",
+      "description": "SetupSuite/Teardown, SetupTest, запуск набора, assertions в suite.",
+      "tags": ["suite", "фикстуры", "группы", "Setup"],
+      "level": "intermediate"
+    },
+    {
+      "file": "testify-best-practices.md",
+      "title": "Лучшие практики testify",
+      "description": "Разделение require/assert, мокирование, сообщения об ошибках, порядок в suites.",
+      "tags": ["best practices", "советы", "антипаттерны"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-assert.md",
+      "title": "Пример: Базовое использование assert/require",
+      "description": "Тест с делением и проверкой ошибок.",
+      "tags": ["пример", "assert", "require"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/mock-example.md",
+      "title": "Пример: Мок с testify",
+      "description": "Создание и использование мока Greeter.",
+      "tags": ["пример", "mock", "мок"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/suite-example.md",
+      "title": "Пример: Suite с фикстурами",
+      "description": "Набор тестов с инициализацией счетчика.",
+      "tags": ["пример", "suite", "фикстуры"],
+      "level": "intermediate"
+    }
+  ]
+}
