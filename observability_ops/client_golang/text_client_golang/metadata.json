@@ -1,0 +1,69 @@
+{
+  "library": "github.com/prometheus/client_golang",
+  "description": "Official Prometheus instrumentation library for Go. Supports counters, gauges, histograms, summaries, labels, custom collectors, and an HTTP handler for metrics exposition.",
+  "sections": [
+    {
+      "file": "prometheus-quick-start.md",
+      "title": "Быстрый старт: установка и первые метрики",
+      "description": "Установка, создание счётчика с метками, регистрация, отдача метрик через /metrics.",
+      "tags": ["установка", "счётчик", "метрики", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "prometheus-metrics-types.md",
+      "title": "Типы метрик: Counter, Gauge, Histogram, Summary",
+      "description": "Описание и примеры использования всех четырёх типов метрик.",
+      "tags": ["Counter", "Gauge", "Histogram", "Summary"],
+      "level": "intermediate"
+    },
+    {
+      "file": "prometheus-labels-and-vecs.md",
+      "title": "Метки и векторные метрики",
+      "description": "Vec-типы, WithLabelValues, CurryWith, кардинальность меток, удаление старых рядов.",
+      "tags": ["метки", "Vec", "CurryWith", "кардинальность"],
+      "level": "intermediate"
+    },
+    {
+      "file": "prometheus-collectors-and-custom.md",
+      "title": "Collector'ы и кастомные метрики",
+      "description": "Интерфейс Collector, создание кастомного коллектора, реестры, Unregister.",
+      "tags": ["collector", "кастомный", "реестр"],
+      "level": "advanced"
+    },
+    {
+      "file": "prometheus-gin-integration.md",
+      "title": "Интеграция Prometheus с Gin",
+      "description": "Middleware для сбора HTTP-метрик (счётчик + гистограмма), отдача /metrics.",
+      "tags": ["gin", "middleware", "интеграция"],
+      "level": "intermediate"
+    },
+    {
+      "file": "prometheus-best-practices.md",
+      "title": "Лучшие практики Prometheus в Go",
+      "description": "Именование, кардинальность меток, выбор гистограмм vs summary, тестирование, производительность.",
+      "tags": ["best practices", "именование", "производительность"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-metrics.md",
+      "title": "Пример: Простые метрики",
+      "description": "Минимальный сервер с одним счётчиком.",
+      "tags": ["пример", "базовый"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/custom-collector.md",
+      "title": "Пример: Кастомный коллектор для версии",
+      "description": "Реализация Collector, отдающего версию приложения.",
+      "tags": ["пример", "collector"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/gin-prometheus-middleware.md",
+      "title": "Пример: Middleware для Gin с метриками",
+      "description": "Автоматический сбор HTTP-метрик в Gin-приложении.",
+      "tags": ["пример", "gin", "middleware"],
+      "level": "intermediate"
+    }
+  ]
+}
