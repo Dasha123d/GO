@@ -1,1 +1,0 @@
-SELECT DISTINCT id FROM "t";

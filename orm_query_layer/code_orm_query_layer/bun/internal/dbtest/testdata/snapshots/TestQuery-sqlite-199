@@ -1,1 +1,0 @@
-SELECT * WHERE (name IN ('foo', 'bar'))

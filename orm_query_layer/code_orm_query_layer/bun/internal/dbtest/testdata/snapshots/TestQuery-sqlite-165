@@ -1,1 +1,0 @@
-UPDATE "accounts" AS "accounts" SET "is_active" = FALSE WHERE ("accounts"."id" = 1)

@@ -1,1 +1,0 @@
-/* test */ DELETE FROM `models` AS `model` WHERE (`model`.`id` = NULL)

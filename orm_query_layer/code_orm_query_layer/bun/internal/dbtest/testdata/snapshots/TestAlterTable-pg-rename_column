@@ -1,1 +1,0 @@
-ALTER TABLE "hobbies"."movies" RENAME COLUMN "has_oscar" TO "has_awards"

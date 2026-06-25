@@ -1,1 +1,0 @@
-CREATE TABLE "hobbies"."movies" ("id" VARCHAR, "director" VARCHAR NOT NULL, "budget" INTEGER, "release_date" TIMESTAMPTZ, "has_oscar" BOOLEAN, "genre" VARCHAR)

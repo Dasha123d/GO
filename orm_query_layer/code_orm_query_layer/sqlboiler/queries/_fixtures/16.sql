@@ -1,1 +1,0 @@
-SELECT "cats".* FROM "cats" LEFT JOIN dogs d on d.cat_id = cats.id;
