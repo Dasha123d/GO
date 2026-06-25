@@ -1,0 +1,69 @@
+{
+  "library": "github.com/rs/zerolog",
+  "description": "Zero-allocation JSON logger for Go with chaining API. High performance, level sampling, hooks, console writer, and easy integration with web frameworks.",
+  "sections": [
+    {
+      "file": "zerolog-quick-start.md",
+      "title": "Быстрый старт: установка и первые логи",
+      "description": "Установка, глобальный логгер, цепочечный синтаксис, уровни, ConsoleWriter.",
+      "tags": ["установка", "начало работы", "Msg", "уровни"],
+      "level": "beginner"
+    },
+    {
+      "file": "zerolog-configuration.md",
+      "title": "Конфигурация zerolog: writer, уровни, форматы",
+      "description": "Создание кастомного логгера, MultiLevelWriter, ConsoleWriter, динамический уровень.",
+      "tags": ["конфигурация", "writer", "уровни", "форматы"],
+      "level": "intermediate"
+    },
+    {
+      "file": "zerolog-context-fields.md",
+      "title": "Контекстные поля и обогащение логов",
+      "description": "With, глобальный контекст, временные поля, Dict, передача логгера с request_id.",
+      "tags": ["контекст", "поля", "With", "request_id"],
+      "level": "intermediate"
+    },
+    {
+      "file": "zerolog-sampling-and-hooks.md",
+      "title": "Сэмплирование и хуки",
+      "description": "BasicSampler, BurstSampler, создание собственного сэмплера, хуки (Sentry, syslog).",
+      "tags": ["сэмплирование", "хуки", "Sentry"],
+      "level": "advanced"
+    },
+    {
+      "file": "zerolog-gin-integration.md",
+      "title": "Интеграция zerolog с Gin",
+      "description": "Middleware логирования, инъекция логгера в контекст, обработка паник.",
+      "tags": ["gin", "middleware", "интеграция"],
+      "level": "intermediate"
+    },
+    {
+      "file": "zerolog-best-practices.md",
+      "title": "Лучшие практики zerolog",
+      "description": "Msg в конце цепочки, ObjectMarshaler, осторожность с Fatal, сэмплирование, безопасность.",
+      "tags": ["best practices", "безопасность", "тестирование"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-logger.md",
+      "title": "Пример: Базовый логгер с консольным выводом",
+      "description": "Код с настройкой консольного вывода и несколькими сообщениями.",
+      "tags": ["пример", "базовый"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/json-logger.md",
+      "title": "Пример: JSON-логгер с контекстными полями",
+      "description": "Создание кастомного логгера и вывод JSON.",
+      "tags": ["пример", "JSON", "контекст"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/gin-zerolog-middleware.md",
+      "title": "Пример: Middleware zerolog для Gin",
+      "description": "Интеграция с веб-фреймворком Gin.",
+      "tags": ["пример", "gin", "middleware"],
+      "level": "intermediate"
+    }
+  ]
+}
