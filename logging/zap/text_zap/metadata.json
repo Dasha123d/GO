@@ -1,0 +1,69 @@
+{
+  "library": "go.uber.org/zap",
+  "description": "High-performance structured logging library for Go. Offers typed Logger for zero-allocation logging and SugaredLogger for convenience, with flexible configuration, sampling, and multi-output.",
+  "sections": [
+    {
+      "file": "zap-quick-start.md",
+      "title": "Быстрый старт: установка и первые логи",
+      "description": "Установка, NewProduction/NewDevelopment, базовый синтаксис Logger и SugaredLogger.",
+      "tags": ["установка", "начало работы", "NewProduction"],
+      "level": "beginner"
+    },
+    {
+      "file": "zap-configuration.md",
+      "title": "Конфигурация zap: пресеты, кастомный config, энкодеры",
+      "description": "Кастомизация через Config, EncoderConfig, несколько output'ов, динамический уровень.",
+      "tags": ["конфигурация", "encoder", "output", "AtomicLevel"],
+      "level": "intermediate"
+    },
+    {
+      "file": "zap-sugared-vs-structured.md",
+      "title": "SugaredLogger и структурированный Logger",
+      "description": "Сравнение двух стилей, производительность, когда что использовать.",
+      "tags": ["SugaredLogger", "производительность", "стиль"],
+      "level": "intermediate"
+    },
+    {
+      "file": "zap-performance-tuning.md",
+      "title": "Тюнинг производительности zap",
+      "description": "Избегание Any, ObjectMarshaler, ленивые вычисления, сэмплирование.",
+      "tags": ["производительность", "сэмплирование", "ObjectMarshaler"],
+      "level": "advanced"
+    },
+    {
+      "file": "zap-gin-integration.md",
+      "title": "Интеграция zap с Gin",
+      "description": "Middleware для логирования HTTP-запросов, инъекция логгера, request ID.",
+      "tags": ["gin", "middleware", "интеграция"],
+      "level": "intermediate"
+    },
+    {
+      "file": "zap-best-practices.md",
+      "title": "Лучшие практики zap",
+      "description": "Sync, контекстные поля, ленивые вычисления, тестирование, выбор стиля.",
+      "tags": ["best practices", "безопасность", "тестирование"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-logger.md",
+      "title": "Пример: Базовый структурированный Logger",
+      "description": "Код с NewProduction и типизированными полями.",
+      "tags": ["пример", "базовый"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/sugared-logger.md",
+      "title": "Пример: SugaredLogger",
+      "description": "Пример Infow/Infof в development-режиме.",
+      "tags": ["пример", "sugar"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/gin-zap-middleware.md",
+      "title": "Пример: Middleware Zap для Gin",
+      "description": "Полный код middleware с логированием HTTP-запросов.",
+      "tags": ["пример", "gin", "middleware"],
+      "level": "intermediate"
+    }
+  ]
+}
