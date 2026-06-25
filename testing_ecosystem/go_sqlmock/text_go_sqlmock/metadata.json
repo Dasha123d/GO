@@ -1,0 +1,69 @@
+{
+  "library": "github.com/DATA-DOG/go-sqlmock",
+  "description": "SQL mock driver for Go to test database interactions without a real database. Supports queries, exec, prepared statements, transactions, and GORM.",
+  "sections": [
+    {
+      "file": "sqlmock-quick-start.md",
+      "title": "Быстрый старт: мокируем SQL‑запросы в тестах",
+      "description": "Установка, создание mock, ExpectQuery, ExpectExec, WillReturnRows, проверка ожиданий.",
+      "tags": ["установка", "mock", "ExpectQuery", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "sqlmock-advanced-expectations.md",
+      "title": "Продвинутые ожидания: аргументы, ошибки, задержки",
+      "description": "AnyArg, WillReturnError, WillDelayFor, порядок ожиданий, QueryMatcherRegexp.",
+      "tags": ["аргументы", "ошибки", "задержки", "матчеры"],
+      "level": "intermediate"
+    },
+    {
+      "file": "sqlmock-transactions.md",
+      "title": "Транзакции: мокируем BEGIN, COMMIT, ROLLBACK",
+      "description": "ExpectBegin, ExpectCommit, ExpectRollback, проверка завершения.",
+      "tags": ["транзакции", "begin", "commit", "rollback"],
+      "level": "intermediate"
+    },
+    {
+      "file": "sqlmock-prepared-statements.md",
+      "title": "Подготовленные выражения (prepared statements)",
+      "description": "ExpectPrepare, цепочки ExpectQuery, ошибки Prepare, ExpectClose.",
+      "tags": ["prepare", "stmt", "подготовленные выражения"],
+      "level": "intermediate"
+    },
+    {
+      "file": "sqlmock-gorm-integration.md",
+      "title": "Интеграция с GORM",
+      "description": "Настройка GORM с sqlmock, regexp для GORM-запросов, хелпер NewGormMock.",
+      "tags": ["gorm", "интеграция", "regexp"],
+      "level": "advanced"
+    },
+    {
+      "file": "sqlmock-best-practices.md",
+      "title": "Лучшие практики и безопасность sqlmock",
+      "description": "ExpectationsWereMet, строгие матчеры, изоляция тестов, проверка ошибок.",
+      "tags": ["best practices", "тестирование", "безопасность"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-query.md",
+      "title": "Пример: Базовый Query и Exec",
+      "description": "Код теста с GetUser и sqlmock.",
+      "tags": ["пример", "query", "exec"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/gorm-example.md",
+      "title": "Пример: Мокирование GORM",
+      "description": "Код теста с GORM First и sqlmock.",
+      "tags": ["пример", "gorm"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/transaction-test.md",
+      "title": "Пример: Тестирование транзакций",
+      "description": "Код тестов с commit и rollback.",
+      "tags": ["пример", "транзакции"],
+      "level": "intermediate"
+    }
+  ]
+}
