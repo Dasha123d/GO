@@ -1,0 +1,62 @@
+{
+  "library": "github.com/grafana/grafana-plugin-sdk-go",
+  "description": "Official Grafana SDK for building backend plugins in Go. Supports datasources, health checks, data frames, streaming, and diagnostics.",
+  "sections": [
+    {
+      "file": "grafana-quick-start.md",
+      "title": "Быстрый старт: установка, шаблон и первый плагин",
+      "description": "Создание минимального datasource плагина, структура plugin.json, запуск Serve.",
+      "tags": ["установка", "plugin", "datasource", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "grafana-backend-datasource.md",
+      "title": "Создание backend datasource",
+      "description": "Реализация QueryData, CheckHealth, менеджер экземпляров.",
+      "tags": ["datasource", "QueryData", "health"],
+      "level": "intermediate"
+    },
+    {
+      "file": "grafana-data-frames.md",
+      "title": "Работа с Data Frames",
+      "description": "Формирование фреймов данных, поля, метаданные, лейблы.",
+      "tags": ["data frames", "поля", "time series"],
+      "level": "intermediate"
+    },
+    {
+      "file": "grafana-health-checks.md",
+      "title": "Health Check",
+      "description": "Реализация проверки здоровья источника данных.",
+      "tags": ["health", "status"],
+      "level": "intermediate"
+    },
+    {
+      "file": "grafana-best-practices.md",
+      "title": "Лучшие практики",
+      "description": "Логирование, кеширование, контекст, тестирование, сборка.",
+      "tags": ["best practices", "логирование", "тестирование"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/simple-datasource.md",
+      "title": "Пример: Простой datasource",
+      "description": "Код плагина, возвращающего статический ответ.",
+      "tags": ["пример", "datasource"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/data-frame-example.md",
+      "title": "Пример: Формирование data frame",
+      "description": "Создание временного ряда с метками.",
+      "tags": ["пример", "data frames"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-grafana-integration.md",
+      "title": "Пример: Интеграция с Gin",
+      "description": "Запуск HTTP-сервера внутри плагина для дополнительных задач.",
+      "tags": ["пример", "gin", "интеграция"],
+      "level": "advanced"
+    }
+  ]
+}

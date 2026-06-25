@@ -1,0 +1,62 @@
+{
+  "library": "go.opentelemetry.io/otel + Jaeger exporter",
+  "description": "Distributed tracing for Go services using OpenTelemetry and Jaeger. Setup, span creation, Gin integration, and production best practices.",
+  "sections": [
+    {
+      "file": "jaeger-quick-start.md",
+      "title": "Быстрый старт: установка и первый трейс",
+      "description": "Запуск Jaeger, установка пакетов, инициализация трассировщика, создание спана.",
+      "tags": ["установка", "tracer", "span", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "jaeger-setup-and-config.md",
+      "title": "Настройка Jaeger-экспортера",
+      "description": "OTLP-экспортер, TracerProvider, сэмплирование, переменные окружения.",
+      "tags": ["настройка", "экспортер", "sampling", "конфигурация"],
+      "level": "intermediate"
+    },
+    {
+      "file": "jaeger-span-creation.md",
+      "title": "Создание спанов и работа с ними",
+      "description": "Атрибуты, события, ошибки, вложенные спаны, Span Kind.",
+      "tags": ["спаны", "атрибуты", "события", "ошибки"],
+      "level": "intermediate"
+    },
+    {
+      "file": "jaeger-gin-integration.md",
+      "title": "Интеграция Jaeger с Gin",
+      "description": "Middleware otelgin, ручное создание спанов, передача контекста.",
+      "tags": ["gin", "middleware", "интеграция"],
+      "level": "intermediate"
+    },
+    {
+      "file": "jaeger-best-practices.md",
+      "title": "Лучшие практики Jaeger + OpenTelemetry",
+      "description": "Сэмплирование, корреляция логов, именование сервисов, безопасность.",
+      "tags": ["best practices", "производительность", "логирование"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-tracing.md",
+      "title": "Пример: Простой трейсинг",
+      "description": "Минимальное приложение с ручным созданием спанов.",
+      "tags": ["пример", "базовый"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/gin-jaeger-middleware.md",
+      "title": "Пример: Middleware для Gin",
+      "description": "Автоматическое инструментирование HTTP-запросов.",
+      "tags": ["пример", "gin"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/multiple-services.md",
+      "title": "Пример: Трейсинг между сервисами",
+      "description": "Передача контекста через HTTP-заголовки.",
+      "tags": ["пример", "межсервисный"],
+      "level": "advanced"
+    }
+  ]
+}
