@@ -1,0 +1,69 @@
+{
+  "library": "entgo.io/ent",
+  "description": "Code-generation based ORM for Go. Entity framework with schema definition, type-safe query builder, relations, eager loading, and transaction management.",
+  "sections": [
+    {
+      "file": "ent-quick-start.md",
+      "title": "Быстрый старт: установка, схема и первый клиент",
+      "description": "Установка, создание схемы User, генерация кода, подключение, Create/Get/Update/Delete.",
+      "tags": ["установка", "схема", "CRUD", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "ent-schemas-and-generation.md",
+      "title": "Схемы и кодогенерация",
+      "description": "Поля, индексы, edges, аннотации, хуки, команда ent generate.",
+      "tags": ["схема", "поля", "edges", "генерация"],
+      "level": "intermediate"
+    },
+    {
+      "file": "ent-query-builder.md",
+      "title": "Построитель запросов: fluent API",
+      "description": "Select с условиями, пагинация, агрегация, insert/update/delete, batch-операции.",
+      "tags": ["запросы", "Query", "Create", "Update", "Delete"],
+      "level": "intermediate"
+    },
+    {
+      "file": "ent-relations-and-eager-loading.md",
+      "title": "Связи и Eager Loading",
+      "description": "Определение edges, создание связей, With…, фильтрация по связям, вложенная загрузка.",
+      "tags": ["связи", "edges", "Eager", "With"],
+      "level": "advanced"
+    },
+    {
+      "file": "ent-transactions.md",
+      "title": "Транзакции",
+      "description": "WithTx, ручное управление, savepoints, распространение через контекст.",
+      "tags": ["транзакции", "WithTx", "savepoint"],
+      "level": "intermediate"
+    },
+    {
+      "file": "ent-best-practices.md",
+      "title": "Лучшие практики ent",
+      "description": "Миграции через atlas, eager loading, контекст с таймаутом, prepared statements, хуки.",
+      "tags": ["best practices", "миграции", "производительность", "безопасность"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-crud.md",
+      "title": "Пример: Полный CRUD",
+      "description": "Код создания, чтения, обновления, удаления пользователя.",
+      "tags": ["пример", "CRUD"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/relationships.md",
+      "title": "Пример: Связи User -> Pets",
+      "description": "Загрузка пользователей с питомцами.",
+      "tags": ["пример", "связи"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-ent-integration.md",
+      "title": "Пример: Интеграция с Gin",
+      "description": "Передача клиента ent через middleware Gin.",
+      "tags": ["пример", "gin", "интеграция"],
+      "level": "intermediate"
+    }
+  ]
+}
