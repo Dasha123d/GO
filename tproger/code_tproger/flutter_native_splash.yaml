@@ -1,0 +1,9 @@
+flutter_native_splash:
+  android: true
+  ios: true
+  fullscreen: true
+  image: tproger_mobile_app_assets/lib/config/splashscreen_icon.png
+  color: "#2aa59f"
+  android_12:
+    color: "#2aa59f"
+    image: tproger_mobile_app_assets/lib/config/splashscreen_icon.png

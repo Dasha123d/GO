@@ -1,0 +1,205 @@
+{
+    "estimateText": "Оценить",
+    "@estimateText": {},
+
+    "weCouldNotFindPostsText": "У нас не получилось найти посты по вашим тегам, уменьшите их количество или сбросьте фильтр.",
+    "@weCouldNotFindPostsText": {},
+
+    "orFindInOurTelegramChannelsText": "Или поищите в наших Telegram-каналах:",
+    "@orFindInOurTelegramChannelsText": {},
+
+    "readUsInTelegramText": "Читать нас в Telegram",
+    "@readUsInTelegramText": {},
+
+    "newText": "Новое",
+    "@newText": {},
+
+    "hotText": "Горячее",
+    "@hotText": {},
+
+    "topOfWeekText": "Лучшее за неделю",
+    "@topOfWeekText": {},
+
+    "topOfMonthText": "Лучшее за месяц",
+    "@topOfMonthText": {},
+
+    "topOfTopText": "Лучшее за все время",
+    "@topOfTopText": {},
+
+    "filterText": "Фильтр",
+    "@filterText": {},
+
+    "cleanOutText": "Очистить",
+    "@cleanOutText": {},
+
+    "applyText": "Применить",
+    "@applyText": {},
+
+    "rubricsText": "Рубрики",
+    "@rubricsText": {},
+
+    "forBeginnersText": "Для начинающих",
+    "@forBeginnersText": {},
+
+    "languagesText": "Языки",
+    "@languagesText": {},
+
+    "themesText": "Темы",
+    "@themesText": {},
+
+    "allSiteText": "Весь сайт",
+    "@allSiteText": {},
+
+    "stubyPlansText": "Планы обучения",
+    "@stubyPlansText": {},
+
+    "tasksText": "Задачки",
+    "@tasksText": {},
+
+    "quizzesText": "Викторины",
+    "@quizzesText": {},
+
+    "booksText": "Книги",
+    "@booksText": {},
+
+    "videoText": "Видео",
+    "@v": {},
+
+    "shortAboutMainText": "Коротко о главном",
+    "@shortAboutMainText": {},
+
+    "answersOfExpertsText": "Ответы экспертов",
+    "@answersOfExpertsText": {},
+
+    "articlesText": "Статьи",
+    "@articlesText": {},
+
+    "translationsText": "Переводы",
+    "@translationsText": {},
+
+    "selectionsText": "Подборки",
+    "@selectionsText": {},
+
+    "humorText": "Юмор",
+    "@humorText": {},
+
+    "interviewText0": "Интервью",
+    "@interviewText0": {},
+
+    "pythonText": "Python",
+    "@pythonText": {},
+
+    "javaText": "Java",
+    "@javaText": {},
+
+    "cPlusPlusText": "C++",
+    "@cPlusPlusText": {},
+
+    "cSharpText": "C#",
+    "@cSharpText": {},
+
+    "javaScriptText": "JavaScript",
+    "@javaScriptText": {},
+
+    "cssText": "CSS",
+    "@cssText": {},
+
+    "webAssemblyText": "WebAssembly",
+    "@webAssemblyText": {},
+
+    "reactText": "React",
+    "@reactText": {},
+
+    "phpText": "PHP",
+    "@phpText": {},
+
+    "nodeJsText": "Node.js",
+    "@nodeJsText": {},
+
+    "sqlText": "SQL",
+    "@sqlText": {},
+
+    "mySqlText": "MySQL",
+    "@mySqlText": {},
+
+    "golangText": "Golang",
+    "@golangText": {},
+
+    "dockerText": "Docker",
+    "@dockerText": {},
+
+    "swiftText": "Swift",
+    "@swiftText": {},
+
+    "djangoText": "Django",
+    "@djangoText": {},
+
+    "dotNetText": ".NET",
+    "@dotNetText": {},
+
+    "perlText": "Perl",
+    "@perlText": {},
+
+    "objectiveCText": "Objective-C",
+    "@objectiveCText": {},
+
+    "rLanguageText": "Язык R",
+    "@rLanguageText": {},
+
+    "assemblerLanguageText": "Язык ассемблера",
+    "@assemblerLanguageText": {},
+    
+    "cLanguageText": "Язык Си",
+    "@cLanguageText": {},
+
+    "algorithmsAndDataStructuresText": "Алгоритмы и структуры данных",
+    "@algorithmsAndDataStructuresText": {},
+
+    "designPatternsText": "Паттерны проектирования",
+    "@designPatternsText": {},
+
+    "interviewText1": "Собеседование",
+    "@interviewText1": {},
+
+    "machineLearningText": "Машинное обучение",
+    "@machineLearningText": {},
+
+    "developmentMethodologiesText": "Методологии разработки",
+    "@developmentMethodologiesText": {},
+
+    "neuralNetworksText": "Нейронные сети",
+    "@neuralNetworksText": {},
+
+    "artificialIntelligenceText": "Искуственный интеллект",
+    "@artificialIntelligenceText": {},
+
+    "designOfInterfacesAndUxText": "Дизайн интерфейсов и UX",
+    "@designOfInterfacesAndUxText": {},
+
+    "dataScienceText": "Data Science",
+    "@dataScienceText": {},
+
+    "systemAdministrationText": "Системное администрирование",
+    "@systemAdministrationText": {},
+
+    "webDevelopmentText": "Веб-разработка",
+    "@webDevelopmentText": {},
+
+    "gameDevelopmentText": "Разработка игр",
+    "@gameDevelopmentText": {},
+
+    "databasesText": "Базы данных",
+    "@databasesText": {},
+
+    "mobileDevelopmentText": "Мобильная разработка",
+    "@mobileDevelopmentText": {},
+
+    "botsText": "Боты",
+    "@botsText": {},
+
+    "advicesText": "Советы",
+    "@advicesText": {},
+
+    "programmingStudyText": "Обучение программированию",
+    "@programmingStudyText": {}
+}
