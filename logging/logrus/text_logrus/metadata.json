@@ -1,0 +1,69 @@
+{
+  "library": "github.com/sirupsen/logrus",
+  "description": "Structured logger for Go. Support for levels, hooks, multiple formatters (text, JSON), and easy integration with web frameworks.",
+  "sections": [
+    {
+      "file": "logrus-quick-start.md",
+      "title": "Быстрый старт: установка и первый лог",
+      "description": "Установка, глобальный логгер, создание экземпляра, базовые уровни.",
+      "tags": ["установка", "логгер", "уровни", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "logrus-fields-and-formatting.md",
+      "title": "Поля и форматеры: JSON, текст, кастом",
+      "description": "WithFields, JSON/Text форматтеры, настройка FieldMap, кастомный Formatter.",
+      "tags": ["форматирование", "JSON", "поля", "WithFields"],
+      "level": "intermediate"
+    },
+    {
+      "file": "logrus-levels-and-filtering.md",
+      "title": "Уровни логирования и фильтрация",
+      "description": "SetLevel, ParseLevel, отдельные логгеры с разными уровнями, подавление вывода.",
+      "tags": ["уровни", "фильтрация", "SetLevel"],
+      "level": "intermediate"
+    },
+    {
+      "file": "logrus-hooks.md",
+      "title": "Хуки: расширение возможностей логирования",
+      "description": "Интерфейс Hook, создание своего хука (файл, сеть), популярные сторонние хуки.",
+      "tags": ["хуки", "hook", "расширения", "Elasticsearch"],
+      "level": "advanced"
+    },
+    {
+      "file": "logrus-gin-integration.md",
+      "title": "Интеграция Logrus с Gin",
+      "description": "Замена логгера Gin, middleware с полями, инъекция логгера в контекст.",
+      "tags": ["gin", "middleware", "интеграция"],
+      "level": "intermediate"
+    },
+    {
+      "file": "logrus-best-practices.md",
+      "title": "Лучшие практики Logrus",
+      "description": "Структурированные поля, уровни, безопасность, конфиденциальность, тестирование.",
+      "tags": ["best practices", "антипаттерны", "безопасность"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-logger.md",
+      "title": "Пример: Базовое использование Logrus",
+      "description": "Код с настройкой уровня, формата и выводом сообщений.",
+      "tags": ["пример", "базовый"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/json-formatter.md",
+      "title": "Пример: JSON-формат с настройками",
+      "description": "Пример с JSON-форматтером и FieldMap.",
+      "tags": ["пример", "JSON"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-logrus-middleware.md",
+      "title": "Пример: Middleware для Gin с Logrus",
+      "description": "Интеграция логгера в Gin-обработчики.",
+      "tags": ["пример", "gin", "middleware"],
+      "level": "intermediate"
+    }
+  ]
+}
