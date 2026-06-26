@@ -1,0 +1,62 @@
+{
+  "library": "github.com/hashicorp/terraform-plugin-sdk/v2",
+  "description": "Go SDK for building Terraform providers. Define schemas, CRUD operations, data sources, and acceptance tests.",
+  "sections": [
+    {
+      "file": "terraform-quick-start.md",
+      "title": "Быстрый старт: установка, провайдер и первый ресурс",
+      "description": "Создание минимального провайдера с ресурсом, запуск плагина.",
+      "tags": ["установка", "начало работы", "ресурс"],
+      "level": "beginner"
+    },
+    {
+      "file": "terraform-schema-and-data-sources.md",
+      "title": "Схема провайдера и Data Sources",
+      "description": "Конфигурация провайдера, типы полей, создание data sources.",
+      "tags": ["схема", "провайдер", "data source"],
+      "level": "intermediate"
+    },
+    {
+      "file": "terraform-resource-lifecycle.md",
+      "title": "Жизненный цикл ресурса: CRUD, импорт и диффы",
+      "description": "Операции Create/Read/Update/Delete, импорт, CustomizeDiff, миграции состояния.",
+      "tags": ["CRUD", "импорт", "дифф"],
+      "level": "advanced"
+    },
+    {
+      "file": "terraform-provider-testing.md",
+      "title": "Тестирование провайдера",
+      "description": "Acceptance tests, мокирование API, unit-тесты CRUD.",
+      "tags": ["тестирование", "acceptance", "unit"],
+      "level": "intermediate"
+    },
+    {
+      "file": "terraform-best-practices.md",
+      "title": "Лучшие практики Terraform Plugin SDK",
+      "description": "Обработка ошибок, контекст, ForceNew, документация, миграция на Plugin Framework.",
+      "tags": ["best practices", "безопасность", "документация"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/basic-provider.md",
+      "title": "Пример: Минимальный провайдер",
+      "description": "Код провайдера с одним ресурсом.",
+      "tags": ["пример", "базовый"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/resource-example.md",
+      "title": "Пример: Ресурс с импортом и обновлением",
+      "description": "Расширенный ресурс с кастомным диффом.",
+      "tags": ["пример", "ресурс"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/data-source-example.md",
+      "title": "Пример: Data Source для получения сервера по имени",
+      "description": "Реализация data source.",
+      "tags": ["пример", "data source"],
+      "level": "intermediate"
+    }
+  ]
+}

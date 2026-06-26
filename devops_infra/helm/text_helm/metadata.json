@@ -1,0 +1,62 @@
+{
+  "library": "helm.sh/helm/v3",
+  "description": "Helm SDK for Go. Install, upgrade, rollback, and manage Helm releases, charts, and repositories programmatically.",
+  "sections": [
+    {
+      "file": "helm-quick-start.md",
+      "title": "Быстрый старт: установка и первый релиз",
+      "description": "Подключение к кластеру, инициализация action.Configuration, установка чарта.",
+      "tags": ["установка", "начало работы", "action"],
+      "level": "beginner"
+    },
+    {
+      "file": "helm-install-upgrade.md",
+      "title": "Установка, обновление, удаление и откат",
+      "description": "Install, Upgrade, Rollback, Uninstall, History, Status.",
+      "tags": ["install", "upgrade", "rollback", "history"],
+      "level": "intermediate"
+    },
+    {
+      "file": "helm-chart-operations.md",
+      "title": "Работа с чартами: загрузка, упаковка, шаблоны",
+      "description": "Загрузка чартов из разных источников, рендеринг, упаковка, линтинг.",
+      "tags": ["чарты", "шаблоны", "lint"],
+      "level": "intermediate"
+    },
+    {
+      "file": "helm-repositories.md",
+      "title": "Управление репозиториями",
+      "description": "Добавление, синхронизация индекса, поиск и загрузка чартов из репозиториев.",
+      "tags": ["репозитории", "index", "download"],
+      "level": "intermediate"
+    },
+    {
+      "file": "helm-best-practices.md",
+      "title": "Лучшие практики Helm SDK",
+      "description": "Потокобезопасность, логирование, тестирование, безопасность, управление версиями.",
+      "tags": ["best practices", "безопасность", "тестирование"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/install-release.md",
+      "title": "Пример: Установка чарта из файла",
+      "description": "Минимальный код для установки локального чарта.",
+      "tags": ["пример", "install"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/list-releases.md",
+      "title": "Пример: Список релизов",
+      "description": "Вывод всех Helm‑релизов в namespace.",
+      "tags": ["пример", "list"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/gin-helm-proxy.md",
+      "title": "Пример: Веб-прокси для управления Helm",
+      "description": "Создание REST API с Gin для управления релизами через Helm SDK.",
+      "tags": ["пример", "gin", "интеграция"],
+      "level": "advanced"
+    }
+  ]
+}
