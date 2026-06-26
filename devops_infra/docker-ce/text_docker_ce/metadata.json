@@ -1,0 +1,69 @@
+{
+  "library": "github.com/docker/docker/client",
+  "description": "Official Docker Engine SDK for Go. Manage containers, images, networks, volumes, and build/push directly from your Go application.",
+  "sections": [
+    {
+      "file": "docker-quick-start.md",
+      "title": "Быстрый старт: установка, подключение и первый контейнер",
+      "description": "Установка, создание клиента, список контейнеров.",
+      "tags": ["установка", "подключение", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "docker-containers.md",
+      "title": "Работа с контейнерами",
+      "description": "Создание, запуск, остановка, удаление, логи, exec, wait.",
+      "tags": ["контейнеры", "create", "start", "exec", "logs"],
+      "level": "intermediate"
+    },
+    {
+      "file": "docker-images.md",
+      "title": "Работа с образами",
+      "description": "Список, pull, build, push, tag, remove.",
+      "tags": ["образы", "pull", "build", "push"],
+      "level": "intermediate"
+    },
+    {
+      "file": "docker-networks-and-volumes.md",
+      "title": "Сети и тома",
+      "description": "Создание сетей, подключение контейнеров, управление томами.",
+      "tags": ["сети", "тома", "volumes"],
+      "level": "intermediate"
+    },
+    {
+      "file": "docker-build-and-compose.md",
+      "title": "Сборка, push и Compose",
+      "description": "CI/CD pipeline, работа с compose-go.",
+      "tags": ["build", "push", "compose", "CI/CD"],
+      "level": "advanced"
+    },
+    {
+      "file": "docker-best-practices.md",
+      "title": "Лучшие практики Docker SDK for Go",
+      "description": "Таймауты, безопасность, тестирование, версионирование API.",
+      "tags": ["best practices", "безопасность", "тестирование"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/list-containers.md",
+      "title": "Пример: Список контейнеров",
+      "description": "Минимальный пример вывода списка контейнеров.",
+      "tags": ["пример", "базовый"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/run-container.md",
+      "title": "Пример: Запуск контейнера nginx",
+      "description": "Полный цикл: pull, create, start, wait, remove.",
+      "tags": ["пример", "контейнер"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/gin-docker-health.md",
+      "title": "Пример: Проверка Docker из веб-приложения",
+      "description": "Использование Docker SDK в Gin для мониторинга.",
+      "tags": ["пример", "gin", "интеграция"],
+      "level": "intermediate"
+    }
+  ]
+}
