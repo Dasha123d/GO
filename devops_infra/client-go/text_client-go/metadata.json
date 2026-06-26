@@ -1,0 +1,69 @@
+{
+  "library": "k8s.io/client-go",
+  "description": "Official Go client for Kubernetes. Full API coverage, informers, leader election, authentication, and tools for building controllers and operators.",
+  "sections": [
+    {
+      "file": "client-go-quick-start.md",
+      "title": "Быстрый старт: установка, аутентификация и первый запрос",
+      "description": "Установка, загрузка kubeconfig, создание clientset, получение списка Pod'ов.",
+      "tags": ["установка", "аутентификация", "начало работы"],
+      "level": "beginner"
+    },
+    {
+      "file": "client-go-configuration.md",
+      "title": "Конфигурация подключения",
+      "description": "In‑cluster, kubeconfig, QPS, таймауты, Bearer Token.",
+      "tags": ["конфигурация", "таймауты", "безопасность"],
+      "level": "intermediate"
+    },
+    {
+      "file": "client-go-resources.md",
+      "title": "Работа с ресурсами (CRUD)",
+      "description": "Get, List, Create, Update, Delete, Watch, метки, поля.",
+      "tags": ["CRUD", "resources", "watch"],
+      "level": "intermediate"
+    },
+    {
+      "file": "client-go-informers.md",
+      "title": "Informers: эффективное кеширование и реакция на изменения",
+      "description": "SharedInformerFactory, регистрация обработчиков, lister, индексы.",
+      "tags": ["informer", "кеш", "события"],
+      "level": "advanced"
+    },
+    {
+      "file": "client-go-leader-election.md",
+      "title": "Leader Election: выбор ведущего экземпляра",
+      "description": "LeaseLock, RunOrDie, обработка потери лидерства.",
+      "tags": ["leader election", "высокая доступность"],
+      "level": "advanced"
+    },
+    {
+      "file": "client-go-best-practices.md",
+      "title": "Лучшие практики client-go",
+      "description": "Informers, контексты, RetryOnConflict, fake‑клиент, версионирование.",
+      "tags": ["best practices", "тестирование", "производительность"],
+      "level": "advanced"
+    },
+    {
+      "file": "examples/list-pods.md",
+      "title": "Пример: Вывод списка Pod'ов",
+      "description": "Простой клиент, выводящий имена Pod'ов.",
+      "tags": ["пример", "базовый"],
+      "level": "beginner"
+    },
+    {
+      "file": "examples/informer-example.md",
+      "title": "Пример: Контроллер с Informer",
+      "description": "Реакция на добавление/удаление Pod'ов с кешированием.",
+      "tags": ["пример", "informer"],
+      "level": "intermediate"
+    },
+    {
+      "file": "examples/leader-election-example.md",
+      "title": "Пример: Leader Election с контроллером",
+      "description": "Запуск единственного активного экземпляра контроллера.",
+      "tags": ["пример", "лидерство"],
+      "level": "advanced"
+    }
+  ]
+}
